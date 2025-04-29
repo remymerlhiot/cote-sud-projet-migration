@@ -70,3 +70,17 @@
 .elementor-content div:empty {
   display: none;
 }
+
+/* WordPress content placeholders */
+.wordpress-placeholder {
+  background-color: #e2e2e2;
+  border-radius: 0.5rem;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
