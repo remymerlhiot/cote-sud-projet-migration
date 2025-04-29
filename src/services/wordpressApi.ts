@@ -1,7 +1,9 @@
+
 import { toast } from "@/components/ui/sonner";
 
 // Base URL for the WordPress API - replace with your actual WordPress site URL
 const API_BASE_URL = "https://cote-sud.immo/wp-json/wp/v2";
+const CUSTOM_API_BASE_URL = "https://cote-sud.immo/wp-json/axo/v1";
 
 // Types for WordPress API responses
 export interface WordPressProperty {
@@ -62,6 +64,15 @@ export interface WordPressPage {
       alt_text: string;
     }>;
   };
+}
+
+// New interface for the custom endpoint response
+export interface CustomWordPressPage {
+  title: string;
+  content: string;
+  featured_image: string | null;
+  elementor_data: string | null;
+  media_list: string[];
 }
 
 // Fetch properties from WordPress API (now using the 'annonce' endpoint)
@@ -146,6 +157,24 @@ export const fetchPageBySlug = async (slug: string): Promise<WordPressPage | nul
   } catch (error) {
     console.error(`Failed to fetch page with slug "${slug}":`, error);
     toast.error("Impossible de récupérer la page");
+    return null;
+  }
+};
+
+// Fetch page from custom WordPress API endpoint
+export const fetchCustomPageBySlug = async (slug: string): Promise<CustomWordPressPage | null> => {
+  try {
+    const response = await fetch(`${CUSTOM_API_BASE_URL}/page?slug=${slug}`);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching custom page: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`Failed to fetch custom page with slug "${slug}":`, error);
+    toast.error("Impossible de récupérer la page personnalisée");
     return null;
   }
 };

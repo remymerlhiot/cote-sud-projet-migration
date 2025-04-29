@@ -1,23 +1,18 @@
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import PropertyCard from "@/components/PropertyCard";
 import ServiceSection from "@/components/ServiceSection";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useProperties, transformPropertyData } from "@/hooks/useWordPress";
-import { useAccueilPage } from "@/hooks/useAccueilPage";
 import { toast } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import WordPressPage from "@/components/WordPressPage";
+import CustomWordPressPage from "@/components/CustomWordPressPage";
 
 const Index = () => {
   // Fetch properties from WordPress API
   const { data: wpProperties, isLoading, error } = useProperties();
-  
-  // Fetch home page content
-  const { data: homePage, isLoading: isLoadingHome, error: homeError } = useAccueilPage();
   
   // Fallback data if the API call fails or is loading
   const [fallbackProperties] = useState([
@@ -61,10 +56,6 @@ const Index = () => {
     toast.error("Impossible de récupérer les biens immobiliers. Affichage des données de secours.");
   }
 
-  if (homeError) {
-    toast.error("Impossible de récupérer le contenu de la page d'accueil.");
-  }
-
   // Use WordPress data if available, otherwise use fallback
   const displayProperties = wpProperties && wpProperties.length > 0 
     ? wpProperties.map(prop => transformPropertyData(prop))
@@ -79,18 +70,12 @@ const Index = () => {
       <main className="flex-grow">
         {/* Prestige Title - WordPress Content */}
         <section className="text-center py-12">
-          {isLoadingHome ? (
-            <div className="mx-auto w-3/4 md:w-1/2">
-              <Skeleton className="h-24 rounded-lg" />
-            </div>
-          ) : (
-            <WordPressPage 
-              slug="accueil" 
-              showTitle={false}
-              extractSection=".prestige-title"
-              className="mx-auto w-3/4 md:w-1/2"
-            />
-          )}
+          <CustomWordPressPage 
+            slug="accueil" 
+            showTitle={false}
+            extractSection=".prestige-title"
+            className="mx-auto w-3/4 md:w-1/2"
+          />
         </section>
 
         {/* Properties Carousel */}
@@ -121,28 +106,16 @@ const Index = () => {
 
         {/* Difference Section - WordPress Content */}
         <section className="container mx-auto mb-20">
-          {isLoadingHome ? (
-            <div className="space-y-4">
-              <Skeleton className="h-12 w-1/3 mx-auto" />
-              <div className="flex flex-col md:flex-row gap-8">
-                <Skeleton className="w-full md:w-1/3 aspect-square rounded-full" />
-                <Skeleton className="w-full md:w-2/3 h-64" />
-              </div>
-            </div>
-          ) : (
-            <>
-              <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">
-                LA DIFFÉRENCE
-              </h2>
-              
-              <WordPressPage 
-                slug="accueil" 
-                showTitle={false}
-                extractSection=".difference-section"
-                className="flex flex-col md:flex-row items-center gap-8"
-              />
-            </>
-          )}
+          <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">
+            LA DIFFÉRENCE
+          </h2>
+          
+          <CustomWordPressPage 
+            slug="accueil" 
+            showTitle={false}
+            extractSection=".difference-section"
+            className="flex flex-col md:flex-row items-center gap-8"
+          />
         </section>
       </main>
 

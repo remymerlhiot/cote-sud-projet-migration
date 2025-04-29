@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import NosBiens from "./pages/NosBiens";
 import PageTest from "./pages/PageTest";
+import DynamicPage from "./pages/DynamicPage";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,12 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/nos-biens" element={<NosBiens />} />
           <Route path="/page-test" element={<PageTest />} />
+          
+          {/* Dynamic page routes */}
+          <Route path="/page/:slug" element={<DynamicPage />} />
+          <Route path="/contact" element={<DynamicPage slug="contact" />} />
+          <Route path="/services" element={<DynamicPage slug="services" />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
