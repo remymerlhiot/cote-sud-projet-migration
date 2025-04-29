@@ -36,40 +36,41 @@ const PropertyCard = ({ property }: PropertyProps) => {
     : property as DisplayProperty;
 
   return (
-    <Card className="overflow-hidden border-none shadow-lg h-full">
-      <CardContent className="p-0">
-        <div className="relative">
+    <Card className="overflow-hidden border-none shadow-md h-full bg-white">
+      <CardContent className="p-0 relative">
+        <div>
           <img 
             src={displayData.image} 
             alt={typeof displayData.title === 'string' ? displayData.title : "Propriété"} 
-            className="w-full h-64 object-cover"
+            className="w-full h-56 object-cover"
           />
-          <div className="absolute bottom-4 right-4 bg-white px-2 py-1 text-xs font-semibold">
+          <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
             {displayData.ref}
           </div>
         </div>
-        <div className="p-4">
-          <h3 className="text-lg font-medium text-center">
+        <div className="p-4 text-center">
+          <h3 className="text-lg font-medium mt-2 text-[#CD9B59]">
             {typeof displayData.title === 'string' ? displayData.title : displayData.title.rendered}
           </h3>
-          <p className="text-center text-sm text-gray-600 mb-2">{displayData.location}</p>
-          <p className="text-center font-semibold text-[#CD9B59]">PRIX : {displayData.price}</p>
+          <p className="text-xs text-gray-600 mb-4 uppercase">{displayData.location}</p>
+          <p className="font-semibold text-lg mb-4">PRIX : {displayData.price}</p>
+
+          <div className="grid grid-cols-3 gap-2 border-t border-gray-200 pt-4">
+            <div className="flex flex-col items-center">
+              <p className="text-[10px] text-gray-600">Surface</p>
+              <p className="font-medium text-sm">{displayData.area}</p>
+            </div>
+            <div className="flex flex-col items-center border-l border-r border-gray-200">
+              <p className="text-[10px] text-gray-600">Pièces</p>
+              <p className="font-medium text-sm">{displayData.rooms}</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <p className="text-[10px] text-gray-600">Chambres</p>
+              <p className="font-medium text-sm">{displayData.bedrooms}</p>
+            </div>
+          </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between items-center px-4 py-2 bg-gray-100">
-        <div className="flex items-center gap-1">
-          <span className="text-xs">🏠</span>
-          <span className="text-xs">{displayData.area}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs">🚪</span>
-          <span className="text-xs">{displayData.rooms}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs">🛏️</span>
-          <span className="text-xs">{displayData.bedrooms}</span>
-        </div>
-      </CardFooter>
     </Card>
   );
 };
