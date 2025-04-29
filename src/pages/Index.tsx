@@ -1,12 +1,10 @@
-
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import PropertyCard from "@/components/PropertyCard";
 import ServiceSection from "@/components/ServiceSection";
 import { Accordion } from "@/components/ui/accordion";
+import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -67,59 +65,7 @@ const Index = () => {
   return (
     <div className="flex flex-col min-h-screen bg-[#f2e9da]">
       {/* Header */}
-      <header className="relative">
-        <div className="relative h-[200px] md:h-[300px] bg-cover bg-center" style={{ backgroundImage: `url(/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png)` }}>
-          {/* Logo */}
-          <div className="absolute inset-0 flex justify-center items-center">
-            <h1 className="text-5xl font-light text-white">AXO</h1>
-          </div>
-          
-          {/* Navigation */}
-          <div className="absolute bottom-0 left-0 right-0 bg-[#f2e9da]/70 py-2">
-            <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
-              <NavigationMenu className="container flex justify-center md:justify-start">
-                <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
-                  <NavigationMenuItem className="bg-[#CD9B59] px-4 py-2">
-                    <NavigationMenuLink href="/" className="text-white uppercase text-sm font-medium">
-                      Accueil
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink href="/notre-histoire" className="text-[#CD9B59] uppercase text-sm font-medium">
-                      Notre Histoire
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink href="/acheter" className="text-[#CD9B59] uppercase text-sm font-medium">
-                      Acheter
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink href="/estimation" className="text-[#CD9B59] uppercase text-sm font-medium">
-                      Estimation
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink href="/partenaires" className="text-[#CD9B59] uppercase text-sm font-medium">
-                      Partenaires
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink href="/nos-avis" className="text-[#CD9B59] uppercase text-sm font-medium">
-                      Nos Avis
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-              
-              <div className="flex flex-col md:flex-row items-center mt-2 md:mt-0 gap-2">
-                <span className="text-[#CD9B59] uppercase text-sm font-medium">Nous contacter</span>
-                <span className="text-[#CD9B59] text-sm">06 99 09 04 98</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-grow">
