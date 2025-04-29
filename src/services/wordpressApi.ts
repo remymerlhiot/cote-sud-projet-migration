@@ -2,7 +2,7 @@
 import { toast } from "@/components/ui/sonner";
 
 // Base URL for the WordPress API - replace with your actual WordPress site URL
-const API_BASE_URL = "https://example-domain.com/wp-json/wp/v2";
+const API_BASE_URL = "https://cote-sud.immo/wp-json/wp/v2";
 
 // Types for WordPress API responses
 export interface WordPressProperty {
