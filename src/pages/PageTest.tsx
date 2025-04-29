@@ -20,7 +20,7 @@ const PageTest = () => {
         
         {/* WordPress page component with the slug of the page to fetch */}
         <div className="mb-12">
-          <WordPressPage slug="accueil" />
+          <WordPressPage slug="new-home" />
         </div>
         
         {/* Direct display of page data for testing/comparison */}
