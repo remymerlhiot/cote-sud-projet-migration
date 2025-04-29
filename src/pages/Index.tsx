@@ -1,12 +1,205 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import PropertyCard from "@/components/PropertyCard";
+import ServiceSection from "@/components/ServiceSection";
+import { Accordion } from "@/components/ui/accordion";
+import Footer from "@/components/Footer";
 
 const Index = () => {
+  const [properties] = useState([
+    {
+      id: 1,
+      title: "MAISON DE VILLAGE",
+      location: "BOULBON",
+      ref: "REF 42-12704",
+      price: "199 000 €",
+      area: "274m²",
+      rooms: "10",
+      bedrooms: "5",
+      image: "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"
+    },
+    {
+      id: 2,
+      title: "MAISON INDIVIDUELLE",
+      location: "TRIGNAN",
+      ref: "REF 42-12736",
+      price: "269 000 €",
+      area: "135m²",
+      rooms: "5",
+      bedrooms: "3",
+      image: "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"
+    },
+    {
+      id: 3,
+      title: "MAISON",
+      location: "EYMEUX",
+      ref: "REF 42-12785",
+      price: "495 000 €",
+      area: "180m²",
+      rooms: "6",
+      bedrooms: "4",
+      image: "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"
+    }
+  ]);
+
+  const services = [
+    {
+      id: "estimation",
+      title: "L'ESTIMATION",
+      content: "Nous prenons un soin particulier à étudier et déterminer la valeur précise de votre bien grâce à notre expertise immobilière sur différents critères méthodologiquement explorés, afin de définir le juste prix du bien."
+    },
+    {
+      id: "diffusion",
+      title: "UNE DIFFUSION CIBLE",
+      content: ""
+    },
+    {
+      id: "offre",
+      title: "L'OFFRE D'ACHAT",
+      content: ""
+    }
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="flex flex-col min-h-screen bg-[#f2e9da]">
+      {/* Header */}
+      <header className="relative">
+        <div className="relative h-[200px] md:h-[300px] bg-cover bg-center" style={{ backgroundImage: `url(/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png)` }}>
+          {/* Logo */}
+          <div className="absolute inset-0 flex justify-center items-center">
+            <h1 className="text-5xl font-light text-white">AXO</h1>
+          </div>
+          
+          {/* Navigation */}
+          <div className="absolute bottom-0 left-0 right-0 bg-[#f2e9da]/70 py-2">
+            <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
+              <NavigationMenu className="container flex justify-center md:justify-start">
+                <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
+                  <NavigationMenuItem className="bg-[#CD9B59] px-4 py-2">
+                    <NavigationMenuLink href="/" className="text-white uppercase text-sm font-medium">
+                      Accueil
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink href="/notre-histoire" className="text-[#CD9B59] uppercase text-sm font-medium">
+                      Notre Histoire
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink href="/acheter" className="text-[#CD9B59] uppercase text-sm font-medium">
+                      Acheter
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink href="/estimation" className="text-[#CD9B59] uppercase text-sm font-medium">
+                      Estimation
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink href="/partenaires" className="text-[#CD9B59] uppercase text-sm font-medium">
+                      Partenaires
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink href="/nos-avis" className="text-[#CD9B59] uppercase text-sm font-medium">
+                      Nos Avis
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+              
+              <div className="flex flex-col md:flex-row items-center mt-2 md:mt-0 gap-2">
+                <span className="text-[#CD9B59] uppercase text-sm font-medium">Nous contacter</span>
+                <span className="text-[#CD9B59] text-sm">06 99 09 04 98</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-grow">
+        {/* Prestige Title */}
+        <section className="text-center py-12">
+          <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] mb-8">L'IMMOBILIER DE PRESTIGE</h2>
+          <h3 className="text-xl md:text-2xl font-light text-[#CD9B59]">NOS BIENS À LA VENTE</h3>
+        </section>
+
+        {/* Properties Carousel */}
+        <section className="container mx-auto mb-20">
+          <Carousel className="mx-auto max-w-6xl">
+            <CarouselContent>
+              {properties.map((property) => (
+                <CarouselItem key={property.id} className="md:basis-1/3">
+                  <PropertyCard property={property} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center mt-4">
+              <CarouselPrevious className="relative static transform-none h-8 w-8 mr-2" />
+              <CarouselNext className="relative static transform-none h-8 w-8" />
+            </div>
+          </Carousel>
+        </section>
+
+        {/* Services Section */}
+        <section className="mb-20">
+          <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">SERVICES DE L'AGENCE</h2>
+          
+          <div className="relative">
+            <div className="bg-cover bg-center h-[400px]" style={{ backgroundImage: "url('/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png')" }}>
+              <div className="container mx-auto px-4 h-full flex justify-end items-center">
+                <div className="w-full md:w-1/2 lg:w-1/3">
+                  <Accordion type="single" collapsible className="w-full">
+                    {services.map((service) => (
+                      <ServiceSection key={service.id} service={service} />
+                    ))}
+                  </Accordion>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Difference Section */}
+        <section className="container mx-auto mb-20">
+          <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">LA DIFFÉRENCE</h2>
+          
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="w-full md:w-1/3 relative">
+              <div className="rounded-full overflow-hidden">
+                <img src="/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png" alt="Différence AXO" className="w-full" />
+              </div>
+            </div>
+            
+            <div className="w-full md:w-2/3 text-[#CD9B59]">
+              <h3 className="text-xl font-light mb-4 text-center md:text-left">L'ACCOMPAGNEMENT</h3>
+              <p className="mb-6 text-center md:text-left">
+                Aujourd'hui, notre priorité est d'offrir un accompagnement sur-mesure et une expertise complète, tant sur le plan immobilier que sur le plan patrimonial, fiscal ou juridique.
+              </p>
+              <p className="mb-6 text-center md:text-left">
+                Nous nous engageons à fournir un service personnalisé, en collaboration avec des partenaires de confiance, pour chaque étape de votre projet immobilier, qu'il s'agisse d'achat ou de vente.
+              </p>
+              <p className="mb-8 text-center md:text-left">
+                Notaires, courtiers, architectes, maîtres d'œuvre, artisans ou encore spécialistes, concepteurs d'intérieur, transitaires, conseillers, diagnostiqueurs. Nos experts seront activés pour vous durant toute la chaîne de notre engagement à s'adapter à chacun de vos besoins.
+              </p>
+              
+              <div className="text-center md:text-left">
+                <Button className="bg-[#CD9B59] text-white hover:bg-[#b78a4d]">
+                  EN SAVOIR PLUS
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
