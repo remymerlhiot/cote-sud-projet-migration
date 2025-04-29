@@ -145,8 +145,8 @@ const Index = () => {
             <div className="md:w-1/3">
               <div className="overflow-hidden rounded-full">
                 <img 
-                  src="/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png"
-                  alt="Maison de prestige" 
+                  src={homePage?.featured_image || "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png"}
+                  alt="AXO Côté Sud - La différence" 
                   className="w-full h-auto"
                 />
               </div>
