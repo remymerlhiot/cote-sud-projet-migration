@@ -1,6 +1,13 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchProperties, fetchPages, fetchMedia, WordPressProperty } from "@/services/wordpressApi";
+import { 
+  fetchProperties, 
+  fetchPages, 
+  fetchMedia, 
+  fetchPageBySlug,
+  WordPressProperty, 
+  WordPressPage 
+} from "@/services/wordpressApi";
 
 export const useProperties = () => {
   return useQuery({
@@ -15,6 +22,15 @@ export const usePages = () => {
     queryKey: ["pages"],
     queryFn: fetchPages,
     staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+export const usePageBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: ["page", slug],
+    queryFn: () => fetchPageBySlug(slug),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: !!slug,
   });
 };
 
