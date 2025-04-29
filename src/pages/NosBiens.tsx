@@ -1,7 +1,19 @@
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useProperties } from "@/hooks/useWordPress";
+import PropertyCard from "@/components/PropertyCard";
+import { toast } from "@/components/ui/sonner";
 
 const NosBiens = () => {
+  // Fetch properties from WordPress API
+  const { data: properties, isLoading, error } = useProperties();
+
+  // Show toast error if API fails
+  if (error) {
+    toast.error("Impossible de récupérer les biens immobiliers");
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f2e9da]">
       {/* Header */}
@@ -15,12 +27,23 @@ const NosBiens = () => {
           <p>Découvrez notre sélection de biens immobiliers de prestige.</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Content will be added later */}
-          <div className="h-64 bg-gray-100 flex items-center justify-center">
-            <p className="text-gray-500">Contenu à venir</p>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <p className="text-[#CD9B59]">Chargement des biens immobiliers...</p>
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {properties && properties.length > 0 ? (
+              properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-[#CD9B59]">Aucun bien immobilier disponible pour le moment.</p>
+              </div>
+            )}
+          </div>
+        )}
       </main>
 
       {/* Footer */}
