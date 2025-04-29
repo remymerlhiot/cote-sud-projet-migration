@@ -6,15 +6,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface WordPressPageProps {
   slug: string;
   className?: string;
+  showTitle?: boolean;
 }
 
-const WordPressPage: React.FC<WordPressPageProps> = ({ slug, className = "" }) => {
+const WordPressPage: React.FC<WordPressPageProps> = ({ 
+  slug, 
+  className = "",
+  showTitle = true 
+}) => {
   const { data: page, isLoading, isError } = usePageBySlug(slug);
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-12 w-3/4" />
+        {showTitle && <Skeleton className="h-12 w-3/4" />}
         <Skeleton className="h-64 w-full" />
         <Skeleton className="h-32 w-full" />
       </div>
@@ -31,10 +36,12 @@ const WordPressPage: React.FC<WordPressPageProps> = ({ slug, className = "" }) =
 
   return (
     <div className={`wordpress-page ${className}`}>
-      <h1 
-        className="text-3xl font-light text-[#CD9B59] mb-6"
-        dangerouslySetInnerHTML={{ __html: page.title.rendered }}
-      />
+      {showTitle && (
+        <h1 
+          className="text-3xl font-light text-[#CD9B59] mb-6"
+          dangerouslySetInnerHTML={{ __html: page.title.rendered }}
+        />
+      )}
       
       {page.featured_media_url && (
         <div className="featured-image mb-8">
