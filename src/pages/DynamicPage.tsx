@@ -6,9 +6,14 @@ import Footer from "@/components/Footer";
 import CustomWordPressPage from "@/components/CustomWordPressPage";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const DynamicPage = () => {
-  // Get the slug from the URL parameters
-  const { slug } = useParams<{ slug: string }>();
+interface DynamicPageProps {
+  slug?: string;
+}
+
+const DynamicPage: React.FC<DynamicPageProps> = ({ slug: propSlug }) => {
+  // Get the slug from the URL parameters or from props
+  const { slug: paramSlug } = useParams<{ slug: string }>();
+  const slug = propSlug || paramSlug;
   
   return (
     <div className="flex flex-col min-h-screen bg-[#f2e9da]">
