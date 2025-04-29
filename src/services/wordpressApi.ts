@@ -31,6 +31,11 @@ export interface WordPressProperty {
   };
 }
 
+export interface WordPressAnnonce extends WordPressProperty {
+  // Add any specific fields for the 'annonce' post type
+  // The structure is largely the same as WordPressProperty
+}
+
 export interface WordPressMedia {
   id: number;
   source_url: string;
@@ -59,11 +64,11 @@ export interface WordPressPage {
   };
 }
 
-// Fetch properties from WordPress API
+// Fetch properties from WordPress API (now using the 'annonce' endpoint)
 export const fetchProperties = async (): Promise<WordPressProperty[]> => {
   try {
-    // Using _embed to include featured media in the response
-    const response = await fetch(`${API_BASE_URL}/posts?_embed&categories=3&per_page=10`);
+    // Using _embed to include featured media in the response and the annonce endpoint
+    const response = await fetch(`${API_BASE_URL}/annonce?_embed&per_page=10`);
     
     if (!response.ok) {
       throw new Error(`Error fetching properties: ${response.statusText}`);
@@ -82,7 +87,7 @@ export const fetchProperties = async (): Promise<WordPressProperty[]> => {
 // Fetch a single property by ID
 export const fetchPropertyById = async (id: number): Promise<WordPressProperty | null> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/${id}?_embed`);
+    const response = await fetch(`${API_BASE_URL}/annonce/${id}?_embed`);
     
     if (!response.ok) {
       throw new Error(`Error fetching property: ${response.statusText}`);

@@ -6,6 +6,7 @@ import {
   fetchMedia, 
   fetchPageBySlug,
   WordPressProperty,
+  WordPressAnnonce,
   transformPropertyData
 } from "@/services/wordpressApi";
 

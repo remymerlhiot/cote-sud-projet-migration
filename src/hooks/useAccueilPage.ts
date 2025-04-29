@@ -4,8 +4,8 @@ import { fetchPageBySlug } from "@/services/wordpressApi";
 
 export const useAccueilPage = () => {
   return useQuery({
-    queryKey: ["page", "new-home"],
-    queryFn: () => fetchPageBySlug("new-home"),
+    queryKey: ["page", "accueil"],
+    queryFn: () => fetchPageBySlug("accueil"),
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };

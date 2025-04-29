@@ -6,13 +6,18 @@ import PropertyCard from "@/components/PropertyCard";
 import ServiceSection from "@/components/ServiceSection";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useProperties } from "@/hooks/useWordPress";
+import { useProperties, transformPropertyData } from "@/hooks/useWordPress";
+import { useAccueilPage } from "@/hooks/useAccueilPage";
 import { toast } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import WordPressPage from "@/components/WordPressPage";
 
 const Index = () => {
   // Fetch properties from WordPress API
   const { data: wpProperties, isLoading, error } = useProperties();
+  
+  // Fetch home page content
+  const { data: homePage, isLoading: isLoadingHome, error: homeError } = useAccueilPage();
   
   // Fallback data if the API call fails or is loading
   const [fallbackProperties] = useState([
@@ -56,8 +61,14 @@ const Index = () => {
     toast.error("Impossible de récupérer les biens immobiliers. Affichage des données de secours.");
   }
 
+  if (homeError) {
+    toast.error("Impossible de récupérer le contenu de la page d'accueil.");
+  }
+
   // Use WordPress data if available, otherwise use fallback
-  const displayProperties = wpProperties && wpProperties.length > 0 ? wpProperties : fallbackProperties;
+  const displayProperties = wpProperties && wpProperties.length > 0 
+    ? wpProperties.map(prop => transformPropertyData(prop))
+    : fallbackProperties;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f2e9da]">
@@ -66,11 +77,20 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="flex-grow">
-        {/* Prestige Title - WordPress Placeholder */}
+        {/* Prestige Title - WordPress Content */}
         <section className="text-center py-12">
-          <div className="bg-gray-300 mx-auto w-3/4 md:w-1/2 h-24 rounded-lg flex items-center justify-center">
-            <p className="text-gray-600 font-medium">Zone de titre WordPress</p>
-          </div>
+          {isLoadingHome ? (
+            <div className="mx-auto w-3/4 md:w-1/2">
+              <Skeleton className="h-24 rounded-lg" />
+            </div>
+          ) : (
+            <WordPressPage 
+              slug="accueil" 
+              showTitle={false}
+              extractSection=".prestige-title"
+              className="mx-auto w-3/4 md:w-1/2"
+            />
+          )}
         </section>
 
         {/* Properties Carousel */}
@@ -99,26 +119,30 @@ const Index = () => {
         {/* Services Section with Accordion */}
         <ServiceSection />
 
-        {/* Difference Section - WordPress Placeholder */}
+        {/* Difference Section - WordPress Content */}
         <section className="container mx-auto mb-20">
-          <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">LA DIFFÉRENCE</h2>
-          
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="w-full md:w-1/3 relative">
-              <div className="rounded-full overflow-hidden bg-gray-300 aspect-square flex items-center justify-center">
-                <p className="text-gray-600 font-medium">Image WordPress</p>
+          {isLoadingHome ? (
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-1/3 mx-auto" />
+              <div className="flex flex-col md:flex-row gap-8">
+                <Skeleton className="w-full md:w-1/3 aspect-square rounded-full" />
+                <Skeleton className="w-full md:w-2/3 h-64" />
               </div>
             </div>
-            
-            <div className="w-full md:w-2/3 bg-gray-300 rounded-lg p-8 flex items-center justify-center">
-              <div className="text-center">
-                <p className="text-gray-600 font-medium mb-4">Zone de contenu WordPress</p>
-                <Button className="bg-[#CD9B59] text-white hover:bg-[#b78a4d]">
-                  EN SAVOIR PLUS
-                </Button>
-              </div>
-            </div>
-          </div>
+          ) : (
+            <>
+              <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">
+                LA DIFFÉRENCE
+              </h2>
+              
+              <WordPressPage 
+                slug="accueil" 
+                showTitle={false}
+                extractSection=".difference-section"
+                className="flex flex-col md:flex-row items-center gap-8"
+              />
+            </>
+          )}
         </section>
       </main>
 
