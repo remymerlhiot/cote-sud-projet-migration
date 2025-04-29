@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import WordPressPage from "@/components/WordPressPage";
 import { useAccueilPage } from "@/hooks/useAccueilPage";
 import { Skeleton } from "@/components/ui/skeleton";
+import "@/styles/elementor.css"; // Import the Elementor CSS fixes
 
 const PageTest = () => {
   const { data: pageData, isLoading, isError } = useAccueilPage();
@@ -20,7 +21,16 @@ const PageTest = () => {
         
         {/* WordPress page component with the slug of the page to fetch */}
         <div className="mb-12">
-          <WordPressPage slug="new-home" />
+          <WordPressPage 
+            slug="new-home" 
+            cleaningOptions={{
+              removeElementorClasses: true,
+              simplifyStructure: true, 
+              makeImagesResponsive: true,
+              fixLinks: true,
+              baseDomain: "https://cote-sud.immo"
+            }}
+          />
         </div>
         
         {/* Direct display of page data for testing/comparison */}

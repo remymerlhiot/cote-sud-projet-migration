@@ -1,4 +1,3 @@
-
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -11,6 +10,8 @@ import { useProperties } from "@/hooks/useWordPress";
 import { useAccueilPage } from "@/hooks/useAccueilPage";
 import { toast } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import WordPressPage from "@/components/WordPressPage";
+import "@/styles/elementor.css"; // Import the Elementor CSS fixes
 
 const Index = () => {
   // Fetch homepage content from WordPress API
@@ -165,7 +166,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Difference Section - Dynamic Content from WordPress */}
+        {/* Difference Section - Dynamic Content from WordPress with Elementor Cleanup */}
         <section className="container mx-auto mb-20">
           <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">LA DIFFÉRENCE</h2>
           
@@ -191,10 +192,20 @@ const Index = () => {
               ) : (
                 <>
                   {pageData ? (
-                    <div 
-                      className="prose max-w-none prose-headings:text-[#CD9B59] prose-headings:font-light text-[#CD9B59]"
-                      dangerouslySetInnerHTML={{ __html: pageData.content.rendered }}
-                    />
+                    <div className="elementor-content">
+                      <WordPressPage 
+                        slug="new-home"
+                        showTitle={false} 
+                        className="prose max-w-none prose-headings:text-[#CD9B59] prose-headings:font-light text-[#CD9B59]"
+                        cleaningOptions={{
+                          removeElementorClasses: true,
+                          simplifyStructure: true,
+                          makeImagesResponsive: true,
+                          fixLinks: true,
+                        }}
+                        extractSection=".elementor-widget-text-editor"
+                      />
+                    </div>
                   ) : (
                     <>
                       <h3 className="text-xl font-light mb-4 text-center md:text-left">L'ACCOMPAGNEMENT</h3>

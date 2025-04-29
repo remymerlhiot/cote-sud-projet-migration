@@ -1,20 +1,45 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { usePageBySlug } from "@/hooks/useWordPress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cleanElementorHtml, CleaningOptions } from "@/utils/elementorCleaner";
 
 interface WordPressPageProps {
   slug: string;
   className?: string;
   showTitle?: boolean;
+  cleaningOptions?: CleaningOptions;
+  extractSection?: string;
 }
 
 const WordPressPage: React.FC<WordPressPageProps> = ({ 
   slug, 
   className = "",
-  showTitle = true 
+  showTitle = true,
+  cleaningOptions,
+  extractSection
 }) => {
   const { data: page, isLoading, isError } = usePageBySlug(slug);
+
+  // Process and clean the HTML content
+  const processedContent = useMemo(() => {
+    if (!page?.content?.rendered) return "";
+    
+    let content = page.content.rendered;
+    
+    // Clean the Elementor HTML
+    content = cleanElementorHtml(content, cleaningOptions);
+    
+    // Extract specific section if requested
+    if (extractSection) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, "text/html");
+      const section = doc.querySelector(extractSection);
+      content = section ? section.innerHTML : content;
+    }
+    
+    return content;
+  }, [page, cleaningOptions, extractSection]);
 
   if (isLoading) {
     return (
@@ -54,8 +79,8 @@ const WordPressPage: React.FC<WordPressPageProps> = ({
       )}
       
       <div 
-        className="page-content prose max-w-none prose-headings:text-[#CD9B59] prose-headings:font-light"
-        dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+        className="page-content prose max-w-none prose-headings:text-[#CD9B59] prose-headings:font-light elementor-content"
+        dangerouslySetInnerHTML={{ __html: processedContent }}
       />
     </div>
   );

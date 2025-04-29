@@ -1,0 +1,72 @@
+
+/* CSS styles to properly display Elementor content in React */
+
+.elementor-content {
+  /* Base styles */
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Typography */
+.elementor-content h1, 
+.elementor-content h2, 
+.elementor-content h3, 
+.elementor-content h4, 
+.elementor-content h5, 
+.elementor-content h6 {
+  color: #CD9B59;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.elementor-content p {
+  margin-bottom: 1rem;
+}
+
+/* Layout components */
+.elementor-content .elementor-section,
+.elementor-content .elementor-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.elementor-content .elementor-column {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .elementor-content .elementor-column {
+    flex-basis: 100%;
+  }
+}
+
+/* Images */
+.elementor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.25rem;
+}
+
+/* Custom elements */
+.elementor-content .elementor-button {
+  display: inline-block;
+  background-color: #CD9B59;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  margin: 0.5rem 0;
+}
+
+.elementor-content .elementor-button:hover {
+  background-color: #b78a4d;
+}
+
+/* Fix for weird Elementor div artifacts */
+.elementor-content div:empty {
+  display: none;
+}
