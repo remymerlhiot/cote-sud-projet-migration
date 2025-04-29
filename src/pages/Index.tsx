@@ -62,7 +62,7 @@ const Index = () => {
     : fallbackProperties;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f2e9da]">
+    <div className="flex flex-col min-h-screen bg-cream font-raleway">
       {/* Header */}
       <Header />
 
@@ -80,9 +80,13 @@ const Index = () => {
 
         {/* Properties Carousel */}
         <section className="container mx-auto mb-20">
+          <h2 className="text-2xl md:text-3xl font-playfair font-light text-gold text-center mb-12">
+            NOS BIENS D'EXCEPTION
+          </h2>
+          
           {isLoading ? (
             <div className="flex justify-center py-12">
-              <p className="text-[#CD9B59]">Chargement des biens immobiliers...</p>
+              <p className="text-gold">Chargement des biens immobiliers...</p>
             </div>
           ) : (
             <Carousel className="mx-auto max-w-6xl">
@@ -106,7 +110,7 @@ const Index = () => {
 
         {/* Difference Section - WordPress Content */}
         <section className="container mx-auto mb-20">
-          <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-playfair font-light text-gold text-center mb-12">
             LA DIFFÉRENCE
           </h2>
           

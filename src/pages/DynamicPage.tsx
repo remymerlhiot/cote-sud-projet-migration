@@ -16,14 +16,14 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ slug: propSlug }) => {
   const slug = propSlug || paramSlug;
   
   return (
-    <div className="flex flex-col min-h-screen bg-[#f2e9da]">
+    <div className="flex flex-col min-h-screen bg-cream font-raleway">
       {/* Header */}
       <Header />
 
       {/* Main Content */}
       <main className="flex-grow container mx-auto py-12 px-4">
         {!slug ? (
-          <div className="text-center p-8 text-[#CD9B59]">Page introuvable</div>
+          <div className="text-center p-8 text-gold">Page introuvable</div>
         ) : (
           <CustomWordPressPage 
             slug={slug} 

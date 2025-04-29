@@ -35,7 +35,17 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, "text/html");
       const section = doc.querySelector(extractSection);
-      content = section ? section.innerHTML : content;
+      
+      if (section) {
+        return section.innerHTML;
+      } else {
+        // If specific section not found, try to find it in the elementor_data
+        const elementorDoc = page.elementor_data ? 
+          parser.parseFromString(`<div>${page.elementor_data}</div>`, "text/html") : null;
+        
+        const elementorSection = elementorDoc?.querySelector(extractSection);
+        return elementorSection ? elementorSection.innerHTML : content;
+      }
     }
     
     return content;
@@ -62,7 +72,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
   return (
     <div className={`wordpress-page ${className}`}>
       {showTitle && (
-        <h1 className="text-3xl font-light text-[#CD9B59] mb-6">
+        <h1 className="text-3xl font-playfair font-light text-[#CD9B59] mb-6">
           {page.title}
         </h1>
       )}
@@ -78,7 +88,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
       )}
       
       <div 
-        className="page-content prose max-w-none prose-headings:text-[#CD9B59] prose-headings:font-light elementor-content"
+        className="page-content prose max-w-none prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light font-raleway elementor-content"
         dangerouslySetInnerHTML={{ __html: processedContent }}
       />
       

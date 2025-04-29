@@ -5,6 +5,7 @@
   /* Base styles */
   width: 100%;
   overflow-x: hidden;
+  font-family: 'Raleway', sans-serif;
 }
 
 /* Typography */
@@ -18,10 +19,12 @@
   font-weight: 300;
   margin-bottom: 1rem;
   margin-top: 1.5rem;
+  font-family: 'Playfair Display', serif;
 }
 
 .elementor-content p {
   margin-bottom: 1rem;
+  line-height: 1.6;
 }
 
 /* Layout components */
@@ -30,6 +33,7 @@
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 2rem;
 }
 
 .elementor-content .elementor-column {
@@ -60,6 +64,7 @@
   border-radius: 0.25rem;
   text-decoration: none;
   margin: 0.5rem 0;
+  font-family: 'Raleway', sans-serif;
 }
 
 .elementor-content .elementor-button:hover {
@@ -106,6 +111,7 @@
   width: 100%;
   text-align: left;
   transition: all 0.2s ease;
+  font-family: 'Playfair Display', serif;
 }
 
 .services-accordion .accordion-content {
@@ -143,4 +149,106 @@
 
 .animate-accordion-up {
   animation: accordion-slide-up 0.3s ease-out;
+}
+
+/* Prestige Title Section */
+.prestige-title h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  line-height: 1.3;
+  font-weight: 400;
+  color: #CD9B59;
+  margin-bottom: 1.5rem;
+}
+
+.prestige-title p {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Difference Section */
+.difference-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .difference-section {
+    flex-direction: row;
+  }
+}
+
+.difference-section .difference-item {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+}
+
+.difference-section h3 {
+  font-family: 'Playfair Display', serif;
+  color: #CD9B59;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.difference-section p {
+  font-family: 'Raleway', sans-serif;
+  line-height: 1.6;
+}
+
+/* Add specific styles for Elementor widgets */
+.elementor-content .elementor-widget-text-editor,
+.elementor-content .elementor-text-editor {
+  line-height: 1.6;
+}
+
+.elementor-content .elementor-widget-heading h2 {
+  font-size: 2rem;
+}
+
+.elementor-content .elementor-widget-heading h3 {
+  font-size: 1.75rem;
+}
+
+.elementor-content .elementor-widget-image-box,
+.elementor-content .elementor-image-box-wrapper {
+  text-align: center;
+}
+
+.elementor-content .elementor-widget-icon-box,
+.elementor-content .elementor-icon-box-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Contact form styles from Elementor */
+.elementor-content .elementor-form-fields-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.elementor-content .elementor-field-group {
+  margin-bottom: 1rem;
+}
+
+.elementor-content .elementor-field {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+}
+
+.elementor-content .elementor-button.elementor-size-sm {
+  padding: 0.75rem 1.5rem;
+}
+
+/* Specific sections styling */
+.elementor-content section.elementor-section {
+  padding: 2rem 0;
 }
