@@ -42,7 +42,7 @@ const ServiceSection = ({ className }: ServiceSectionProps) => {
     <section 
       className={`relative w-full mb-20 ${className}`}
       style={{
-        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/lovable-uploads/df0b0336-49ea-44d1-aa0b-f32ef78fa759.png')",
+        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://cote-sud.immo/wp-content/uploads/2024/11/champs-de-lavandes-sur-sainte-victoire.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center"
       }}
