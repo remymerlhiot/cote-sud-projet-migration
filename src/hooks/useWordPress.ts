@@ -5,8 +5,8 @@ import {
   fetchPages, 
   fetchMedia, 
   fetchPageBySlug,
-  WordPressProperty, 
-  WordPressPage 
+  WordPressProperty,
+  transformPropertyData
 } from "@/services/wordpressApi";
 
 export const useProperties = () => {
@@ -43,20 +43,5 @@ export const useMedia = (mediaId: number) => {
   });
 };
 
-// Helper function to transform WordPress property data to our app's format
-export const transformPropertyData = (wpProperty: WordPressProperty) => {
-  const featuredImage = wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url || 
-    "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"; // Fallback image
-  
-  return {
-    id: wpProperty.id,
-    title: wpProperty.title.rendered || "",
-    location: wpProperty.acf?.location || "",
-    ref: wpProperty.acf?.reference || `REF ${wpProperty.id}`,
-    price: wpProperty.acf?.price || "Prix sur demande",
-    area: wpProperty.acf?.area || "N/A",
-    rooms: wpProperty.acf?.rooms || "N/A",
-    bedrooms: wpProperty.acf?.bedrooms || "N/A",
-    image: featuredImage,
-  };
-};
+// Re-export the transform function for convenience
+export { transformPropertyData };

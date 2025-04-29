@@ -1,7 +1,6 @@
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { WordPressProperty } from "@/services/wordpressApi";
-import { transformPropertyData } from "@/hooks/useWordPress";
+import { WordPressProperty, transformPropertyData } from "@/services/wordpressApi";
 
 type PropertyProps = {
   property: WordPressProperty | {
@@ -17,13 +16,24 @@ type PropertyProps = {
   }
 };
 
+// Define a type for our transformed display data
+type DisplayProperty = {
+  id: number;
+  title: string | { rendered: string };
+  location: string;
+  ref: string;
+  price: string;
+  area: string;
+  rooms: string;
+  bedrooms: string;
+  image: string;
+};
+
 const PropertyCard = ({ property }: PropertyProps) => {
-  // Handle both WordPress API data and our static data format
-  const isWordPressData = 'title' in property && typeof property.title === 'object';
-  
-  const displayData = isWordPressData 
+  // Always transform the data to ensure consistent structure
+  const displayData: DisplayProperty = 'acf' in property 
     ? transformPropertyData(property as WordPressProperty) 
-    : property;
+    : property as DisplayProperty;
 
   return (
     <Card className="overflow-hidden border-none shadow-lg h-full">
