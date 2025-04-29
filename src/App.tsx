@@ -27,6 +27,7 @@ const App = () => (
           <Route path="/page/:slug" element={<DynamicPage />} />
           <Route path="/contact" element={<DynamicPage slug="contact" />} />
           <Route path="/services" element={<DynamicPage slug="services" />} />
+          <Route path="/new-home" element={<DynamicPage slug="new-home" />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

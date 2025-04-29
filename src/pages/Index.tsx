@@ -71,7 +71,7 @@ const Index = () => {
         {/* Prestige Title - WordPress Content */}
         <section className="text-center py-12">
           <CustomWordPressPage 
-            slug="accueil" 
+            slug="new-home" 
             showTitle={false}
             extractSection=".prestige-title"
             className="mx-auto w-3/4 md:w-1/2"
@@ -111,7 +111,7 @@ const Index = () => {
           </h2>
           
           <CustomWordPressPage 
-            slug="accueil" 
+            slug="new-home" 
             showTitle={false}
             extractSection=".difference-section"
             className="flex flex-col md:flex-row items-center gap-8"
