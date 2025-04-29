@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import PropertyCard from "@/components/PropertyCard";
 import ServiceSection from "@/components/ServiceSection";
-import { Accordion } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useProperties } from "@/hooks/useWordPress";
@@ -97,20 +96,8 @@ const Index = () => {
           )}
         </section>
 
-        {/* Services Section - WordPress Placeholder */}
-        <section className="mb-20">
-          <h2 className="text-2xl md:text-3xl font-light text-[#CD9B59] text-center mb-12">SERVICES DE L'AGENCE</h2>
-          
-          <div className="relative">
-            <div className="bg-gray-300 h-[400px] rounded-lg flex items-center justify-center">
-              <div className="container mx-auto px-4 h-full flex justify-end items-center">
-                <div className="w-full md:w-1/2 lg:w-1/3 bg-gray-200 rounded-lg p-4">
-                  <p className="text-gray-600 font-medium text-center">Zone des services WordPress</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Services Section with Accordion */}
+        <ServiceSection />
 
         {/* Difference Section - WordPress Placeholder */}
         <section className="container mx-auto mb-20">
