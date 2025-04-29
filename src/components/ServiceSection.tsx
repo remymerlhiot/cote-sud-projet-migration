@@ -42,7 +42,7 @@ const ServiceSection = ({ className }: ServiceSectionProps) => {
     <section 
       className={`relative w-full mb-20 ${className}`}
       style={{
-        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/lovable-uploads/4a7ef02b-4a3b-4e6a-a38d-cec10dd62268.png')",
+        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/lovable-uploads/df0b0336-49ea-44d1-aa0b-f32ef78fa759.png')",
         backgroundSize: "cover",
         backgroundPosition: "center"
       }}
