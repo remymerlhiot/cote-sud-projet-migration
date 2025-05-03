@@ -18,7 +18,44 @@ export interface WordPressProperty {
     rendered: string;
   };
   featured_media: number;
-  acf: {
+  
+  // Add direct property fields to match API response structure
+  mandat?: string;
+  ville?: string;
+  localisation?: string;
+  prix?: string;
+  prix_affiche?: string;
+  surf_hab?: string;
+  piece?: string;
+  nb_chambre?: string;
+  dpe_lettre_consom_energ?: string;
+  type_mandat?: string;
+  operation?: string;
+  famille?: string;
+  type?: string;
+  adresse?: string;
+  code_postal?: string;
+  pays?: string;
+  prestige?: string;
+  neuf?: string;
+  surf_terrain?: string;
+  nb_etage?: string;
+  num_etage?: string;
+  nb_sdb?: string;
+  nb_salle_deau?: string;
+  nb_wc?: string;
+  chauffage?: string;
+  balcon?: string;
+  ascenseur?: string;
+  nb_garage?: string;
+  terrasse?: string;
+  piscine?: string;
+  annee_constr?: string;
+  texte_fr?: string;
+  reference?: string;
+  
+  // Keep the ACF object for backward compatibility
+  acf?: {
     // Original fields (keeping for backward compatibility)
     location?: string;
     price?: string;
@@ -27,7 +64,7 @@ export interface WordPressProperty {
     bedrooms?: string;
     dpe?: string;
     
-    // WordPress ACF field names from the actual implementation
+    // WordPress ACF field names
     mandat?: string;
     ville?: string;
     localisation?: string;
@@ -37,9 +74,6 @@ export interface WordPressProperty {
     piece?: string;
     nb_chambre?: string;
     dpe_lettre_consom_energ?: string;
-    
-    // Removing duplicate reference field
-    // reference?: string;  - Removed duplicate
     
     // Additional fields from the WordPress ACF list
     type_mandat?: string;
@@ -67,6 +101,7 @@ export interface WordPressProperty {
     texte_fr?: string;
     reference?: string; // Single reference field
   };
+  
   _embedded?: {
     "wp:featuredmedia"?: Array<{
       source_url: string;
@@ -132,6 +167,18 @@ export const fetchProperties = async (): Promise<WordPressProperty[]> => {
     if (data && data.length > 0) {
       console.log("WordPress API Complete Property Response:", data[0]);
       console.log("WordPress API ACF Fields:", JSON.stringify(data[0]?.acf, null, 2));
+      
+      // Add additional logging to see all available fields
+      console.log("Available fields at root level:", Object.keys(data[0]));
+      
+      // Log some specific fields we're interested in
+      console.log("Property mandat:", data[0]?.mandat);
+      console.log("Property ville:", data[0]?.ville);
+      console.log("Property prix:", data[0]?.prix);
+      console.log("Property prix_affiche:", data[0]?.prix_affiche);
+      console.log("Property surf_hab:", data[0]?.surf_hab);
+      console.log("Property piece:", data[0]?.piece);
+      console.log("Property nb_chambre:", data[0]?.nb_chambre);
     }
     
     return data;
@@ -252,37 +299,33 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
   // Log the full property data for debugging
   console.log("Transforming property:", wpProperty.id);
   
-  // Extract fields with fallbacks for ACF field naming conventions
-  const location = wpProperty.acf?.ville || 
-                   wpProperty.acf?.localisation || 
-                   wpProperty.acf?.location || 
-                   "Non spécifié";
+  // Get field value from either root level or ACF object
+  const getFieldValue = (fieldName: string, fallback: string = "Non spécifié") => {
+    return wpProperty[fieldName as keyof WordPressProperty] || 
+           wpProperty.acf?.[fieldName as keyof (WordPressProperty["acf"] & {})] || 
+           fallback;
+  };
   
-  const reference = wpProperty.acf?.mandat || 
-                    wpProperty.acf?.reference || 
-                    `REF ${wpProperty.id}`;
+  // Extract fields with the new helper function
+  const location = getFieldValue('ville') || getFieldValue('localisation') || getFieldValue('location');
+  const reference = getFieldValue('mandat') || getFieldValue('reference') || `REF ${wpProperty.id}`;
   
   // Handle price - try different possible field names
-  const priceString = wpProperty.acf?.prix_affiche || 
-                      wpProperty.acf?.prix || 
-                      wpProperty.acf?.price || 
-                      "Prix sur demande";
+  const priceString = getFieldValue('prix_affiche') || getFieldValue('prix') || getFieldValue('price') || "Prix sur demande";
   const priceNumber = parseInt(priceString.replace(/[^0-9]/g, '')) || 0;
   
   // Handle area/surface - try different possible field names and ensure it has "m²"
-  let area = wpProperty.acf?.surf_hab || wpProperty.acf?.area || "Non spécifié";
+  let area = getFieldValue('surf_hab') || getFieldValue('area') || getFieldValue('surface');
   if (area !== "Non spécifié" && !area.includes("m²")) {
     area = `${area}m²`;
   }
   
-  // Handle rooms - try different possible field names
-  const rooms = wpProperty.acf?.piece || wpProperty.acf?.rooms || "Non spécifié";
-  
-  // Handle bedrooms - try different possible field names
-  const bedrooms = wpProperty.acf?.nb_chambre || wpProperty.acf?.bedrooms || "Non spécifié";
+  // Handle rooms and bedrooms - try different possible field names
+  const rooms = getFieldValue('piece') || getFieldValue('rooms');
+  const bedrooms = getFieldValue('nb_chambre') || getFieldValue('bedrooms');
   
   // DPE rating - get the energy consumption letter
-  const dpe = wpProperty.acf?.dpe_lettre_consom_energ || wpProperty.acf?.dpe || "";
+  const dpe = getFieldValue('dpe_lettre_consom_energ') || getFieldValue('dpe');
   
   // Extract content without HTML tags for a clean description
   const tempDiv = document.createElement('div');
@@ -290,14 +333,14 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
   const contentText = tempDiv.textContent || tempDiv.innerText || "";
   const shortDescription = contentText.substring(0, 150) + "...";
   
-  // Additional property details
-  const propertyType = wpProperty.acf?.type || "";
-  const constructionYear = wpProperty.acf?.annee_constr || "";
-  const hasBalcony = wpProperty.acf?.balcon === "1" ? true : false;
-  const hasElevator = wpProperty.acf?.ascenseur === "1" ? true : false;
-  const hasTerrasse = wpProperty.acf?.terrasse === "1" ? true : false;
-  const hasPool = wpProperty.acf?.piscine === "1" ? true : false;
-  const garageCount = wpProperty.acf?.nb_garage || "0";
+  // Additional property details using the helper function
+  const propertyType = getFieldValue('type');
+  const constructionYear = getFieldValue('annee_constr');
+  const hasBalcony = getFieldValue('balcon') === "1";
+  const hasElevator = getFieldValue('ascenseur') === "1";
+  const hasTerrasse = getFieldValue('terrasse') === "1";
+  const hasPool = getFieldValue('piscine') === "1";
+  const garageCount = getFieldValue('nb_garage') || "0";
   
   return {
     id: wpProperty.id,
