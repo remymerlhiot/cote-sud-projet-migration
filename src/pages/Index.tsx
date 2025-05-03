@@ -9,7 +9,6 @@ import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { ChevronRight } from "lucide-react";
-import { useEmblaCarousel } from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
@@ -81,20 +80,28 @@ const Index = () => {
     ? wpProperties.map(prop => transformPropertyData(prop))
     : fallbackProperties;
     
-  // Filter properties with price >= 800,000€
-  const displayProperties = filterExpensiveProperties(allProperties);
+  // Filter properties with price >= 800,000€ and sort by most recent first
+  const displayProperties = filterExpensiveProperties(allProperties)
+    .sort((a, b) => {
+      // If date property exists, use it, otherwise sort by ID (higher ID = more recent)
+      if (a.date && b.date) {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+      return b.id - a.id; // Sort by ID as fallback (assuming higher ID means more recent)
+    });
 
-  // If no properties meet the price criteria, use at least the fallback ones
+  // If no properties meet the criteria, use fallback sorted by recency
   useEffect(() => {
     if (displayProperties.length === 0) {
-      toast.info("Aucun bien à plus de 800 000€ n'a été trouvé. Affichage des biens en démonstration.");
+      toast.info("Aucun bien récent à plus de 800 000€ n'a été trouvé. Affichage des biens en démonstration.");
     }
   }, [displayProperties]);
 
-  // Final properties to display (filtered or fallback if none match)
+  // Final properties to display (filtered, sorted or fallback if none match)
   const finalProperties = displayProperties.length > 0 
     ? displayProperties 
-    : filterExpensiveProperties(fallbackProperties);
+    : filterExpensiveProperties(fallbackProperties)
+        .sort((a, b) => b.id - a.id); // Sort fallback by ID
 
   return (
     <div className="flex flex-col min-h-screen bg-cream font-raleway">
