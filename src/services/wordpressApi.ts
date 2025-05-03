@@ -8,6 +8,7 @@ const CUSTOM_API_BASE_URL = "https://cote-sud.immo/wp-json/axo/v1";
 // Types for WordPress API responses
 export interface WordPressProperty {
   id: number;
+  date?: string;  // Add date property to fix the error
   title: {
     rendered: string;
   };
@@ -201,15 +202,29 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
   const featuredImage = wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url || 
     "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"; // Fallback image
   
+  // Extract price as a number for filtering
+  const priceString = wpProperty.acf?.price || "0";
+  const priceNumber = parseInt(priceString.replace(/[^0-9]/g, '')) || 0;
+  
+  // Extract content without HTML tags for a clean description
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = wpProperty.content.rendered;
+  const contentText = tempDiv.textContent || tempDiv.innerText || "";
+  const shortDescription = contentText.substring(0, 150) + "...";
+  
   return {
     id: wpProperty.id,
     title: wpProperty.title.rendered || "",
     location: wpProperty.acf?.location || "",
     ref: wpProperty.acf?.reference || `REF ${wpProperty.id}`,
     price: wpProperty.acf?.price || "Prix sur demande",
+    priceNumber: priceNumber,
     area: wpProperty.acf?.area || "N/A",
     rooms: wpProperty.acf?.rooms || "N/A",
     bedrooms: wpProperty.acf?.bedrooms || "N/A",
     image: featuredImage,
+    date: wpProperty.date || new Date().toISOString(),
+    description: shortDescription,
+    fullContent: wpProperty.content.rendered || "",
   };
 };

@@ -5,6 +5,7 @@ import {
   fetchPages, 
   fetchMedia, 
   fetchPageBySlug,
+  fetchPropertyById,
   WordPressProperty,
   WordPressAnnonce,
   transformPropertyData
@@ -15,6 +16,15 @@ export const useProperties = () => {
     queryKey: ["properties"],
     queryFn: fetchProperties,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const usePropertyById = (id: number) => {
+  return useQuery({
+    queryKey: ["property", id],
+    queryFn: () => fetchPropertyById(id),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!id,
   });
 };
 

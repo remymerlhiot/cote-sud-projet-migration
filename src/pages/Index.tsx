@@ -1,6 +1,6 @@
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropertyCard from "@/components/PropertyCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,6 +9,7 @@ import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { ChevronRight } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
   // Fetch properties from WordPress API
@@ -59,9 +60,15 @@ const Index = () => {
     toast.error("Impossible de récupérer les biens immobiliers. Affichage des données de secours.");
   }
 
-  // Use WordPress data if available, otherwise use fallback
+  // Transform and sort properties by date (most recent first)
   const displayProperties = wpProperties && wpProperties.length > 0 
     ? wpProperties.map(prop => transformPropertyData(prop))
+        .sort((a, b) => {
+          // Sort by date (newest first)
+          const dateA = new Date(a.date || "");
+          const dateB = new Date(b.date || "");
+          return dateB.getTime() - dateA.getTime();
+        })
     : fallbackProperties;
 
   return (
@@ -85,14 +92,35 @@ const Index = () => {
 
         {/* Properties Carousel */}
         <section className="container mx-auto mb-20 px-4">
-          <Carousel className="mx-auto max-w-6xl">
+          <Carousel 
+            className="mx-auto max-w-6xl"
+            plugins={[
+              Autoplay({
+                delay: 4000,
+                stopOnInteraction: true,
+                stopOnMouseEnter: true,
+              }),
+            ]}
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+          >
             <div className="relative">
               <CarouselContent>
-                {displayProperties.map((property) => (
-                  <CarouselItem key={property.id} className="md:basis-1/3 pl-4">
-                    <PropertyCard property={property} />
+                {displayProperties.length > 0 ? (
+                  displayProperties.map((property) => (
+                    <CarouselItem key={property.id} className="md:basis-1/3 pl-4 animate-fadeIn">
+                      <PropertyCard property={property} />
+                    </CarouselItem>
+                  ))
+                ) : (
+                  <CarouselItem className="basis-full pl-4">
+                    <div className="text-center p-12 bg-white rounded shadow">
+                      <p>Aucun bien immobilier disponible pour le moment.</p>
+                    </div>
                   </CarouselItem>
-                ))}
+                )}
               </CarouselContent>
               <div className="absolute -left-6 top-1/2 transform -translate-y-1/2">
                 <CarouselPrevious className="relative static transform-none h-8 w-8 border-[#CD9B59] bg-white text-[#CD9B59] hover:bg-[#CD9B59] hover:text-white" />

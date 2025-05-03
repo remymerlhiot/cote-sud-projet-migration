@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import NosBiens from "./pages/NosBiens";
 import PageTest from "./pages/PageTest";
 import DynamicPage from "./pages/DynamicPage";
+import PropertyDetail from "./pages/PropertyDetail";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/nos-biens" element={<NosBiens />} />
           <Route path="/page-test" element={<PageTest />} />
+          <Route path="/property/:id" element={<PropertyDetail />} />
           
           {/* Dynamic page routes */}
           <Route path="/page/:slug" element={<DynamicPage />} />
