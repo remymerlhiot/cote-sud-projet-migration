@@ -51,3 +51,18 @@ a:hover, button:hover {
   max-width: 1400px;
   margin: 0 auto;
 }
+
+/* YouTube background styling */
+#youtube-background {
+  pointer-events: none;
+}
+
+/* Navigation menu item styling */
+.navigation-menu-item {
+  transition: background-color 0.3s ease;
+}
+
+.navigation-menu-item:hover {
+  background-color: rgba(205, 155, 89, 0.8);
+}
+
