@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/sonner";
 
 // Base URL for the WordPress API - replace with your actual WordPress site URL
@@ -20,16 +19,15 @@ export interface WordPressProperty {
   };
   featured_media: number;
   acf: {
-    // Original fields
+    // Original fields (keeping for backward compatibility)
     location?: string;
     price?: string;
     area?: string;
     rooms?: string;
     bedrooms?: string;
-    reference?: string;
     dpe?: string;
     
-    // WordPress ACF field names
+    // WordPress ACF field names from the actual implementation
     mandat?: string;
     ville?: string;
     localisation?: string;
@@ -39,7 +37,9 @@ export interface WordPressProperty {
     piece?: string;
     nb_chambre?: string;
     dpe_lettre_consom_energ?: string;
-    reference?: string;
+    
+    // Removing duplicate reference field
+    // reference?: string;  - Removed duplicate
     
     // Additional fields from the WordPress ACF list
     type_mandat?: string;
@@ -65,6 +65,7 @@ export interface WordPressProperty {
     piscine?: string;
     annee_constr?: string;
     texte_fr?: string;
+    reference?: string; // Single reference field
   };
   _embedded?: {
     "wp:featuredmedia"?: Array<{
@@ -269,7 +270,7 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
   const priceNumber = parseInt(priceString.replace(/[^0-9]/g, '')) || 0;
   
   // Handle area/surface - try different possible field names and ensure it has "m²"
-  let area = wpProperty.acf?.surf_hab || wpProperty.acf?.area || wpProperty.acf?.surface || "Non spécifié";
+  let area = wpProperty.acf?.surf_hab || wpProperty.acf?.area || "Non spécifié";
   if (area !== "Non spécifié" && !area.includes("m²")) {
     area = `${area}m²`;
   }
@@ -322,4 +323,3 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
     garageCount: garageCount
   };
 };
-
