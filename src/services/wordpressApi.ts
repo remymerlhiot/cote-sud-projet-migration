@@ -26,6 +26,7 @@ export interface WordPressProperty {
     rooms?: string;
     bedrooms?: string;
     reference?: string;
+    dpe?: string;
   };
   _embedded?: {
     "wp:featuredmedia"?: Array<{
@@ -222,6 +223,7 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
     area: wpProperty.acf?.area || "N/A",
     rooms: wpProperty.acf?.rooms || "N/A",
     bedrooms: wpProperty.acf?.bedrooms || "N/A",
+    dpe: wpProperty.acf?.dpe || "",
     image: featuredImage,
     date: wpProperty.date || new Date().toISOString(),
     description: shortDescription,

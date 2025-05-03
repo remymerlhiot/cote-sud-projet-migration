@@ -26,6 +26,22 @@ const PropertyDetail = () => {
   // Transform the property data for display
   const displayData = property ? transformPropertyData(property) : null;
 
+  // Helper function to determine the color class based on DPE rating
+  const getDpeColorClass = (dpe?: string) => {
+    if (!dpe) return "bg-gray-200 text-gray-800";
+    
+    switch(dpe.toUpperCase()) {
+      case "A": return "bg-green-500 text-white";
+      case "B": return "bg-green-400 text-white";
+      case "C": return "bg-yellow-300 text-gray-800";
+      case "D": return "bg-yellow-500 text-white";
+      case "E": return "bg-orange-500 text-white";
+      case "F": return "bg-red-500 text-white";
+      case "G": return "bg-red-700 text-white";
+      default: return "bg-gray-200 text-gray-800";
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-cream font-raleway">
@@ -90,12 +106,17 @@ const PropertyDetail = () => {
           </h1>
           
           {/* Property image */}
-          <div className="mb-8">
+          <div className="mb-8 relative">
             <img 
               src={displayData.image} 
               alt={displayData.title} 
               className="w-full h-auto object-cover rounded-md"
             />
+            {displayData.dpe && (
+              <div className={`absolute top-4 right-4 ${getDpeColorClass(displayData.dpe)} px-3 py-2 rounded-md text-sm font-medium`}>
+                DPE: {displayData.dpe.toUpperCase()}
+              </div>
+            )}
           </div>
           
           {/* Property quick info */}

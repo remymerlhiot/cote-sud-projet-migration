@@ -15,6 +15,7 @@ type PropertyProps = {
     bedrooms: string;
     image: string;
     description?: string;
+    dpe?: string;
   }
 };
 
@@ -32,6 +33,7 @@ type DisplayProperty = {
   image: string;
   date?: string;
   description?: string;
+  dpe?: string;
 };
 
 const PropertyCard = ({ property }: PropertyProps) => {
@@ -39,6 +41,22 @@ const PropertyCard = ({ property }: PropertyProps) => {
   const displayData: DisplayProperty = 'acf' in property 
     ? transformPropertyData(property as WordPressProperty) 
     : property as DisplayProperty;
+
+  // Helper function to determine the color class based on DPE rating
+  const getDpeColorClass = (dpe?: string) => {
+    if (!dpe) return "bg-gray-200";
+    
+    switch(dpe.toUpperCase()) {
+      case "A": return "bg-green-500";
+      case "B": return "bg-green-400";
+      case "C": return "bg-yellow-300";
+      case "D": return "bg-yellow-500";
+      case "E": return "bg-orange-500";
+      case "F": return "bg-red-500";
+      case "G": return "bg-red-700";
+      default: return "bg-gray-200";
+    }
+  };
 
   return (
     <Link to={`/property/${displayData.id}`} className="block h-full">
@@ -53,6 +71,11 @@ const PropertyCard = ({ property }: PropertyProps) => {
             <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
               {displayData.ref}
             </div>
+            {displayData.dpe && (
+              <div className={`absolute top-3 right-3 ${getDpeColorClass(displayData.dpe)} text-white px-2 py-1 text-xs font-medium rounded-sm`}>
+                DPE: {displayData.dpe.toUpperCase()}
+              </div>
+            )}
           </div>
           <div className="p-4 text-center">
             <h3 className="text-lg font-medium mt-2 text-[#CD9B59]">
