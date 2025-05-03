@@ -1,6 +1,6 @@
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropertyCard from "@/components/PropertyCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,10 +9,17 @@ import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { ChevronRight } from "lucide-react";
+import { useEmblaCarousel } from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
   // Fetch properties from WordPress API
   const { data: wpProperties, isLoading, error } = useProperties();
+  
+  // Set up autoplay plugin for carousel
+  const [carouselPlugin] = useState(() => 
+    Autoplay({ delay: 4000, stopOnInteraction: false })
+  );
   
   // Fallback data if the API call fails or is loading
   const [fallbackProperties] = useState([
@@ -21,7 +28,7 @@ const Index = () => {
       title: "APPARTEMENT",
       location: "SAINT PONT L'ESPRIT",
       ref: "REF N° 20345",
-      price: "642 500 €",
+      price: "842 500 €",
       area: "248m²",
       rooms: "7",
       bedrooms: "3",
@@ -43,7 +50,7 @@ const Index = () => {
       title: "MAISON",
       location: "EYGALIÈRES",
       ref: "REF N° 21155",
-      price: "793 000 €",
+      price: "893 000 €",
       area: "117m²",
       rooms: "4",
       bedrooms: "3",
@@ -59,10 +66,35 @@ const Index = () => {
     toast.error("Impossible de récupérer les biens immobiliers. Affichage des données de secours.");
   }
 
+  // Filter properties to only show those with price >= 800,000€
+  const filterExpensiveProperties = (properties) => {
+    return properties.filter(prop => {
+      const priceStr = typeof prop.price === 'string' ? prop.price : prop.acf?.price || '';
+      // Extract numerical value from price string (removing € and spaces)
+      const priceValue = parseFloat(priceStr.replace(/[^0-9,.]/g, '').replace(',', '.'));
+      return !isNaN(priceValue) && priceValue >= 800000;
+    });
+  };
+
   // Use WordPress data if available, otherwise use fallback
-  const displayProperties = wpProperties && wpProperties.length > 0 
+  const allProperties = wpProperties && wpProperties.length > 0 
     ? wpProperties.map(prop => transformPropertyData(prop))
     : fallbackProperties;
+    
+  // Filter properties with price >= 800,000€
+  const displayProperties = filterExpensiveProperties(allProperties);
+
+  // If no properties meet the price criteria, use at least the fallback ones
+  useEffect(() => {
+    if (displayProperties.length === 0) {
+      toast.info("Aucun bien à plus de 800 000€ n'a été trouvé. Affichage des biens en démonstration.");
+    }
+  }, [displayProperties]);
+
+  // Final properties to display (filtered or fallback if none match)
+  const finalProperties = displayProperties.length > 0 
+    ? displayProperties 
+    : filterExpensiveProperties(fallbackProperties);
 
   return (
     <div className="flex flex-col min-h-screen bg-cream font-raleway">
@@ -79,18 +111,27 @@ const Index = () => {
             L'IMMOBILIER DE PRESTIGE
           </h1>
           <h2 className="text-xl md:text-2xl font-playfair font-normal text-[#CD9B59] mt-10 mb-12">
-            NOS BIENS À LA VENTE
+            NOS BIENS PREMIUM À LA VENTE
           </h2>
         </section>
 
         {/* Properties Carousel */}
         <section className="container mx-auto mb-20 px-4">
-          <Carousel className="mx-auto max-w-6xl">
+          <Carousel 
+            className="mx-auto max-w-6xl"
+            plugins={[carouselPlugin]}
+            opts={{
+              align: "center",
+              loop: true
+            }}
+          >
             <div className="relative">
               <CarouselContent>
-                {displayProperties.map((property) => (
-                  <CarouselItem key={property.id} className="md:basis-1/3 pl-4">
-                    <PropertyCard property={property} />
+                {finalProperties.map((property) => (
+                  <CarouselItem key={property.id} className="md:basis-1/3 pl-4 transition-opacity duration-500">
+                    <div className="animate-fade-in">
+                      <PropertyCard property={property} />
+                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
