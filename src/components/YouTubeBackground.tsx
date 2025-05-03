@@ -4,9 +4,18 @@ import { useEffect, useRef } from 'react';
 interface YouTubeBackgroundProps {
   videoId: string;
   startTime?: number;
+  endTime?: number;
+  overlayColor?: string;
+  overlayOpacity?: number;
 }
 
-const YouTubeBackground = ({ videoId, startTime = 0 }: YouTubeBackgroundProps) => {
+const YouTubeBackground = ({ 
+  videoId, 
+  startTime = 0, 
+  endTime, 
+  overlayColor = "#000000", 
+  overlayOpacity = 0.3 
+}: YouTubeBackgroundProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -16,9 +25,11 @@ const YouTubeBackground = ({ videoId, startTime = 0 }: YouTubeBackgroundProps) =
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
 
+    let player: any;
+
     // Initialize player when API is ready
     window.onYouTubeIframeAPIReady = () => {
-      new window.YT.Player('youtube-background', {
+      player = new window.YT.Player('youtube-background', {
         videoId: videoId,
         playerVars: {
           autoplay: 1,
@@ -40,8 +51,24 @@ const YouTubeBackground = ({ videoId, startTime = 0 }: YouTubeBackgroundProps) =
             event.target.playVideo();
           },
           onStateChange: (event) => {
-            // Replay video when it ends
-            if (event.data === window.YT.PlayerState.ENDED) {
+            // Si une valeur endTime est définie, vérifier si nous avons atteint cette limite
+            if (endTime && player) {
+              // Vérifier périodiquement la position de lecture
+              const checkTimeInterval = setInterval(() => {
+                const currentTime = player.getCurrentTime();
+                if (currentTime >= endTime) {
+                  // Revenir au début de la séquence (startTime)
+                  player.seekTo(startTime);
+                }
+              }, 1000); // Vérifier chaque seconde
+              
+              // Nettoyer l'intervalle à la destruction du composant
+              return () => clearInterval(checkTimeInterval);
+            }
+            
+            // Replay video when it ends if no endTime is set
+            if (!endTime && event.data === window.YT.PlayerState.ENDED) {
+              event.target.seekTo(startTime);
               event.target.playVideo();
             }
           }
@@ -53,7 +80,17 @@ const YouTubeBackground = ({ videoId, startTime = 0 }: YouTubeBackgroundProps) =
       // Clean up
       window.onYouTubeIframeAPIReady = null;
     };
-  }, [videoId, startTime]);
+  }, [videoId, startTime, endTime]);
+
+  // Convertir l'opacité en valeur hexadécimale pour la couleur CSS
+  const getHexOpacity = (opacity: number) => {
+    // Convertir l'opacité (0-1) en valeur hexadécimale (00-FF)
+    const hexOpacity = Math.round(opacity * 255).toString(16).padStart(2, '0');
+    return hexOpacity;
+  };
+
+  // Créer la couleur de l'overlay avec opacité
+  const overlayColorWithOpacity = `${overlayColor}${getHexOpacity(overlayOpacity)}`;
 
   return (
     <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -63,7 +100,11 @@ const YouTubeBackground = ({ videoId, startTime = 0 }: YouTubeBackgroundProps) =
           className="absolute w-[300%] h-[300%] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
         ></div>
       </div>
-      <div className="absolute inset-0 bg-black/30 pointer-events-none"></div>
+      {/* Overlay avec la couleur et l'opacité personnalisées */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{ backgroundColor: overlayColorWithOpacity }}
+      ></div>
     </div>
   );
 };

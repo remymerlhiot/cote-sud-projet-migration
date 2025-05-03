@@ -10,14 +10,22 @@ const Header = () => {
     return location.pathname === path;
   };
 
-  // Vous pouvez changer l'ID de la vidéo YouTube ici
-  const youtubeVideoId = "TgOm5yiEZQU"; // Exemple d'ID de vidéo YouTube
+  // ID de la nouvelle vidéo YouTube avec paramètres de début et fin
+  const youtubeVideoId = "-Ck0w7BZAbs";
+  const startTime = 8; // Démarrer à 8 secondes
+  const endTime = 60; // Terminer à 60 secondes
 
   return (
     <header className="relative">
       <div className="relative h-[400px] md:h-[500px] overflow-hidden">
-        {/* YouTube Video Background */}
-        <YouTubeBackground videoId={youtubeVideoId} />
+        {/* YouTube Video Background avec les nouveaux paramètres */}
+        <YouTubeBackground 
+          videoId={youtubeVideoId}
+          startTime={startTime}
+          endTime={endTime}
+          overlayColor="#B17226"
+          overlayOpacity={0.36}
+        />
         
         <div className="absolute inset-0">
           {/* Logo */}
