@@ -326,21 +326,37 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
   
   // Helper function to get field value as string, ensuring we always return a string
   const getFieldValue = (fieldName: string, fallback: string = "Non spécifié"): string => {
+    // Get value from root level property
     const rootValue = wpProperty[fieldName as keyof WordPressProperty];
-    const acfValue = wpProperty.acf?.[fieldName as keyof (WordPressProperty["acf"] & {})];
+    // Get value from ACF property
+    const acfValue = wpProperty.acf?.[fieldName as keyof (typeof wpProperty.acf)];
     
     // Check for root level value
     if (rootValue !== undefined && rootValue !== null) {
       if (typeof rootValue === 'string') return rootValue;
       if (typeof rootValue === 'number') return String(rootValue);
-      if (typeof rootValue === 'object' && 'rendered' in rootValue) return rootValue.rendered;
+      // Handle rendered property carefully with type checking
+      if (typeof rootValue === 'object' && rootValue !== null) {
+        // Check if the object has a 'rendered' property
+        const renderedObj = rootValue as unknown as { rendered?: string };
+        if (renderedObj.rendered) {
+          return renderedObj.rendered;
+        }
+      }
     }
     
     // Check for ACF value
     if (acfValue !== undefined && acfValue !== null) {
       if (typeof acfValue === 'string') return acfValue;
       if (typeof acfValue === 'number') return String(acfValue);
-      if (typeof acfValue === 'object' && 'rendered' in acfValue) return acfValue.rendered;
+      // Handle rendered property carefully with type checking
+      if (typeof acfValue === 'object' && acfValue !== null) {
+        // Check if the object has a 'rendered' property
+        const renderedObj = acfValue as unknown as { rendered?: string };
+        if (renderedObj.rendered) {
+          return renderedObj.rendered;
+        }
+      }
     }
     
     return fallback;
@@ -381,9 +397,16 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
   const hasTerrasse = getFieldValue('terrasse') === "1";
   const hasPool = getFieldValue('piscine') === "1";
   const garageCount = getFieldValue('nb_garage') || "0";
-  const title = typeof wpProperty.title === 'object' ? 
-    wpProperty.title.rendered : 
-    String(wpProperty.title || "Propriété");
+  
+  // Handle title property carefully
+  let title = "";
+  if (typeof wpProperty.title === 'object' && wpProperty.title !== null && 'rendered' in wpProperty.title) {
+    title = wpProperty.title.rendered;
+  } else if (typeof wpProperty.title === 'string') {
+    title = wpProperty.title;
+  } else {
+    title = "Propriété";
+  }
   
   return {
     id: wpProperty.id,
