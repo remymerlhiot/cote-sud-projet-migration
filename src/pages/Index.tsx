@@ -9,7 +9,7 @@ import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { ChevronRight } from "lucide-react";
-import Autoplay from "embla-carousel-autoplay";
+import AutoplayPlugin from "embla-carousel-autoplay";
 
 const Index = () => {
   // Fetch properties from WordPress API
@@ -95,7 +95,7 @@ const Index = () => {
           <Carousel 
             className="mx-auto max-w-6xl"
             plugins={[
-              Autoplay({
+              AutoplayPlugin({
                 delay: 4000,
                 stopOnInteraction: true,
                 stopOnMouseEnter: true,
