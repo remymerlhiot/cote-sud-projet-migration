@@ -211,6 +211,5 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
     rooms: wpProperty.acf?.rooms || "N/A",
     bedrooms: wpProperty.acf?.bedrooms || "N/A",
     image: featuredImage,
-    date: wpProperty.date || new Date().toISOString(), // Add date for sorting by recency
   };
 };
