@@ -52,7 +52,7 @@ export interface WordPressProperty {
   piscine?: string;
   annee_constr?: string;
   texte_fr?: string;
-  reference?: string;
+  reference?: string; // Unique reference field
   
   // Keep the ACF object for backward compatibility
   acf?: {
@@ -99,7 +99,7 @@ export interface WordPressProperty {
     piscine?: string;
     annee_constr?: string;
     texte_fr?: string;
-    reference?: string; // Single reference field
+    reference?: string;
   };
   
   _embedded?: {
@@ -149,6 +149,31 @@ export interface CustomWordPressPage {
   featured_image: string | null;
   elementor_data: string | null;
   media_list: string[];
+}
+
+// Définition du type pour la propriété transformée
+export interface TransformedProperty {
+  id: number;
+  title: string;
+  location: string;
+  ref: string;
+  price: string;
+  priceNumber: number;
+  area: string;
+  rooms: string;
+  bedrooms: string;
+  dpe: string;
+  image: string;
+  date: string;
+  description: string;
+  fullContent: string;
+  propertyType: string;
+  constructionYear: string;
+  hasBalcony: boolean;
+  hasElevator: boolean;
+  hasTerrasse: boolean;
+  hasPool: boolean;
+  garageCount: string;
 }
 
 // Fetch properties from WordPress API (now using the 'annonce' endpoint)
@@ -292,21 +317,36 @@ export const fetchMedia = async (mediaId: number): Promise<WordPressMedia | null
 };
 
 // Helper function to transform WordPress property data
-export const transformPropertyData = (wpProperty: WordPressProperty) => {
+export const transformPropertyData = (wpProperty: WordPressProperty): TransformedProperty => {
   const featuredImage = wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url || 
     "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"; // Fallback image
   
   // Log the full property data for debugging
   console.log("Transforming property:", wpProperty.id);
   
-  // Get field value from either root level or ACF object
-  const getFieldValue = (fieldName: string, fallback: string = "Non spécifié") => {
-    return wpProperty[fieldName as keyof WordPressProperty] || 
-           wpProperty.acf?.[fieldName as keyof (WordPressProperty["acf"] & {})] || 
-           fallback;
+  // Helper function to get field value as string, ensuring we always return a string
+  const getFieldValue = (fieldName: string, fallback: string = "Non spécifié"): string => {
+    const rootValue = wpProperty[fieldName as keyof WordPressProperty];
+    const acfValue = wpProperty.acf?.[fieldName as keyof (WordPressProperty["acf"] & {})];
+    
+    // Check for root level value
+    if (rootValue !== undefined && rootValue !== null) {
+      if (typeof rootValue === 'string') return rootValue;
+      if (typeof rootValue === 'number') return String(rootValue);
+      if (typeof rootValue === 'object' && 'rendered' in rootValue) return rootValue.rendered;
+    }
+    
+    // Check for ACF value
+    if (acfValue !== undefined && acfValue !== null) {
+      if (typeof acfValue === 'string') return acfValue;
+      if (typeof acfValue === 'number') return String(acfValue);
+      if (typeof acfValue === 'object' && 'rendered' in acfValue) return acfValue.rendered;
+    }
+    
+    return fallback;
   };
   
-  // Extract fields with the new helper function
+  // Extract fields with the helper function
   const location = getFieldValue('ville') || getFieldValue('localisation') || getFieldValue('location');
   const reference = getFieldValue('mandat') || getFieldValue('reference') || `REF ${wpProperty.id}`;
   
@@ -341,10 +381,13 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
   const hasTerrasse = getFieldValue('terrasse') === "1";
   const hasPool = getFieldValue('piscine') === "1";
   const garageCount = getFieldValue('nb_garage') || "0";
+  const title = typeof wpProperty.title === 'object' ? 
+    wpProperty.title.rendered : 
+    String(wpProperty.title || "Propriété");
   
   return {
     id: wpProperty.id,
-    title: wpProperty.title.rendered || "",
+    title: title,
     location: location,
     ref: reference,
     price: priceString,

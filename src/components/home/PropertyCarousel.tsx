@@ -1,7 +1,7 @@
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import PropertyCard from "@/components/PropertyCard";
-import { useProperties, transformPropertyData } from "@/hooks/useWordPress";
+import { useProperties, transformPropertyData, TransformedProperty } from "@/hooks/useWordPress";
 import { toast } from "@/components/ui/sonner";
 import { useState } from "react";
 import AutoplayPlugin from "embla-carousel-autoplay";
@@ -11,18 +11,29 @@ const PropertyCarousel = () => {
   const { data: wpProperties, isLoading, error } = useProperties();
   
   // Fallback data if the API call fails or is loading
-  const [fallbackProperties] = useState([
+  const [fallbackProperties] = useState<TransformedProperty[]>([
     {
       id: 1,
       title: "APPARTEMENT",
       location: "SAINT PONT L'ESPRIT",
       ref: "REF N° 20345",
       price: "642 500 €",
+      priceNumber: 642500,
       area: "248m²",
       rooms: "7",
       bedrooms: "3",
       image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png",
-      propertyType: "APPARTEMENT"
+      propertyType: "APPARTEMENT",
+      date: new Date().toISOString(),
+      description: "",
+      fullContent: "",
+      constructionYear: "",
+      hasBalcony: false,
+      hasElevator: false,
+      hasTerrasse: false,
+      hasPool: false,
+      garageCount: "0",
+      dpe: ""
     },
     {
       id: 2,
@@ -30,11 +41,22 @@ const PropertyCarousel = () => {
       location: "SAINT REMY DE PROVENCE",
       ref: "REF N° 20340",
       price: "1 687 000 €",
+      priceNumber: 1687000,
       area: "176m²",
       rooms: "6",
       bedrooms: "4",
       image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png",
-      propertyType: "DUPLEX"
+      propertyType: "DUPLEX",
+      date: new Date().toISOString(),
+      description: "",
+      fullContent: "",
+      constructionYear: "",
+      hasBalcony: false,
+      hasElevator: false,
+      hasTerrasse: false,
+      hasPool: false,
+      garageCount: "0",
+      dpe: ""
     },
     {
       id: 3,
@@ -42,11 +64,22 @@ const PropertyCarousel = () => {
       location: "EYGALIÈRES",
       ref: "REF N° 21155",
       price: "793 000 €",
+      priceNumber: 793000,
       area: "117m²",
       rooms: "4",
       bedrooms: "3",
       image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png",
-      propertyType: "MAISON"
+      propertyType: "MAISON",
+      date: new Date().toISOString(),
+      description: "",
+      fullContent: "",
+      constructionYear: "",
+      hasBalcony: false,
+      hasElevator: false,
+      hasTerrasse: false,
+      hasPool: false,
+      garageCount: "0",
+      dpe: ""
     }
   ]);
 

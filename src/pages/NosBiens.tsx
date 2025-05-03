@@ -1,7 +1,8 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useProperties, transformPropertyData } from "@/hooks/useWordPress";
+import { useProperties } from "@/hooks/useWordPress";
+import { transformPropertyData } from "@/services/wordpressApi";
 import PropertyCard from "@/components/PropertyCard";
 import { toast } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";

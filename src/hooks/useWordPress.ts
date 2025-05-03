@@ -8,7 +8,8 @@ import {
   fetchPropertyById,
   WordPressProperty,
   WordPressAnnonce,
-  transformPropertyData
+  transformPropertyData,
+  TransformedProperty
 } from "@/services/wordpressApi";
 
 export const useProperties = () => {
@@ -55,4 +56,4 @@ export const useMedia = (mediaId: number) => {
 };
 
 // Re-export the transform function and types for convenience
-export { transformPropertyData, type WordPressProperty };
+export { transformPropertyData, type WordPressProperty, type TransformedProperty };

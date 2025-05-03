@@ -1,60 +1,17 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { WordPressProperty, transformPropertyData } from "@/services/wordpressApi";
+import { WordPressProperty, transformPropertyData, TransformedProperty } from "@/services/wordpressApi";
 import { Link } from "react-router-dom";
 
 type PropertyProps = {
-  property: WordPressProperty | {
-    id: number;
-    title: string;
-    location: string;
-    ref: string;
-    price: string;
-    area: string;
-    rooms: string;
-    bedrooms: string;
-    image: string;
-    description?: string;
-    dpe?: string;
-    propertyType?: string;
-    constructionYear?: string;
-    hasBalcony?: boolean;
-    hasElevator?: boolean;
-    hasTerrasse?: boolean;
-    hasPool?: boolean;
-    garageCount?: string;
-  }
-};
-
-// Define a type for our transformed display data
-type DisplayProperty = {
-  id: number;
-  title: string | { rendered: string };
-  location: string;
-  ref: string;
-  price: string;
-  priceNumber?: number;
-  area: string;
-  rooms: string;
-  bedrooms: string;
-  image: string;
-  date?: string;
-  description?: string;
-  dpe?: string;
-  propertyType?: string;
-  constructionYear?: string;
-  hasBalcony?: boolean;
-  hasElevator?: boolean;
-  hasTerrasse?: boolean;
-  hasPool?: boolean;
-  garageCount?: string;
+  property: WordPressProperty | TransformedProperty;
 };
 
 const PropertyCard = ({ property }: PropertyProps) => {
-  // Always transform the data to ensure consistent structure
-  const displayData: DisplayProperty = 'acf' in property 
+  // Toujours transformer les données pour assurer une structure cohérente
+  const displayData: TransformedProperty = 'acf' in property 
     ? transformPropertyData(property as WordPressProperty) 
-    : property as DisplayProperty;
+    : property as TransformedProperty;
 
   // Helper function to determine the color class based on DPE rating
   const getDpeColorClass = (dpe?: string) => {
@@ -84,7 +41,7 @@ const PropertyCard = ({ property }: PropertyProps) => {
           <div>
             <img 
               src={displayData.image} 
-              alt={typeof displayData.title === 'string' ? displayData.title : "Propriété"} 
+              alt={displayData.title} 
               className="w-full h-56 object-cover"
             />
             <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
@@ -103,7 +60,7 @@ const PropertyCard = ({ property }: PropertyProps) => {
           </div>
           <div className="p-4 text-center">
             <h3 className="text-lg font-medium mt-2 text-[#CD9B59]">
-              {typeof displayData.title === 'string' ? displayData.title : displayData.title.rendered}
+              {displayData.title}
             </h3>
             <p className="text-xs text-gray-600 mb-2 uppercase">{displayData.location}</p>
             <p className="font-semibold text-lg mb-4">PRIX : {displayData.price}</p>
