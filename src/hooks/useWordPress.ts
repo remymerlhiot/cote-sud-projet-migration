@@ -10,7 +10,7 @@ import {
   WordPressAnnonce,
   transformPropertyData,
   TransformedProperty
-} from "@/services/wordpressApi";
+} from "@/services/wordpress";
 
 export const useProperties = () => {
   return useQuery({

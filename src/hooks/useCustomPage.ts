@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchCustomPageBySlug, CustomWordPressPage } from "@/services/wordpressApi";
+import { fetchCustomPageBySlug, CustomWordPressPage } from "@/services/wordpress";
 
 interface UseCustomPageOptions {
   enabled?: boolean;

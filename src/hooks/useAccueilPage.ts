@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchPageBySlug } from "@/services/wordpressApi";
+import { fetchPageBySlug } from "@/services/wordpress";
 
 export const useAccueilPage = () => {
   return useQuery({
