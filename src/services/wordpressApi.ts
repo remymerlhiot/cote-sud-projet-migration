@@ -27,6 +27,12 @@ export interface WordPressProperty {
     bedrooms?: string;
     reference?: string;
     dpe?: string;
+    // Add potential alternative field names that might be used in WordPress
+    surface?: string; // Alternative for area
+    price_display?: string; // Alternative for price
+    nb_rooms?: string; // Alternative for rooms
+    nb_bedrooms?: string; // Alternative for bedrooms
+    ref?: string; // Alternative for reference
   };
   _embedded?: {
     "wp:featuredmedia"?: Array<{
@@ -88,6 +94,10 @@ export const fetchProperties = async (): Promise<WordPressProperty[]> => {
     }
     
     const data = await response.json();
+    
+    // Debug log to see the actual structure of the data
+    console.log("WordPress API Response:", JSON.stringify(data[0]?.acf, null, 2));
+    
     return data;
   } catch (error) {
     console.error("Failed to fetch properties:", error);
@@ -203,9 +213,26 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
   const featuredImage = wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url || 
     "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"; // Fallback image
   
-  // Extract price as a number for filtering
-  const priceString = wpProperty.acf?.price || "0";
+  // Log the ACF fields for debugging
+  console.log("Property ACF fields:", wpProperty.acf);
+  
+  // Extract fields with fallbacks for different field naming conventions
+  const location = wpProperty.acf?.location || "Non spécifié";
+  const reference = wpProperty.acf?.reference || wpProperty.acf?.ref || `REF ${wpProperty.id}`;
+  
+  // Handle price - try different possible field names
+  const priceString = wpProperty.acf?.price || wpProperty.acf?.price_display || "Prix sur demande";
   const priceNumber = parseInt(priceString.replace(/[^0-9]/g, '')) || 0;
+  
+  // Handle area/surface - try different possible field names
+  const area = wpProperty.acf?.area || wpProperty.acf?.surface || "Non spécifié";
+  
+  // Handle rooms/bedrooms - try different possible field names
+  const rooms = wpProperty.acf?.rooms || wpProperty.acf?.nb_rooms || "Non spécifié";
+  const bedrooms = wpProperty.acf?.bedrooms || wpProperty.acf?.nb_bedrooms || "Non spécifié";
+  
+  // DPE rating
+  const dpe = wpProperty.acf?.dpe || "";
   
   // Extract content without HTML tags for a clean description
   const tempDiv = document.createElement('div');
@@ -216,14 +243,14 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
   return {
     id: wpProperty.id,
     title: wpProperty.title.rendered || "",
-    location: wpProperty.acf?.location || "",
-    ref: wpProperty.acf?.reference || `REF ${wpProperty.id}`,
-    price: wpProperty.acf?.price || "Prix sur demande",
+    location: location,
+    ref: reference,
+    price: priceString,
     priceNumber: priceNumber,
-    area: wpProperty.acf?.area || "N/A",
-    rooms: wpProperty.acf?.rooms || "N/A",
-    bedrooms: wpProperty.acf?.bedrooms || "N/A",
-    dpe: wpProperty.acf?.dpe || "",
+    area: area,
+    rooms: rooms,
+    bedrooms: bedrooms,
+    dpe: dpe,
     image: featuredImage,
     date: wpProperty.date || new Date().toISOString(),
     description: shortDescription,

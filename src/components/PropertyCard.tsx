@@ -58,6 +58,11 @@ const PropertyCard = ({ property }: PropertyProps) => {
     }
   };
 
+  // Check if we have valid data for each property field
+  const hasValidArea = displayData.area && displayData.area !== "Non spécifié";
+  const hasValidRooms = displayData.rooms && displayData.rooms !== "Non spécifié";
+  const hasValidBedrooms = displayData.bedrooms && displayData.bedrooms !== "Non spécifié";
+
   return (
     <Link to={`/property/${displayData.id}`} className="block h-full">
       <Card className="overflow-hidden border-none shadow-md h-full bg-white hover:shadow-lg transition-all duration-300">
@@ -87,15 +92,15 @@ const PropertyCard = ({ property }: PropertyProps) => {
             <div className="grid grid-cols-3 gap-2 border-t border-gray-200 pt-4 mb-4">
               <div className="flex flex-col items-center">
                 <p className="text-[10px] text-gray-600">Surface</p>
-                <p className="font-medium text-sm">{displayData.area}</p>
+                <p className="font-medium text-sm">{hasValidArea ? displayData.area : "Non spécifié"}</p>
               </div>
               <div className="flex flex-col items-center border-l border-r border-gray-200">
                 <p className="text-[10px] text-gray-600">Pièces</p>
-                <p className="font-medium text-sm">{displayData.rooms}</p>
+                <p className="font-medium text-sm">{hasValidRooms ? displayData.rooms : "Non spécifié"}</p>
               </div>
               <div className="flex flex-col items-center">
                 <p className="text-[10px] text-gray-600">Chambres</p>
-                <p className="font-medium text-sm">{displayData.bedrooms}</p>
+                <p className="font-medium text-sm">{hasValidBedrooms ? displayData.bedrooms : "Non spécifié"}</p>
               </div>
             </div>
             
