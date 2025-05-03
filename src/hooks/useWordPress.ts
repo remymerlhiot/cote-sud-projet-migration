@@ -54,5 +54,5 @@ export const useMedia = (mediaId: number) => {
   });
 };
 
-// Re-export the transform function for convenience
-export { transformPropertyData };
+// Re-export the transform function and types for convenience
+export { transformPropertyData, type WordPressProperty };

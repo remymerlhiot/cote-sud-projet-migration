@@ -8,7 +8,7 @@ const CUSTOM_API_BASE_URL = "https://cote-sud.immo/wp-json/axo/v1";
 // Types for WordPress API responses
 export interface WordPressProperty {
   id: number;
-  date?: string;  // Add date property to fix the error
+  date?: string;
   title: {
     rendered: string;
   };
@@ -20,6 +20,7 @@ export interface WordPressProperty {
   };
   featured_media: number;
   acf: {
+    // Original fields
     location?: string;
     price?: string;
     area?: string;
@@ -27,12 +28,43 @@ export interface WordPressProperty {
     bedrooms?: string;
     reference?: string;
     dpe?: string;
-    // Add potential alternative field names that might be used in WordPress
-    surface?: string; // Alternative for area
-    price_display?: string; // Alternative for price
-    nb_rooms?: string; // Alternative for rooms
-    nb_bedrooms?: string; // Alternative for bedrooms
-    ref?: string; // Alternative for reference
+    
+    // WordPress ACF field names
+    mandat?: string;
+    ville?: string;
+    localisation?: string;
+    prix?: string;
+    prix_affiche?: string;
+    surf_hab?: string;
+    piece?: string;
+    nb_chambre?: string;
+    dpe_lettre_consom_energ?: string;
+    reference?: string;
+    
+    // Additional fields from the WordPress ACF list
+    type_mandat?: string;
+    operation?: string;
+    famille?: string;
+    type?: string;
+    adresse?: string;
+    code_postal?: string;
+    pays?: string;
+    prestige?: string;
+    neuf?: string;
+    surf_terrain?: string;
+    nb_etage?: string;
+    num_etage?: string;
+    nb_sdb?: string;
+    nb_salle_deau?: string;
+    nb_wc?: string;
+    chauffage?: string;
+    balcon?: string;
+    ascenseur?: string;
+    nb_garage?: string;
+    terrasse?: string;
+    piscine?: string;
+    annee_constr?: string;
+    texte_fr?: string;
   };
   _embedded?: {
     "wp:featuredmedia"?: Array<{
@@ -96,7 +128,10 @@ export const fetchProperties = async (): Promise<WordPressProperty[]> => {
     const data = await response.json();
     
     // Debug log to see the actual structure of the data
-    console.log("WordPress API Response:", JSON.stringify(data[0]?.acf, null, 2));
+    if (data && data.length > 0) {
+      console.log("WordPress API Complete Property Response:", data[0]);
+      console.log("WordPress API ACF Fields:", JSON.stringify(data[0]?.acf, null, 2));
+    }
     
     return data;
   } catch (error) {
@@ -213,32 +248,55 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
   const featuredImage = wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url || 
     "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"; // Fallback image
   
-  // Log the ACF fields for debugging
-  console.log("Property ACF fields:", wpProperty.acf);
+  // Log the full property data for debugging
+  console.log("Transforming property:", wpProperty.id);
   
-  // Extract fields with fallbacks for different field naming conventions
-  const location = wpProperty.acf?.location || "Non spécifié";
-  const reference = wpProperty.acf?.reference || wpProperty.acf?.ref || `REF ${wpProperty.id}`;
+  // Extract fields with fallbacks for ACF field naming conventions
+  const location = wpProperty.acf?.ville || 
+                   wpProperty.acf?.localisation || 
+                   wpProperty.acf?.location || 
+                   "Non spécifié";
+  
+  const reference = wpProperty.acf?.mandat || 
+                    wpProperty.acf?.reference || 
+                    `REF ${wpProperty.id}`;
   
   // Handle price - try different possible field names
-  const priceString = wpProperty.acf?.price || wpProperty.acf?.price_display || "Prix sur demande";
+  const priceString = wpProperty.acf?.prix_affiche || 
+                      wpProperty.acf?.prix || 
+                      wpProperty.acf?.price || 
+                      "Prix sur demande";
   const priceNumber = parseInt(priceString.replace(/[^0-9]/g, '')) || 0;
   
-  // Handle area/surface - try different possible field names
-  const area = wpProperty.acf?.area || wpProperty.acf?.surface || "Non spécifié";
+  // Handle area/surface - try different possible field names and ensure it has "m²"
+  let area = wpProperty.acf?.surf_hab || wpProperty.acf?.area || wpProperty.acf?.surface || "Non spécifié";
+  if (area !== "Non spécifié" && !area.includes("m²")) {
+    area = `${area}m²`;
+  }
   
-  // Handle rooms/bedrooms - try different possible field names
-  const rooms = wpProperty.acf?.rooms || wpProperty.acf?.nb_rooms || "Non spécifié";
-  const bedrooms = wpProperty.acf?.bedrooms || wpProperty.acf?.nb_bedrooms || "Non spécifié";
+  // Handle rooms - try different possible field names
+  const rooms = wpProperty.acf?.piece || wpProperty.acf?.rooms || "Non spécifié";
   
-  // DPE rating
-  const dpe = wpProperty.acf?.dpe || "";
+  // Handle bedrooms - try different possible field names
+  const bedrooms = wpProperty.acf?.nb_chambre || wpProperty.acf?.bedrooms || "Non spécifié";
+  
+  // DPE rating - get the energy consumption letter
+  const dpe = wpProperty.acf?.dpe_lettre_consom_energ || wpProperty.acf?.dpe || "";
   
   // Extract content without HTML tags for a clean description
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = wpProperty.content.rendered;
   const contentText = tempDiv.textContent || tempDiv.innerText || "";
   const shortDescription = contentText.substring(0, 150) + "...";
+  
+  // Additional property details
+  const propertyType = wpProperty.acf?.type || "";
+  const constructionYear = wpProperty.acf?.annee_constr || "";
+  const hasBalcony = wpProperty.acf?.balcon === "1" ? true : false;
+  const hasElevator = wpProperty.acf?.ascenseur === "1" ? true : false;
+  const hasTerrasse = wpProperty.acf?.terrasse === "1" ? true : false;
+  const hasPool = wpProperty.acf?.piscine === "1" ? true : false;
+  const garageCount = wpProperty.acf?.nb_garage || "0";
   
   return {
     id: wpProperty.id,
@@ -255,5 +313,13 @@ export const transformPropertyData = (wpProperty: WordPressProperty) => {
     date: wpProperty.date || new Date().toISOString(),
     description: shortDescription,
     fullContent: wpProperty.content.rendered || "",
+    propertyType: propertyType,
+    constructionYear: constructionYear,
+    hasBalcony: hasBalcony,
+    hasElevator: hasElevator,
+    hasTerrasse: hasTerrasse,
+    hasPool: hasPool,
+    garageCount: garageCount
   };
 };
+

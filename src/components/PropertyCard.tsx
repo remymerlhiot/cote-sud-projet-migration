@@ -16,6 +16,13 @@ type PropertyProps = {
     image: string;
     description?: string;
     dpe?: string;
+    propertyType?: string;
+    constructionYear?: string;
+    hasBalcony?: boolean;
+    hasElevator?: boolean;
+    hasTerrasse?: boolean;
+    hasPool?: boolean;
+    garageCount?: string;
   }
 };
 
@@ -34,6 +41,13 @@ type DisplayProperty = {
   date?: string;
   description?: string;
   dpe?: string;
+  propertyType?: string;
+  constructionYear?: string;
+  hasBalcony?: boolean;
+  hasElevator?: boolean;
+  hasTerrasse?: boolean;
+  hasPool?: boolean;
+  garageCount?: string;
 };
 
 const PropertyCard = ({ property }: PropertyProps) => {
@@ -76,6 +90,11 @@ const PropertyCard = ({ property }: PropertyProps) => {
             <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
               {displayData.ref}
             </div>
+            {displayData.propertyType && (
+              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 bg-[#CD9B59]/90 text-white px-3 py-1 text-xs font-medium uppercase">
+                {displayData.propertyType}
+              </div>
+            )}
             {displayData.dpe && (
               <div className={`absolute top-3 right-3 ${getDpeColorClass(displayData.dpe)} text-white px-2 py-1 text-xs font-medium rounded-sm`}>
                 DPE: {displayData.dpe.toUpperCase()}
@@ -107,6 +126,24 @@ const PropertyCard = ({ property }: PropertyProps) => {
             {displayData.description && (
               <div className="text-left border-t border-gray-200 pt-4">
                 <p className="text-xs text-gray-700 line-clamp-3">{displayData.description}</p>
+              </div>
+            )}
+            
+            {/* Additional property features */}
+            {(displayData.hasBalcony || displayData.hasTerrasse || displayData.hasPool || displayData.garageCount !== "0") && (
+              <div className="mt-3 flex flex-wrap justify-center gap-2">
+                {displayData.hasBalcony && (
+                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Balcon</span>
+                )}
+                {displayData.hasTerrasse && (
+                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Terrasse</span>
+                )}
+                {displayData.hasPool && (
+                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Piscine</span>
+                )}
+                {displayData.garageCount !== "0" && displayData.garageCount && (
+                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">{parseInt(displayData.garageCount) > 1 ? `${displayData.garageCount} Garages` : "Garage"}</span>
+                )}
               </div>
             )}
             

@@ -21,7 +21,8 @@ const PropertyCarousel = () => {
       area: "248m²",
       rooms: "7",
       bedrooms: "3",
-      image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png"
+      image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png",
+      propertyType: "APPARTEMENT"
     },
     {
       id: 2,
@@ -32,7 +33,8 @@ const PropertyCarousel = () => {
       area: "176m²",
       rooms: "6",
       bedrooms: "4",
-      image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png"
+      image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png",
+      propertyType: "DUPLEX"
     },
     {
       id: 3,
@@ -43,7 +45,8 @@ const PropertyCarousel = () => {
       area: "117m²",
       rooms: "4",
       bedrooms: "3",
-      image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png"
+      image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png",
+      propertyType: "MAISON"
     }
   ]);
 
