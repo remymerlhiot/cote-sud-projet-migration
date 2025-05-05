@@ -37,28 +37,93 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, "text/html");
       
-      // Try to identify and remove team section(s)
+      // More robust approach to identify and remove team section(s)
       const teamSectionSelectors = [
-        // Common selectors that might contain team info
-        ".team-section", 
+        // Common team section identifiers
+        "#notre-equipe", 
+        "#team",
         ".notre-equipe",
-        "section:contains('Notre Équipe')",
-        "section:contains('équipe')",
+        ".team-section",
+        "section:has(h2:contains('Notre Équipe'))",
+        "section:has(h2:contains('Notre équipe'))",
+        "section:has(h2:contains('NOTRE ÉQUIPE'))",
         "div:has(h2:contains('Notre Équipe'))",
-        "div:has(h3:contains('équipe'))",
+        "div:has(h2:contains('Notre équipe'))",
+        "div:has(h2:contains('NOTRE ÉQUIPE'))",
+        "section:has(h3:contains('équipe'))",
+        "div:has(h3:contains('équipe'))"
       ];
       
+      // First attempt with CSS selectors
       for (const selector of teamSectionSelectors) {
         try {
-          const section = doc.querySelector(selector);
-          if (section) {
-            section.parentNode?.removeChild(section);
-          }
+          const elements = doc.querySelectorAll(selector);
+          elements.forEach(element => {
+            if (element) {
+              console.log("Found and removing team section with selector:", selector);
+              element.parentNode?.removeChild(element);
+            }
+          });
         } catch (e) {
-          // Invalid selector, continue to next
-          console.log("Removing section failed:", selector);
+          console.log("Selector failed:", selector);
         }
       }
+      
+      // Fallback: Text-based approach
+      const allSections = doc.querySelectorAll('section, div');
+      allSections.forEach(section => {
+        const sectionText = section.textContent?.toLowerCase() || '';
+        const sectionHTML = section.innerHTML?.toLowerCase() || '';
+        
+        // If section contains team-related text, consider removing it
+        if (
+          (sectionText.includes('notre équipe') || 
+           sectionText.includes('notre equipe') || 
+           sectionText.includes('team') ||
+           sectionHTML.includes('notre équipe') || 
+           sectionHTML.includes('notre equipe')) &&
+          // Ensure it's a substantial section, not just a small reference
+          section.children.length > 1
+        ) {
+          console.log("Found team section via text content, removing");
+          section.parentNode?.removeChild(section);
+        }
+        
+        // Look for headings that might indicate team sections
+        const teamHeadings = section.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        teamHeadings.forEach(heading => {
+          const headingText = heading.textContent?.toLowerCase() || '';
+          if (
+            headingText.includes('notre équipe') || 
+            headingText.includes('notre equipe') ||
+            headingText.includes('team')
+          ) {
+            // Find the parent container of this heading
+            let parentSection = heading.parentElement;
+            let depth = 0;
+            
+            // Try to find the actual section container (up to 3 levels up)
+            while (parentSection && depth < 3) {
+              if (
+                parentSection.tagName === 'SECTION' || 
+                (parentSection.tagName === 'DIV' && parentSection.children.length > 2)
+              ) {
+                console.log("Found team section via heading, removing parent element");
+                parentSection.parentNode?.removeChild(parentSection);
+                break;
+              }
+              parentSection = parentSection.parentElement;
+              depth++;
+            }
+            
+            // If we couldn't find a suitable parent section, remove this specific heading's container
+            if (depth >= 3 && heading.parentElement) {
+              console.log("Found team heading, removing its container");
+              heading.parentElement.parentNode?.removeChild(heading.parentElement);
+            }
+          }
+        });
+      });
       
       content = doc.body.innerHTML;
     }

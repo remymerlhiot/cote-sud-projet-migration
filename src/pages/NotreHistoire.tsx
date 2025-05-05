@@ -6,14 +6,20 @@ import CustomWordPressPage from "@/components/CustomWordPressPage";
 import { useNotreHistoire } from "@/hooks/useNotreHistoire";
 import { Skeleton } from "@/components/ui/skeleton";
 import TeamSection from "@/components/team/TeamSection";
+import { useTeamMembers } from "@/hooks/useTeamMembers";
 
 interface NotreHistoireProps {
   slug?: string;
 }
 
 const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
-  // Use our custom hook
+  // Use our custom hooks
   const { data: page, isLoading, isError } = useNotreHistoire(propSlug);
+  const { isFromWordPress } = useTeamMembers();
+  
+  // Determine whether to show our custom TeamSection component
+  // If team data is from WordPress, we'll use our custom TeamSection
+  // component to display it in a standardized format
   
   return (
     <div className="flex flex-col min-h-screen bg-cream font-raleway">
@@ -52,7 +58,7 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
             <CustomWordPressPage 
               slug={propSlug || "notre-histoire"} 
               className="prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light"
-              hideTeamSection={true}
+              hideTeamSection={true} // Always hide WordPress team section
               cleaningOptions={{
                 removeElementorClasses: true,
                 simplifyStructure: true, 
@@ -64,7 +70,7 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
           )}
         </div>
         
-        {/* Team Section - Will appear below the WordPress content */}
+        {/* Team Section - Will always use our custom component for consistency */}
         <div className="mt-16 max-w-6xl mx-auto">
           <TeamSection />
         </div>
