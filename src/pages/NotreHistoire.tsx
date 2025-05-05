@@ -5,8 +5,6 @@ import Footer from "@/components/Footer";
 import CustomWordPressPage from "@/components/CustomWordPressPage";
 import { useNotreHistoire } from "@/hooks/useNotreHistoire";
 import { Skeleton } from "@/components/ui/skeleton";
-import TeamSection from "@/components/team/TeamSection";
-import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -17,7 +15,6 @@ interface NotreHistoireProps {
 const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
   // Use our custom hooks
   const { data: page, isLoading, isError } = useNotreHistoire(propSlug);
-  const { isFromWordPress } = useTeamMembers();
   const [debugMode, setDebugMode] = useState(false);
   
   return (
@@ -71,7 +68,8 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
             <CustomWordPressPage 
               slug={propSlug || "notre-histoire"} 
               className="prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light"
-              hideTeamSection={true} // Force removal of WordPress team section
+              hideTeamSection={false} // Don't hide the team section
+              styleTeamSection={true} // Apply our custom styling to the WordPress team section
               debugMode={debugMode} // Debug mode to help identify issues
               cleaningOptions={{
                 removeElementorClasses: true,
@@ -82,11 +80,6 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
               }}
             />
           )}
-        </div>
-        
-        {/* Team Section - Always use our custom component for consistency */}
-        <div className="mt-16 max-w-6xl mx-auto">
-          <TeamSection />
         </div>
       </main>
 
