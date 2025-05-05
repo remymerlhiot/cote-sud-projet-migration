@@ -19,13 +19,17 @@ type ServiceItem = {
 
 const ServicesSection = () => {
   const [services, setServices] = useState<ServiceItem[]>([]);
+  const [backgroundImage, setBackgroundImage] = useState<string>("/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png");
   const { data: pageData, isLoading } = useCustomPage("new-home");
 
   useEffect(() => {
     if (pageData?.content) {
-      // Extract services from WordPress content
+      // Extract services and background image from WordPress content
       const parser = new DOMParser();
       const doc = parser.parseFromString(cleanElementorHtml(pageData.content), "text/html");
+      
+      // Look for background image in the services section
+      extractBackgroundImage(doc);
       
       // Look for the services section (using standard selectors)
       const servicesSection = doc.querySelector(".services-section") || 
@@ -149,6 +153,72 @@ const ServicesSection = () => {
     }
   }, [pageData]);
 
+  // Function to extract background image from the WordPress content
+  function extractBackgroundImage(doc: Document) {
+    // Look for elements with background image styles in the services section
+    const servicesSectionElement = findServicesSectionByHeading(doc);
+    
+    if (servicesSectionElement) {
+      // Try to find background image in style attributes
+      const elementsWithBackground = Array.from(servicesSectionElement.querySelectorAll("*[style*='background']"));
+      
+      // Also look for container elements that might have background
+      const potentialBgContainers = Array.from(servicesSectionElement.querySelectorAll(".elementor-background-overlay, .elementor-background-slideshow, .elementor-background, .section-bg"))
+        .concat(Array.from(servicesSectionElement.querySelectorAll("section, div")));
+      
+      // Combine and examine all potential elements
+      const potentialElements = [...elementsWithBackground, ...potentialBgContainers];
+      
+      for (const element of potentialElements) {
+        const style = element.getAttribute("style") || "";
+        
+        // Extract image URL from style
+        const bgImageMatch = style.match(/background-image\s*:\s*url\(['"]?([^'")]+)['"]?\)/i);
+        
+        if (bgImageMatch && bgImageMatch[1]) {
+          console.log("Found background image:", bgImageMatch[1]);
+          setBackgroundImage(bgImageMatch[1]);
+          return;
+        }
+        
+        // Check if there is a dataset background
+        const datasetBg = (element as HTMLElement).dataset?.background;
+        if (datasetBg) {
+          console.log("Found dataset background:", datasetBg);
+          setBackgroundImage(datasetBg);
+          return;
+        }
+      }
+      
+      // If we're here, try looking for images that might be backgrounds
+      const backgroundImages = Array.from(servicesSectionElement.querySelectorAll("img"));
+      if (backgroundImages.length > 0) {
+        const src = backgroundImages[0].getAttribute("src");
+        if (src) {
+          console.log("Found background image from img:", src);
+          setBackgroundImage(src);
+          return;
+        }
+      }
+    }
+    
+    // Also try to find the image by a key part of the filename used in the default image
+    if (pageData?.content) {
+      const matchLavender = pageData.content.match(/https:\/\/cote-sud\.immo\/[^"']*lavande[^"']*\.(jpg|jpeg|png|webp)/i);
+      if (matchLavender && matchLavender[0]) {
+        console.log("Found lavender image from content:", matchLavender[0]);
+        setBackgroundImage(matchLavender[0]);
+        return;
+      }
+    }
+    
+    // If pageData includes a featured image, use it as a fallback
+    if (pageData?.featured_image) {
+      console.log("Using featured image as fallback:", pageData.featured_image);
+      setBackgroundImage(pageData.featured_image);
+    }
+  }
+
   // Helper function to find sections with headings containing "SERVICES"
   function findServicesSectionByHeading(doc: Document) {
     const headings = Array.from(doc.querySelectorAll("h1, h2, h3, h4, h5, h6"));
@@ -173,7 +243,7 @@ const ServicesSection = () => {
 
   return (
     <section className="relative mb-20">
-      <div className="w-full h-[600px] bg-cover bg-center" style={{ backgroundImage: "url('/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png')" }}>
+      <div className="w-full h-[600px] bg-cover bg-center" style={{ backgroundImage: `url('${backgroundImage}')` }}>
         <div className="absolute inset-0 bg-black/60">
           <div className="container mx-auto h-full flex flex-col md:flex-row items-center">
             <div className="md:w-1/3 text-center md:text-left p-8 md:p-12">
