@@ -27,9 +27,10 @@ const ServicesSection = () => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(cleanElementorHtml(pageData.content), "text/html");
       
-      // Look for the services section (often in a specific div or section)
-      // This selector might need adjustment based on the actual HTML structure
-      const servicesSection = doc.querySelector(".services-section, #services-section, section:has(h2:contains('SERVICES'))");
+      // Look for the services section (using standard selectors)
+      const servicesSection = doc.querySelector(".services-section") || 
+                             doc.querySelector("#services-section") || 
+                             findServicesSectionByHeading(doc);
       
       let extractedServices: ServiceItem[] = [];
       
@@ -147,6 +148,28 @@ const ServicesSection = () => {
       }
     }
   }, [pageData]);
+
+  // Helper function to find sections with headings containing "SERVICES"
+  function findServicesSectionByHeading(doc: Document) {
+    const headings = Array.from(doc.querySelectorAll("h1, h2, h3, h4, h5, h6"));
+    for (const heading of headings) {
+      if (heading.textContent?.includes("SERVICES")) {
+        // Return the parent section or a parent element that might contain the services
+        let parent = heading.parentElement;
+        while (parent) {
+          if (parent.tagName === "SECTION" || 
+              parent.classList.contains("section") || 
+              parent.classList.contains("elementor-section")) {
+            return parent;
+          }
+          parent = parent.parentElement;
+        }
+        // If no suitable parent found, return the heading's parent as fallback
+        return heading.parentElement;
+      }
+    }
+    return null;
+  }
 
   return (
     <section className="relative mb-20">
