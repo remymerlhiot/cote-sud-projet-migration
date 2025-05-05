@@ -7,6 +7,7 @@ import { useNotreHistoire } from "@/hooks/useNotreHistoire";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import TeamSection from "@/components/team/TeamSection";
 
 interface NotreHistoireProps {
   slug?: string;
@@ -65,20 +66,25 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
           )}
           
           {page && (
-            <CustomWordPressPage 
-              slug={propSlug || "notre-histoire"} 
-              className="prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light"
-              hideTeamSection={false} // Don't hide the team section
-              styleTeamSection={true} // Apply our custom styling to the WordPress team section
-              debugMode={debugMode} // Debug mode to help identify issues
-              cleaningOptions={{
-                removeElementorClasses: true,
-                simplifyStructure: true, 
-                makeImagesResponsive: true,
-                fixLinks: true,
-                baseDomain: "https://cote-sud.immo"
-              }}
-            />
+            <>
+              <CustomWordPressPage 
+                slug={propSlug || "notre-histoire"} 
+                className="prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light"
+                hideTeamSection={true} // Hide the WordPress team section
+                styleTeamSection={false} // Don't try to style it since we're hiding it
+                debugMode={debugMode} // Debug mode to help identify issues
+                cleaningOptions={{
+                  removeElementorClasses: true,
+                  simplifyStructure: true, 
+                  makeImagesResponsive: true,
+                  fixLinks: true,
+                  baseDomain: "https://cote-sud.immo"
+                }}
+              />
+              
+              {/* Add our custom TeamSection component */}
+              <TeamSection />
+            </>
           )}
         </div>
       </main>

@@ -49,8 +49,11 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
     // Debug mode: store original content before team removal or styling
     const originalContentBeforeProcessing = content;
     
-    // Style team section if requested
-    if (styleTeamSection && !hideTeamSection) {
+    // Make sure we don't try to style the team section if we're going to hide it
+    const shouldStyleTeam = styleTeamSection && !hideTeamSection;
+    
+    // Style team section if requested (only if we're not hiding it)
+    if (shouldStyleTeam) {
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "text/html");
@@ -210,7 +213,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
       }
     }
     
-    // Remove team section if requested (keep the existing code for backwards compatibility)
+    // Remove team section if requested
     if (hideTeamSection) {
       try {
         const parser = new DOMParser();
