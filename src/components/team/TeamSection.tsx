@@ -4,10 +4,18 @@ import TeamMember, { TeamMemberProps } from "./TeamMember";
 import { Separator } from "@/components/ui/separator";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/components/ui/sonner";
 
 const TeamSection: React.FC = () => {
   // Use our custom hook to get team members from WordPress
   const { teamMembers, isLoading, isError, isFromWordPress } = useTeamMembers();
+
+  // Display a toast if we loaded from WordPress
+  React.useEffect(() => {
+    if (isFromWordPress) {
+      toast.success("Membres de l'équipe synchronisés depuis WordPress");
+    }
+  }, [isFromWordPress]);
 
   // Loading state
   if (isLoading) {
@@ -57,7 +65,7 @@ const TeamSection: React.FC = () => {
   }
 
   return (
-    <section className="py-12">
+    <section className="py-12" id="notre-equipe">
       <div className="text-center mb-10">
         <h2 className="text-3xl font-playfair font-light text-gold mb-4">
           Notre Équipe

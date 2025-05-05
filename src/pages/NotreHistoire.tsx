@@ -52,6 +52,7 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
             <CustomWordPressPage 
               slug={propSlug || "notre-histoire"} 
               className="prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light"
+              hideTeamSection={true}
               cleaningOptions={{
                 removeElementorClasses: true,
                 simplifyStructure: true, 

@@ -10,6 +10,7 @@ interface CustomWordPressPageProps {
   showTitle?: boolean;
   cleaningOptions?: CleaningOptions;
   extractSection?: string;
+  hideTeamSection?: boolean;
 }
 
 const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({ 
@@ -17,7 +18,8 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
   className = "",
   showTitle = true,
   cleaningOptions,
-  extractSection
+  extractSection,
+  hideTeamSection = false
 }) => {
   const { data: page, isLoading, isError } = useCustomPage(slug);
 
@@ -29,6 +31,37 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
     
     // Clean the Elementor HTML
     content = cleanElementorHtml(content, cleaningOptions);
+    
+    // Remove team section if requested
+    if (hideTeamSection) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, "text/html");
+      
+      // Try to identify and remove team section(s)
+      const teamSectionSelectors = [
+        // Common selectors that might contain team info
+        ".team-section", 
+        ".notre-equipe",
+        "section:contains('Notre Équipe')",
+        "section:contains('équipe')",
+        "div:has(h2:contains('Notre Équipe'))",
+        "div:has(h3:contains('équipe'))",
+      ];
+      
+      for (const selector of teamSectionSelectors) {
+        try {
+          const section = doc.querySelector(selector);
+          if (section) {
+            section.parentNode?.removeChild(section);
+          }
+        } catch (e) {
+          // Invalid selector, continue to next
+          console.log("Removing section failed:", selector);
+        }
+      }
+      
+      content = doc.body.innerHTML;
+    }
     
     // Extract specific section if requested
     if (extractSection) {
@@ -49,7 +82,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
     }
     
     return content;
-  }, [page, cleaningOptions, extractSection]);
+  }, [page, cleaningOptions, extractSection, hideTeamSection]);
 
   if (isLoading) {
     return (
@@ -92,7 +125,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
         dangerouslySetInnerHTML={{ __html: processedContent }}
       />
       
-      {page.media_list && page.media_list.length > 0 && (
+      {!hideTeamSection && page.media_list && page.media_list.length > 0 && (
         <div className="media-gallery mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {page.media_list.map((imageUrl, index) => (
             <div key={index} className="media-item">

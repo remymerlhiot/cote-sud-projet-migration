@@ -58,138 +58,169 @@ export const useTeamMembers = () => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(page.content, "text/html");
       
-      // Try to find the team section in the WordPress content
-      // We're looking for sections or divs with text containing "équipe" or specific class names
-      const teamSectionSelectors = [
-        // Common selectors that might contain team info
-        ".team-section", 
-        ".notre-equipe",
-        ".elementor-section:has(h2:contains('Notre Équipe'))",
-        ".elementor-section:has(h3:contains('équipe'))",
-        // Look for divs with team-related content
-        "div:has(img):has(.team-member-name)",
-        // Find any section with team members
-        "section:has(h2:contains('quipe'))",
-        ".elementor-widget-container:has(h2:contains('quipe'))",
-      ];
-      
-      // Try each selector
-      let teamSection = null;
-      for (const selector of teamSectionSelectors) {
-        try {
-          const section = doc.querySelector(selector);
-          if (section) {
-            teamSection = section;
-            break;
-          }
-        } catch (e) {
-          // Invalid selector, continue to next
-          console.log("Selector failed:", selector);
-        }
-      }
-      
-      // If we still don't have a team section, look for it by content
-      if (!teamSection) {
-        // Find headings that might indicate a team section
-        const headings = doc.querySelectorAll("h1, h2, h3, h4, h5, h6");
-        for (const heading of headings) {
-          if (heading.textContent?.toLowerCase().includes("équipe") || 
-              heading.textContent?.toLowerCase().includes("equipe") || 
-              heading.textContent?.toLowerCase().includes("team")) {
-            // Found a potential team section heading, get its parent section
-            let parent = heading.parentElement;
-            while (parent && parent.tagName !== "SECTION" && parent.tagName !== "DIV") {
-              parent = parent.parentElement;
-            }
-            if (parent) {
-              teamSection = parent;
-              break;
-            }
-          }
-        }
-      }
-      
-      // If we found a team section, try to extract member info
-      if (teamSection) {
-        // Look for team member cards/elements within the section
-        const memberElements = teamSection.querySelectorAll(".team-member, .elementor-widget-image-box, .elementor-widget-person");
+      // Approach 1: Look for any team member-like structures throughout the page
+      const extractMembersFromEntirePage = () => {
+        const extractedMembers: TeamMemberProps[] = [];
         
-        // If we found specific member elements
-        if (memberElements && memberElements.length > 0) {
-          const extractedMembers: TeamMemberProps[] = [];
+        // Look for images that might be team members
+        const images = doc.querySelectorAll("img");
+        
+        for (const img of images) {
+          // Find potential team member containers (parent elements up to 3 levels)
+          let container = img.parentElement;
+          let depth = 0;
           
-          memberElements.forEach((memberElement) => {
-            // Extract name
-            const nameElement = memberElement.querySelector("h3, h4, .elementor-image-box-title, .elementor-person-name");
-            const name = nameElement?.textContent?.trim() || "";
+          while (container && depth < 3) {
+            const containerText = container.textContent || '';
             
-            // Extract role
-            const roleElement = memberElement.querySelector(".elementor-image-box-description, .elementor-person-title, .role, p");
-            const role = roleElement?.textContent?.trim() || "";
+            // Check if this container has phone number or email-like content
+            const hasPhonePattern = /(?:0|\+33|0033)[1-9](?:[\s.-]?[0-9]{2}){4}/.test(containerText);
+            const hasEmailPattern = /@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(containerText);
             
-            // Extract phone
-            const phoneElement = memberElement.querySelector("a[href^='tel:'], .phone, .elementor-icon-list-text:contains('06')");
-            let phone = phoneElement?.textContent?.trim() || "";
-            // If no direct phone element found, look for it in text content
-            if (!phone) {
-              const text = memberElement.textContent || "";
-              const phoneMatch = text.match(/(?:0|\+33|0033)[1-9](?:[\s.-]?[0-9]{2}){4}/);
-              if (phoneMatch) {
-                phone = phoneMatch[0];
-              }
-            }
-            
-            // Extract email
-            let email = "";
-            const emailElement = memberElement.querySelector("a[href^='mailto:'], .email");
-            if (emailElement) {
-              email = emailElement.textContent?.trim() || "";
-              if (email.startsWith("mailto:")) {
-                email = email.substring(7);
-              }
-            } else {
-              // Try to find email in href
-              const emailLink = memberElement.querySelector("a[href*='@']");
-              if (emailLink) {
-                const href = emailLink.getAttribute("href") || "";
-                if (href.startsWith("mailto:")) {
-                  email = href.substring(7);
+            if (hasPhonePattern || hasEmailPattern) {
+              // This might be a team member
+              const name = findNameInContainer(container);
+              
+              if (name) {
+                // Extract member information
+                const phone = extractPhone(container);
+                const email = extractEmail(container);
+                const role = extractRole(container, name);
+                const linkedin = extractLinkedIn(container);
+                const imageUrl = img.getAttribute("src") || "";
+                
+                // Add to extracted members if basic info is available
+                if (name && (phone || email)) {
+                  extractedMembers.push({
+                    name,
+                    phone: phone || "Numéro non disponible",
+                    email,
+                    linkedin,
+                    role,
+                    imageUrl
+                  });
+                  
+                  // Break the loop as we've found what we need
+                  break;
                 }
               }
             }
             
-            // Extract LinkedIn
-            let linkedin = "";
-            const linkedinElement = memberElement.querySelector("a[href*='linkedin.com'], .linkedin");
-            if (linkedinElement) {
-              linkedin = linkedinElement.getAttribute("href") || "";
-            }
-            
-            // Extract image URL
-            let imageUrl = "";
-            const imgElement = memberElement.querySelector("img");
-            if (imgElement) {
-              imageUrl = imgElement.getAttribute("src") || "";
-            }
-            
-            // Only add member if at least name and phone are available
-            if (name && (phone || email)) {
-              extractedMembers.push({
-                name,
-                phone: phone || "Numéro non disponible",
-                role,
-                email,
-                linkedin,
-                imageUrl
-              });
-            }
-          });
-          
-          // If we successfully extracted members, return them
-          if (extractedMembers.length > 0) {
-            return { teamMembers: extractedMembers, isFromWordPress: true };
+            // Move up the DOM tree
+            container = container.parentElement;
+            depth++;
           }
         }
+        
+        return extractedMembers;
+      };
+      
+      // Helper function to find name in a container
+      const findNameInContainer = (container: Element): string => {
+        // First look for headings
+        const heading = container.querySelector("h1, h2, h3, h4, h5, h6");
+        if (heading && heading.textContent && heading.textContent.trim().length > 0) {
+          return heading.textContent.trim();
+        }
+        
+        // Then look for elements with potential name classes
+        const nameEl = container.querySelector(".name, .title, .agent-name, strong, b");
+        if (nameEl && nameEl.textContent && nameEl.textContent.trim().length > 0) {
+          return nameEl.textContent.trim();
+        }
+        
+        // Then look for the first paragraph or div if it's short (likely a name)
+        const firstP = container.querySelector("p, div");
+        if (firstP && firstP.textContent) {
+          const text = firstP.textContent.trim();
+          // If text is short and not phone/email, it might be a name
+          if (text.length > 0 && text.length < 40 && 
+              !text.includes('@') && !/\d{2}\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}/.test(text)) {
+            return text;
+          }
+        }
+        
+        return "";
+      };
+      
+      // Helper function to extract phone
+      const extractPhone = (container: Element): string => {
+        // Look for phone in href
+        const phoneLink = container.querySelector("a[href^='tel:']");
+        if (phoneLink && phoneLink.getAttribute("href")) {
+          const href = phoneLink.getAttribute("href") || "";
+          return href.replace('tel:', '');
+        }
+        
+        // Look for phone in text
+        const text = container.textContent || "";
+        const phoneMatch = text.match(/(?:0|\+33|0033)[1-9](?:[\s.-]?[0-9]{2}){4}/);
+        if (phoneMatch) {
+          return phoneMatch[0];
+        }
+        
+        return "";
+      };
+      
+      // Helper function to extract email
+      const extractEmail = (container: Element): string => {
+        // Look for email in href
+        const emailLink = container.querySelector("a[href^='mailto:']");
+        if (emailLink && emailLink.getAttribute("href")) {
+          const href = emailLink.getAttribute("href") || "";
+          return href.replace('mailto:', '');
+        }
+        
+        // Look for email in text
+        const text = container.textContent || "";
+        const emailMatch = text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/);
+        if (emailMatch) {
+          return emailMatch[0];
+        }
+        
+        return "";
+      };
+      
+      // Helper function to extract role
+      const extractRole = (container: Element, name: string): string => {
+        // First try to find "role" by class
+        const roleEl = container.querySelector(".role, .position, .job-title");
+        if (roleEl && roleEl.textContent) {
+          return roleEl.textContent.trim();
+        }
+        
+        // Try to find paragraphs after the name
+        const paragraphs = container.querySelectorAll("p");
+        for (const p of paragraphs) {
+          if (p.textContent && 
+              !p.textContent.includes(name) && 
+              !p.textContent.includes('@') && 
+              !/\d{2}\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}/.test(p.textContent)) {
+            const text = p.textContent.trim();
+            // If it's short, it could be a role
+            if (text.length > 0 && text.length < 40) {
+              return text;
+            }
+          }
+        }
+        
+        return "";
+      };
+      
+      // Helper function to extract LinkedIn
+      const extractLinkedIn = (container: Element): string => {
+        const linkedinLink = container.querySelector("a[href*='linkedin.com']");
+        if (linkedinLink && linkedinLink.getAttribute("href")) {
+          return linkedinLink.getAttribute("href") || "";
+        }
+        return "";
+      };
+      
+      // Try the whole page approach first
+      const membersFromPage = extractMembersFromEntirePage();
+      if (membersFromPage.length > 0) {
+        console.log("Successfully extracted team members from WordPress content");
+        return { teamMembers: membersFromPage, isFromWordPress: true };
       }
       
       // If we couldn't extract members with the above methods, return fallback data
