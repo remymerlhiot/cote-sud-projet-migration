@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import CustomWordPressPage from "@/components/CustomWordPressPage";
 import { useNotreHistoire } from "@/hooks/useNotreHistoire";
 import { Skeleton } from "@/components/ui/skeleton";
+import TeamSection from "@/components/team/TeamSection";
 
 interface NotreHistoireProps {
   slug?: string;
@@ -60,6 +61,11 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
               }}
             />
           )}
+        </div>
+        
+        {/* Team Section - Will appear below the WordPress content */}
+        <div className="mt-16 max-w-6xl mx-auto">
+          <TeamSection />
         </div>
       </main>
 
