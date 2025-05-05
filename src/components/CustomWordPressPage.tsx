@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect } from "react";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,9 +26,11 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
 }) => {
   const { data: page, isLoading, isError } = useCustomPage(slug);
   const [showOriginalHtml, setShowOriginalHtml] = useState(false);
+  const [originalContent, setOriginalContent] = useState<string>("");
+  const [processedContent, setProcessedContent] = useState<string>("");
 
   // Process and clean the HTML content
-  const processedContent = useMemo(() => {
+  const processedHtmlContent = useMemo(() => {
     if (!page?.content) return "";
     
     let content = page.content;
@@ -37,8 +38,8 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
     // Clean the Elementor HTML
     content = cleanElementorHtml(content, cleaningOptions);
     
-    // Debug mode: capture original content before team removal
-    const originalContent = content;
+    // Debug mode: store original content before team removal
+    const originalContentBeforeRemoval = content;
     
     // Remove team section if requested
     if (hideTeamSection) {
@@ -206,10 +207,10 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
       }
     }
     
-    // In debug mode, store the original content for comparison
+    // In debug mode, store the content for comparison
     if (debugMode) {
-      window.originalWordPressContent = originalContent;
-      window.processedWordPressContent = content;
+      setOriginalContent(originalContentBeforeRemoval);
+      setProcessedContent(content);
     }
     
     return content;
@@ -279,8 +280,8 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
         className="page-content prose max-w-none prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light font-raleway elementor-content"
         dangerouslySetInnerHTML={{ 
           __html: debugMode && showOriginalHtml 
-            ? (window as any).originalWordPressContent || "Contenu original non disponible" 
-            : processedContent 
+            ? originalContent
+            : processedHtmlContent 
         }}
       />
       
