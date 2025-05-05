@@ -68,3 +68,24 @@ export const fetchCustomPageBySlug = async (slug: string): Promise<CustomWordPre
     return null;
   }
 };
+
+// Extract a specific section from a page by its selector
+export const extractSectionFromPage = async (
+  slug: string, 
+  selector: string
+): Promise<string | null> => {
+  try {
+    const page = await fetchCustomPageBySlug(slug);
+    
+    if (!page?.content) return null;
+    
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(page.content, "text/html");
+    const section = doc.querySelector(selector);
+    
+    return section ? section.outerHTML : null;
+  } catch (error) {
+    console.error(`Failed to extract section from page "${slug}":`, error);
+    return null;
+  }
+};
