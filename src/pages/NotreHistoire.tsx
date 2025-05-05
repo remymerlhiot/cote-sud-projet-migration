@@ -7,6 +7,8 @@ import { useNotreHistoire } from "@/hooks/useNotreHistoire";
 import { Skeleton } from "@/components/ui/skeleton";
 import TeamSection from "@/components/team/TeamSection";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface NotreHistoireProps {
   slug?: string;
@@ -16,10 +18,7 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
   // Use our custom hooks
   const { data: page, isLoading, isError } = useNotreHistoire(propSlug);
   const { isFromWordPress } = useTeamMembers();
-  
-  // Determine whether to show our custom TeamSection component
-  // If team data is from WordPress, we'll use our custom TeamSection
-  // component to display it in a standardized format
+  const [debugMode, setDebugMode] = useState(false);
   
   return (
     <div className="flex flex-col min-h-screen bg-cream font-raleway">
@@ -29,6 +28,20 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
       {/* Main Content */}
       <main className="flex-grow container mx-auto py-12 px-4">
         <div className="max-w-4xl mx-auto">
+          {/* Debug toggle in development - toggle to help identify HTML structure issues */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-4 text-right">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setDebugMode(!debugMode)}
+                className="text-xs"
+              >
+                {debugMode ? "Désactiver debug" : "Activer debug"}
+              </Button>
+            </div>
+          )}
+          
           {isLoading && (
             <div className="space-y-6">
               <Skeleton className="h-16 w-2/3" />
@@ -58,7 +71,8 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
             <CustomWordPressPage 
               slug={propSlug || "notre-histoire"} 
               className="prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light"
-              hideTeamSection={true} // Always hide WordPress team section
+              hideTeamSection={true} // Force removal of WordPress team section
+              debugMode={debugMode} // Debug mode to help identify issues
               cleaningOptions={{
                 removeElementorClasses: true,
                 simplifyStructure: true, 
@@ -70,7 +84,7 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
           )}
         </div>
         
-        {/* Team Section - Will always use our custom component for consistency */}
+        {/* Team Section - Always use our custom component for consistency */}
         <div className="mt-16 max-w-6xl mx-auto">
           <TeamSection />
         </div>
