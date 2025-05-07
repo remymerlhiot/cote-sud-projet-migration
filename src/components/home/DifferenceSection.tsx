@@ -19,7 +19,7 @@ const DifferenceSection = () => {
   const { data: homePage, isLoading } = useCustomPage("new-home");
   const [content, setContent] = useState<DifferenceContent>({
     title: "LA DIFFÉRENCE",
-    image: "/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png",
+    image: "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png",
     mainText: [
       "AXO Côté Sud, réseau d'agences spécialisées en commercialisation de biens immobiliers d'exception, s'adresse aux clients à la recherche de leur lieu de vie idéal au cœur du Sud de la France.",
       "Notre équipe composée d'experts du secteur immobilier, vous accompagne tout au long de votre projet, des premières étapes de recherche jusqu'à la concrétisation de votre projet immobilier que vous souhaitiez devenir locataire ou bien propriétaire."
@@ -154,11 +154,11 @@ const DifferenceSection = () => {
       ) : (
         <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
           <div className="md:w-1/3">
-            <div className="overflow-hidden rounded-full">
+            <div className="overflow-hidden rounded-full aspect-square border-4 border-[#C8A977] shadow-lg">
               <img 
                 src={content.image}
                 alt="AXO Côté Sud - La différence" 
-                className="w-full h-auto"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
@@ -169,7 +169,7 @@ const DifferenceSection = () => {
               </p>
             ))}
             
-            <h3 className="text-2xl font-playfair font-normal text-[#CD9B59] mb-6">
+            <h3 className="text-2xl font-playfair font-normal text-[#C8A977] mb-6">
               {content.accompagnementTitle}
             </h3>
             
@@ -179,8 +179,8 @@ const DifferenceSection = () => {
               </p>
             ))}
             
-            <Button variant="outline" className="border-[#CD9B59] text-[#CD9B59] hover:bg-[#CD9B59] hover:text-white">
-              EN SAVOIR PLUS <ChevronRight size={16} />
+            <Button variant="outline" className="border-[#C8A977] text-[#C8A977] hover:bg-[#C8A977] hover:text-white">
+              EN SAVOIR PLUS <ChevronRight size={16} className="ml-1" />
             </Button>
           </div>
         </div>
