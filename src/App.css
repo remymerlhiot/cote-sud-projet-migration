@@ -66,3 +66,49 @@ a:hover, button:hover {
   background-color: rgba(205, 155, 89, 0.8);
 }
 
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+  }
+  
+  p {
+    font-size: 0.95rem;
+  }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Mobile menu adjustments */
+.mobile-menu-link {
+  transition: background-color 0.2s ease;
+}
+
+.mobile-menu-link:active {
+  background-color: rgba(205, 155, 89, 0.9);
+}
+
+/* Fix for estimation widget container on mobile */
+#jst__est_11bS96785252f655f6Xy524293v7P112 {
+  width: 100% !important;
+  min-height: 600px;
+  position: relative;
+  display: block;
+}
+
+/* Ensure iframe from widget is responsive */
+#jst__est_11bS96785252f655f6Xy524293v7P112 iframe {
+  width: 100% !important;
+  max-width: 100%;
+}

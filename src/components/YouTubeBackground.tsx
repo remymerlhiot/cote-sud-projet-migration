@@ -1,5 +1,6 @@
 
 import { useEffect, useRef } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface YouTubeBackgroundProps {
   videoId: string;
@@ -17,19 +18,21 @@ const YouTubeBackground = ({
   overlayOpacity = 0.3 
 }: YouTubeBackgroundProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<any>(null);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
+    let checkTimeInterval: NodeJS.Timeout | null = null;
+    
     // Load YouTube API
     const tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
 
-    let player: any;
-
     // Initialize player when API is ready
     window.onYouTubeIframeAPIReady = () => {
-      player = new window.YT.Player('youtube-background', {
+      playerRef.current = new window.YT.Player('youtube-background', {
         videoId: videoId,
         playerVars: {
           autoplay: 1,
@@ -49,21 +52,21 @@ const YouTubeBackground = ({
           onReady: (event) => {
             event.target.mute();
             event.target.playVideo();
+            
+            // Adjust size based on device
+            updatePlayerSize();
           },
           onStateChange: (event) => {
             // Si une valeur endTime est définie, vérifier si nous avons atteint cette limite
-            if (endTime && player) {
+            if (endTime && playerRef.current) {
               // Vérifier périodiquement la position de lecture
-              const checkTimeInterval = setInterval(() => {
-                const currentTime = player.getCurrentTime();
+              checkTimeInterval = setInterval(() => {
+                const currentTime = playerRef.current.getCurrentTime();
                 if (currentTime >= endTime) {
                   // Revenir au début de la séquence (startTime)
-                  player.seekTo(startTime);
+                  playerRef.current.seekTo(startTime);
                 }
               }, 1000); // Vérifier chaque seconde
-              
-              // Nettoyer l'intervalle à la destruction du composant
-              return () => clearInterval(checkTimeInterval);
             }
             
             // Replay video when it ends if no endTime is set
@@ -71,16 +74,72 @@ const YouTubeBackground = ({
               event.target.seekTo(startTime);
               event.target.playVideo();
             }
+            
+            // Handle potential playback errors
+            if (event.data === window.YT.PlayerState.UNSTARTED || 
+                event.data === window.YT.PlayerState.CUED) {
+              setTimeout(() => {
+                try {
+                  event.target.playVideo();
+                } catch (e) {
+                  console.error("Failed to play video:", e);
+                }
+              }, 1000);
+            }
+          },
+          onError: (event) => {
+            console.error("YouTube player error:", event.data);
+            // Try to recover from error
+            setTimeout(() => {
+              try {
+                event.target.playVideo();
+              } catch (e) {
+                console.error("Failed to recover from error:", e);
+              }
+            }, 3000);
           }
         }
       });
+    };
+    
+    // Update player size on window resize
+    const handleResize = () => {
+      updatePlayerSize();
+    };
+    
+    window.addEventListener('resize', handleResize);
+
+    // Function to update the player's size based on container dimensions
+    const updatePlayerSize = () => {
+      if (!containerRef.current || !playerRef.current) return;
+      
+      const containerWidth = containerRef.current.offsetWidth;
+      const containerHeight = containerRef.current.offsetHeight;
+      
+      // Calculate proper scaling factor for the video
+      // Use a larger scale for mobile to ensure full coverage
+      const scaleFactor = isMobile ? 3.5 : 3;
+      
+      try {
+        playerRef.current.setSize(containerWidth * scaleFactor, containerHeight * scaleFactor);
+      } catch (e) {
+        console.error("Failed to resize player:", e);
+      }
     };
 
     return () => {
       // Clean up
       window.onYouTubeIframeAPIReady = null;
+      window.removeEventListener('resize', handleResize);
+      
+      if (checkTimeInterval) {
+        clearInterval(checkTimeInterval);
+      }
+      
+      // Clean up player reference
+      playerRef.current = null;
     };
-  }, [videoId, startTime, endTime]);
+  }, [videoId, startTime, endTime, isMobile]);
 
   // Convertir l'opacité en valeur hexadécimale pour la couleur CSS
   const getHexOpacity = (opacity: number) => {
