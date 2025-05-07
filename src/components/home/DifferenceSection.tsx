@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { cleanElementorHtml } from "@/utils/elementorCleaner";
 import { Skeleton } from "@/components/ui/skeleton";
-
 type DifferenceContent = {
   title: string;
   image: string;
@@ -13,64 +11,60 @@ type DifferenceContent = {
   accompagnementTitle: string;
   accompagnementText: string[];
 };
-
 const DifferenceSection = () => {
   // Fetch homepage content
-  const { data: homePage, isLoading } = useCustomPage("new-home");
+  const {
+    data: homePage,
+    isLoading
+  } = useCustomPage("new-home");
   const [content, setContent] = useState<DifferenceContent>({
     title: "LA DIFFÉRENCE",
     image: "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png",
-    mainText: [
-      "AXO Côté Sud, réseau d'agences spécialisées en commercialisation de biens immobiliers d'exception, s'adresse aux clients à la recherche de leur lieu de vie idéal au cœur du Sud de la France.",
-      "Notre équipe composée d'experts du secteur immobilier, vous accompagne tout au long de votre projet, des premières étapes de recherche jusqu'à la concrétisation de votre projet immobilier que vous souhaitiez devenir locataire ou bien propriétaire."
-    ],
+    mainText: ["AXO Côté Sud, réseau d'agences spécialisées en commercialisation de biens immobiliers d'exception, s'adresse aux clients à la recherche de leur lieu de vie idéal au cœur du Sud de la France.", "Notre équipe composée d'experts du secteur immobilier, vous accompagne tout au long de votre projet, des premières étapes de recherche jusqu'à la concrétisation de votre projet immobilier que vous souhaitiez devenir locataire ou bien propriétaire."],
     accompagnementTitle: "L'ACCOMPAGNEMENT",
-    accompagnementText: [
-      "Anticipation, des actions, des prestations, maîtrise des dossiers, professionnalisme, des connaissances, disponibilité et réactivité. Autant d'adjectifs qui vous permettront de vous rassurer dans votre projet, d'avoir une écoute face à vos questionnements, de recevoir des conseils avisés et d'être soutenu dans vos démarches."
-    ]
+    accompagnementText: ["Anticipation, des actions, des prestations, maîtrise des dossiers, professionnalisme, des connaissances, disponibilité et réactivité. Autant d'adjectifs qui vous permettront de vous rassurer dans votre projet, d'avoir une écoute face à vos questionnements, de recevoir des conseils avisés et d'être soutenu dans vos démarches."]
   });
-
   useEffect(() => {
     if (homePage?.content) {
       extractDifferenceContent(homePage.content);
     }
   }, [homePage]);
-
   const extractDifferenceContent = (htmlContent: string) => {
     // Parse the content
     const parser = new DOMParser();
     const doc = parser.parseFromString(cleanElementorHtml(htmlContent), "text/html");
-    
+
     // Try to find the difference section
     const differenceSection = findDifferenceSectionByHeading(doc);
-    
     if (differenceSection) {
-      const newContent: DifferenceContent = { ...content };
-      
+      const newContent: DifferenceContent = {
+        ...content
+      };
+
       // Extract title
       const titleElement = differenceSection.querySelector("h1, h2, h3, h4, h5, h6");
       if (titleElement && titleElement.textContent) {
         newContent.title = titleElement.textContent.trim();
       }
-      
+
       // Extract image
       const imageElement = differenceSection.querySelector("img");
       if (imageElement && imageElement.getAttribute("src")) {
         newContent.image = imageElement.getAttribute("src") || content.image;
       }
-      
+
       // Extract main text paragraphs
       const mainTextElements = Array.from(differenceSection.querySelectorAll("p"));
       const mainTexts: string[] = [];
       const accompagnementTexts: string[] = [];
       let foundAccompagnement = false;
       let accompagnementTitle = "";
-      
+
       // Process paragraphs
       for (const paragraph of mainTextElements) {
         const text = paragraph.textContent?.trim();
         if (!text) continue;
-        
+
         // Check if this is the accompagnement section
         const prevElement = paragraph.previousElementSibling;
         if (prevElement && prevElement.tagName.match(/^H[1-6]$/)) {
@@ -82,7 +76,7 @@ const DifferenceSection = () => {
             continue;
           }
         }
-        
+
         // If we've found accompagnement section, add to that array
         if (foundAccompagnement) {
           accompagnementTexts.push(text);
@@ -90,20 +84,17 @@ const DifferenceSection = () => {
           mainTexts.push(text);
         }
       }
-      
+
       // If we found content, update the state
       if (mainTexts.length > 0) {
         newContent.mainText = mainTexts;
       }
-      
       if (accompagnementTexts.length > 0) {
         newContent.accompagnementText = accompagnementTexts;
       }
-      
       if (accompagnementTitle) {
         newContent.accompagnementTitle = accompagnementTitle;
       }
-      
       setContent(newContent);
     }
   };
@@ -116,9 +107,7 @@ const DifferenceSection = () => {
         // Find the parent section that contains this heading
         let parent = heading.parentElement;
         while (parent) {
-          if (parent.tagName === "SECTION" || 
-              parent.classList.contains("section") || 
-              parent.classList.contains("elementor-section")) {
+          if (parent.tagName === "SECTION" || parent.classList.contains("section") || parent.classList.contains("elementor-section")) {
             return parent;
           }
           parent = parent.parentElement;
@@ -129,15 +118,12 @@ const DifferenceSection = () => {
     }
     return null;
   }
-
-  return (
-    <section className="container mx-auto mb-20 px-4">
+  return <section className="container mx-auto mb-20 px-4">
       <h2 className="text-2xl md:text-3xl font-playfair font-normal text-[#CD9B59] text-center mb-12">
         {content.title}
       </h2>
       
-      {isLoading ? (
-        <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+      {isLoading ? <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
           <div className="md:w-1/3">
             <Skeleton className="w-full h-[300px] rounded-full" />
           </div>
@@ -150,43 +136,28 @@ const DifferenceSection = () => {
             <Skeleton className="h-6 w-full mb-2" />
             <Skeleton className="h-12 w-48 mt-4" />
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+        </div> : <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
           <div className="md:w-1/3">
             <div className="overflow-hidden rounded-full aspect-square border-4 border-[#C8A977] shadow-lg">
-              <img 
-                src={content.image}
-                alt="AXO Côté Sud - La différence" 
-                className="w-full h-full object-cover"
-              />
+              <img src={content.image} alt="AXO Côté Sud - La différence" className="w-full h-full object-cover" />
             </div>
           </div>
           <div className="md:w-2/3">
-            {content.mainText.map((paragraph, index) => (
-              <p key={`main-${index}`} className="text-gray-700 mb-4">
+            {content.mainText.map((paragraph, index) => <p key={`main-${index}`} className="text-gray-700 mb-4">
                 {paragraph}
-              </p>
-            ))}
+              </p>)}
             
             <h3 className="text-2xl font-playfair font-normal text-[#C8A977] mb-6">
               {content.accompagnementTitle}
             </h3>
             
-            {content.accompagnementText.map((paragraph, index) => (
-              <p key={`accomp-${index}`} className="text-gray-700 mb-6">
+            {content.accompagnementText.map((paragraph, index) => <p key={`accomp-${index}`} className="text-gray-700 mb-6">
                 {paragraph}
-              </p>
-            ))}
+              </p>)}
             
-            <Button variant="outline" className="border-[#C8A977] text-[#C8A977] hover:bg-[#C8A977] hover:text-white">
-              EN SAVOIR PLUS <ChevronRight size={16} className="ml-1" />
-            </Button>
+            
           </div>
-        </div>
-      )}
-    </section>
-  );
+        </div>}
+    </section>;
 };
-
 export default DifferenceSection;
