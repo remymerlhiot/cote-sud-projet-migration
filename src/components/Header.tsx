@@ -1,3 +1,4 @@
+
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { useLocation } from "react-router-dom";
 import { Home, Phone } from "lucide-react";
@@ -14,7 +15,7 @@ const Header = () => {
   const endTime = 60; // Terminer à 60 secondes
 
   return <header className="relative">
-      <div className="relative h-[400px] md:h-[500px] overflow-hidden">
+      <div className="relative h-[220px] overflow-hidden">
         {/* YouTube Video Background avec les nouveaux paramètres */}
         <YouTubeBackground videoId={youtubeVideoId} startTime={startTime} endTime={endTime} overlayColor="#B17226" overlayOpacity={0.36} />
         
@@ -26,7 +27,7 @@ const Header = () => {
           </div>
           
           {/* Navigation Menu - Centered and uniform */}
-          <div className="absolute bottom-24 left-0 right-0 w-full">
+          <div className="absolute bottom-8 left-0 right-0 w-full">
             <div className="container mx-auto">
               <div className="flex justify-center">
                 <div className="bg-[#CD9B59]/30 backdrop-blur-sm">
@@ -76,7 +77,7 @@ const Header = () => {
           </div>
           
           {/* Contact Bar */}
-          <div className="absolute bottom-8 left-0 right-0 py-2">
+          <div className="absolute bottom-1 left-0 right-0 py-1">
             <div className="container mx-auto flex justify-center items-center gap-12 text-xs">
               <div className="flex items-center gap-2 text-white">
                 <Home size={14} className="text-white" />
