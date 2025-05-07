@@ -370,32 +370,6 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
   if (!page) {
     return <div className="text-center p-8 text-[#CD9B59]">Page introuvable</div>;
   }
-  return <div className={`wordpress-page ${className}`}>
-      {showTitle && page.title}
-      
-      {page.featured_image && <div className="featured-image mb-8">
-          <img src={page.featured_image} alt={page.title || "Featured image"} className="w-full h-auto rounded-lg" />
-        </div>}
-      
-      {debugMode && <div className="mb-4 p-2 bg-amber-50 border border-amber-200 rounded">
-          <p className="text-sm text-amber-800 mb-2">Mode debug activé</p>
-          <Button variant="outline" size="sm" onClick={() => {
-        setShowOriginalHtml(!showOriginalHtml);
-        toast.info(showOriginalHtml ? "Affichage du contenu traité" : "Affichage du contenu original");
-      }} className="text-xs">
-            {showOriginalHtml ? "Voir contenu traité" : "Voir contenu original"}
-          </Button>
-        </div>}
-      
-      {!hideContent && <div className="page-content prose max-w-none prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light font-raleway elementor-content" dangerouslySetInnerHTML={{
-      __html: debugMode && showOriginalHtml ? originalContent : processedHtmlContent
-    }} />}
-      
-      {!hideTeamSection && page.media_list && page.media_list.length > 0 && <div className="media-gallery mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {page.media_list.map((imageUrl, index) => <div key={index} className="media-item">
-              <img src={imageUrl} alt={`Media ${index + 1} - ${page.title || ""}`} className="w-full h-auto rounded-lg" />
-            </div>)}
-        </div>}
-    </div>;
+  return;
 };
 export default CustomWordPressPage;
