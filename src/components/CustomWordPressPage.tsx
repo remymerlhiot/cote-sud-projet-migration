@@ -17,6 +17,7 @@ interface CustomWordPressPageProps {
   hideTeamSection?: boolean;
   styleTeamSection?: boolean;
   debugMode?: boolean;
+  hideContent?: boolean; // New prop to control content visibility
 }
 
 const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({ 
@@ -27,10 +28,11 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
   extractSection,
   hideTeamSection = false,
   styleTeamSection = false,
-  debugMode = false
+  debugMode = false,
+  hideContent = false // Default to showing content
 }) => {
   const { data: page, isLoading, isError } = useCustomPage(slug);
-  const [showOriginalHtml, setShowOriginalHtml] = useState(false);
+  const [showOriginalHtml, setShowOriginalHtml] = useState<boolean>(false);
   const [originalContent, setOriginalContent] = useState<string>("");
   const [processedContent, setProcessedContent] = useState<string>("");
   
@@ -415,7 +417,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
 
   return (
     <div className={`wordpress-page ${className}`}>
-      {showTitle && (
+      {showTitle && page.title && (
         <h1 className="text-3xl font-playfair font-light text-[#CD9B59] mb-6">
           {page.title}
         </h1>
@@ -425,7 +427,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
         <div className="featured-image mb-8">
           <img 
             src={page.featured_image} 
-            alt={page.title} 
+            alt={page.title || "Featured image"} 
             className="w-full h-auto rounded-lg"
           />
         </div>
@@ -448,14 +450,16 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
         </div>
       )}
       
-      <div 
-        className="page-content prose max-w-none prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light font-raleway elementor-content"
-        dangerouslySetInnerHTML={{ 
-          __html: debugMode && showOriginalHtml 
-            ? originalContent
-            : processedHtmlContent 
-        }}
-      />
+      {!hideContent && (
+        <div 
+          className="page-content prose max-w-none prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light font-raleway elementor-content"
+          dangerouslySetInnerHTML={{ 
+            __html: debugMode && showOriginalHtml 
+              ? originalContent
+              : processedHtmlContent 
+          }}
+        />
+      )}
       
       {!hideTeamSection && page.media_list && page.media_list.length > 0 && (
         <div className="media-gallery mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -463,7 +467,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             <div key={index} className="media-item">
               <img 
                 src={imageUrl} 
-                alt={`Media ${index + 1} - ${page.title}`} 
+                alt={`Media ${index + 1} - ${page.title || ""}`} 
                 className="w-full h-auto rounded-lg"
               />
             </div>

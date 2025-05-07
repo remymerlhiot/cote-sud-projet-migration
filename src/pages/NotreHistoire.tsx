@@ -72,6 +72,7 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
                 className="prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light"
                 hideTeamSection={true} // Hide the WordPress team section
                 styleTeamSection={false} // Don't try to style it since we're hiding it
+                hideContent={true} // Hide the content block as requested
                 debugMode={debugMode} // Debug mode to help identify issues
                 cleaningOptions={{
                   removeElementorClasses: true,
