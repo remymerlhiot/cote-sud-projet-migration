@@ -19,7 +19,8 @@ type ServiceItem = {
 
 const ServicesSection = () => {
   const [services, setServices] = useState<ServiceItem[]>([]);
-  const [backgroundImage, setBackgroundImage] = useState<string>("/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png");
+  // Mise à jour de l'URL de l'image de fond avec celle spécifiée
+  const [backgroundImage, setBackgroundImage] = useState<string>("https://cote-sud.immo/wp-content/uploads/2024/11/champs-de-lavandes-sur-sainte-victoire.jpg");
   const { data: pageData, isLoading } = useCustomPage("new-home");
 
   useEffect(() => {
@@ -291,3 +292,4 @@ const ServicesSection = () => {
 };
 
 export default ServicesSection;
+
