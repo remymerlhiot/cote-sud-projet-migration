@@ -1,3 +1,4 @@
+
 // Types for WordPress API responses
 export interface WordPressProperty {
   id: number;
@@ -168,4 +169,16 @@ export interface TransformedProperty {
   hasTerrasse: boolean;
   hasPool: boolean;
   garageCount: string;
+  // Nouveaux champs
+  postalCode?: string;
+  address?: string;
+  landArea?: string;
+  floorNumber?: string;
+  totalFloors?: string;
+  bathrooms?: string;
+  toilets?: string;
+  heatingType?: string;
+  isNewConstruction?: boolean;
+  isPrestigious?: boolean;
+  country?: string;
 }

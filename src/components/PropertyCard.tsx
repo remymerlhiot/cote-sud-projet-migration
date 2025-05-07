@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { WordPressProperty, transformPropertyData, TransformedProperty } from "@/services/wordpressApi";
+import { WordPressProperty, transformPropertyData, TransformedProperty } from "@/services/wordpress";
 import { Link } from "react-router-dom";
 
 type PropertyProps = {
@@ -33,12 +33,35 @@ const PropertyCard = ({ property }: PropertyProps) => {
   const hasValidArea = displayData.area && displayData.area !== "Non spécifié";
   const hasValidRooms = displayData.rooms && displayData.rooms !== "Non spécifié";
   const hasValidBedrooms = displayData.bedrooms && displayData.bedrooms !== "Non spécifié";
+  
+  // Additional feature badges
+  const renderFeatureBadges = () => {
+    const badges = [];
+    
+    if (displayData.isNewConstruction) {
+      badges.push(
+        <span key="new" className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
+          NEUF
+        </span>
+      );
+    }
+    
+    if (displayData.isPrestigious) {
+      badges.push(
+        <span key="prestige" className="absolute top-3 right-16 bg-[#B17226] text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
+          PRESTIGE
+        </span>
+      );
+    }
+    
+    return badges;
+  };
 
   return (
     <Link to={`/property/${displayData.id}`} className="block h-full">
       <Card className="overflow-hidden border-none shadow-md h-full bg-white hover:shadow-lg transition-all duration-300">
         <CardContent className="p-0 relative">
-          <div>
+          <div className="relative">
             <img 
               src={displayData.image} 
               alt={displayData.title} 
@@ -48,22 +71,28 @@ const PropertyCard = ({ property }: PropertyProps) => {
               {displayData.ref}
             </div>
             {displayData.propertyType && (
-              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 bg-[#CD9B59]/90 text-white px-3 py-1 text-xs font-medium uppercase">
+              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 bg-[#C8A977]/90 text-white px-3 py-1 text-xs font-medium uppercase">
                 {displayData.propertyType}
               </div>
             )}
             {displayData.dpe && (
-              <div className={`absolute top-3 right-3 ${getDpeColorClass(displayData.dpe)} text-white px-2 py-1 text-xs font-medium rounded-sm`}>
+              <div className={`absolute bottom-3 right-3 ${getDpeColorClass(displayData.dpe)} text-white px-2 py-1 text-xs font-medium rounded-sm`}>
                 DPE: {displayData.dpe.toUpperCase()}
               </div>
             )}
+            {renderFeatureBadges()}
           </div>
           <div className="p-4 text-center">
-            <h3 className="text-lg font-medium mt-2 text-[#CD9B59]">
+            <h3 className="text-lg font-serif mt-2 text-[#C8A977]">
               {displayData.title}
             </h3>
-            <p className="text-xs text-gray-600 mb-2 uppercase">{displayData.location}</p>
-            <p className="font-semibold text-lg mb-4">PRIX : {displayData.price}</p>
+            <p className="text-xs text-[#37373A] mb-2 uppercase">
+              {displayData.location}
+              {displayData.postalCode ? ` - ${displayData.postalCode}` : ''}
+            </p>
+            <p className="font-semibold text-lg mb-4 text-[#B17226]">
+              {displayData.price}
+            </p>
 
             <div className="grid grid-cols-3 gap-2 border-t border-gray-200 pt-4 mb-4">
               <div className="flex flex-col items-center">
@@ -82,12 +111,13 @@ const PropertyCard = ({ property }: PropertyProps) => {
             
             {displayData.description && (
               <div className="text-left border-t border-gray-200 pt-4">
-                <p className="text-xs text-gray-700 line-clamp-3">{displayData.description}</p>
+                <p className="text-xs text-[#37373A] line-clamp-3">{displayData.description}</p>
               </div>
             )}
             
             {/* Additional property features */}
-            {(displayData.hasBalcony || displayData.hasTerrasse || displayData.hasPool || displayData.garageCount !== "0") && (
+            {(displayData.hasBalcony || displayData.hasTerrasse || displayData.hasPool || 
+              displayData.garageCount !== "0" || displayData.bathrooms) && (
               <div className="mt-3 flex flex-wrap justify-center gap-2">
                 {displayData.hasBalcony && (
                   <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Balcon</span>
@@ -99,13 +129,20 @@ const PropertyCard = ({ property }: PropertyProps) => {
                   <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Piscine</span>
                 )}
                 {displayData.garageCount !== "0" && displayData.garageCount && (
-                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">{parseInt(displayData.garageCount) > 1 ? `${displayData.garageCount} Garages` : "Garage"}</span>
+                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
+                    {parseInt(displayData.garageCount) > 1 ? `${displayData.garageCount} Garages` : "Garage"}
+                  </span>
+                )}
+                {displayData.bathrooms && (
+                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
+                    {parseInt(displayData.bathrooms) > 1 ? `${displayData.bathrooms} SDB` : "1 SDB"}
+                  </span>
                 )}
               </div>
             )}
             
             <div className="mt-4 flex justify-center">
-              <span className="inline-block px-4 py-2 bg-[#CD9B59] text-white text-xs rounded-sm hover:bg-[#BA8A48] transition-colors">
+              <span className="inline-block px-4 py-2 bg-[#C8A977] text-white text-xs rounded-sm hover:bg-[#B17226] transition-colors">
                 Voir le détail
               </span>
             </div>

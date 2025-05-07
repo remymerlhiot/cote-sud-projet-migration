@@ -77,11 +77,25 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
   // Additional property details using the helper function
   const propertyType = getFieldValue('type');
   const constructionYear = getFieldValue('annee_constr');
-  const hasBalcony = getFieldValue('balcon') === "1";
-  const hasElevator = getFieldValue('ascenseur') === "1";
-  const hasTerrasse = getFieldValue('terrasse') === "1";
-  const hasPool = getFieldValue('piscine') === "1";
+  
+  // Special features with fallback to boolean values if strings aren't available
+  const hasBalcony = getFieldValue('balcon') === "1" || getFieldValue('balcon').toLowerCase() === "true";
+  const hasElevator = getFieldValue('ascenseur') === "1" || getFieldValue('ascenseur').toLowerCase() === "true";
+  const hasTerrasse = getFieldValue('terrasse') === "1" || getFieldValue('terrasse').toLowerCase() === "true";
+  const hasPool = getFieldValue('piscine') === "1" || getFieldValue('piscine').toLowerCase() === "true";
   const garageCount = getFieldValue('nb_garage') || "0";
+  
+  // New fields for improved data extraction
+  const postalCode = getFieldValue('code_postal');
+  const address = getFieldValue('adresse');
+  const landArea = getFieldValue('surf_terrain');
+  const floorNumber = getFieldValue('num_etage');
+  const totalFloors = getFieldValue('nb_etage');
+  const bathrooms = getFieldValue('nb_sdb') || getFieldValue('nb_salle_deau');
+  const toilets = getFieldValue('nb_wc');
+  const heatingType = getFieldValue('chauffage');
+  const isNewConstruction = getFieldValue('neuf') === "1";
+  const isPrestigious = getFieldValue('prestige') === "1";
   
   // Handle title property carefully
   let title = "";
@@ -90,7 +104,7 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
   } else if (typeof wpProperty.title === 'string') {
     title = wpProperty.title;
   } else {
-    title = "Propriété";
+    title = propertyType || "Propriété";
   }
   
   return {
@@ -114,6 +128,18 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
     hasElevator: hasElevator,
     hasTerrasse: hasTerrasse,
     hasPool: hasPool,
-    garageCount: garageCount
+    garageCount: garageCount,
+    // Nouveaux champs ajoutés
+    postalCode: postalCode,
+    address: address,
+    landArea: landArea,
+    floorNumber: floorNumber,
+    totalFloors: totalFloors,
+    bathrooms: bathrooms,
+    toilets: toilets,
+    heatingType: heatingType,
+    isNewConstruction: isNewConstruction,
+    isPrestigious: isPrestigious,
+    country: getFieldValue('pays'),
   };
 };
