@@ -13,11 +13,13 @@ export interface TeamMemberProps {
 const TeamMember: React.FC<TeamMemberProps> = ({
   name,
   phone,
+  email,
   imageUrl,
+  role,
 }) => {
   return (
     <div className="flex flex-col items-center text-center mb-8">
-      <div className="relative w-48 h-32 overflow-hidden rounded-[50%/60%] mb-4 bg-cream border-gold/10">
+      <div className="relative w-48 h-48 overflow-hidden rounded-full mb-4 bg-cream border-gold/10">
         {imageUrl ? (
           <img 
             src={imageUrl} 
@@ -32,7 +34,9 @@ const TeamMember: React.FC<TeamMemberProps> = ({
       </div>
 
       <h3 className="font-playfair text-xl text-gold uppercase mb-2">{name}</h3>
+      {role && <p className="text-sm text-gray-600 mb-1">{role}</p>}
       <p className="text-sm">{phone}</p>
+      {email && <p className="text-sm text-gray-600">{email}</p>}
     </div>
   );
 };

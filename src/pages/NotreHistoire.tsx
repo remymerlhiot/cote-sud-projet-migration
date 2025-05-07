@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import TeamSection from "@/components/team/TeamSection";
+import HistoryIntroSection from "@/components/history/HistoryIntroSection";
 
 interface NotreHistoireProps {
   slug?: string;
@@ -81,6 +82,13 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({ slug: propSlug }) => {
                   fixLinks: true,
                   baseDomain: "https://cote-sud.immo"
                 }}
+              />
+              
+              {/* Add our new HistoryIntroSection component */}
+              <HistoryIntroSection 
+                imageUrl={page.featured_image || "/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"}
+                title="Notre Histoire"
+                description="Côté Sud Immobilier vous accompagne dans tous vos projets immobiliers depuis plus de 15 ans. Notre expertise du marché local et notre connaissance approfondie de la région nous permettent de vous offrir un service personnalisé et de qualité. Notre équipe de professionnels est à votre écoute pour vous guider dans votre recherche et vous accompagner jusqu'à la concrétisation de votre projet."
               />
               
               {/* Add our custom TeamSection component */}

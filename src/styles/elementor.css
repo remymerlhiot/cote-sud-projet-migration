@@ -305,14 +305,14 @@ section:has(h3:contains('Notre équipe')) {
   }
 }
 
-/* Oval image for team members */
+/* Round image for team members */
 .team-member-image,
 #notre-equipe .avatar,
 [id*="equipe"] .avatar,
 [id*="team"] .avatar {
   width: 12rem;
-  height: 8rem;
-  border-radius: 50%/60%;
+  height: 12rem;
+  border-radius: 50%;
   overflow: hidden;
   margin-bottom: 1rem;
   background-color: #f2e9da;
