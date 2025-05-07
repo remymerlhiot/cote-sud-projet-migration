@@ -42,6 +42,42 @@ export type Database = {
         }
         Relationships: []
       }
+      google_reviews: {
+        Row: {
+          comment: string
+          enabled: boolean | null
+          id: string
+          name: string
+          profile_photo: string | null
+          rating: number
+          review_date: string
+          review_place: string
+          scraped_at: string | null
+        }
+        Insert: {
+          comment: string
+          enabled?: boolean | null
+          id?: string
+          name: string
+          profile_photo?: string | null
+          rating: number
+          review_date: string
+          review_place: string
+          scraped_at?: string | null
+        }
+        Update: {
+          comment?: string
+          enabled?: boolean | null
+          id?: string
+          name?: string
+          profile_photo?: string | null
+          rating?: number
+          review_date?: string
+          review_place?: string
+          scraped_at?: string | null
+        }
+        Relationships: []
+      }
       real_estate_mandates: {
         Row: {
           commercial_practices: string | null

@@ -6,9 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, MessageCircle } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import GoogleReviews from '@/components/GoogleReviews';
 
 // Type for reviews
 interface AgentReview {
@@ -113,69 +113,9 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-// Component to display Google Reviews integration information
-const GoogleReviewsIntegration = () => {
-  const { toast } = useToast();
-  
-  // Function to handle when the Google Reviews script is loaded
-  const handleScriptLoad = () => {
-    // This would typically contain code to initialize the Google Reviews widget
-    // For now, we just show a toast notification
-    toast({
-      title: "Google Reviews",
-      description: "Les avis Google ont été chargés avec succès.",
-      duration: 3000,
-    });
-  };
-
-  return (
-    <div className="bg-sable-30 p-6 rounded-lg mt-8">
-      <h3 className="text-xl font-playfair mb-4 text-cuivre">Intégration des Avis Google</h3>
-      <p className="text-anthracite mb-4">
-        Cette section permettra d'intégrer automatiquement les avis Google de l'agence et des agents. 
-        Pour l'intégration complète, il faudra:
-      </p>
-      <ul className="list-disc pl-6 mb-4 text-anthracite">
-        <li>Obtenir un API key Google Places</li>
-        <li>Configurer les IDs Place de l'agence et des agents</li>
-        <li>Implémenter la récupération des avis via l'API</li>
-      </ul>
-      <div className="flex justify-center mt-6">
-        <Button 
-          onClick={() => handleScriptLoad()}
-          className="bg-cuivre hover:bg-sable text-white"
-        >
-          <MessageCircle className="mr-2" />
-          Charger les avis Google
-        </Button>
-      </div>
-    </div>
-  );
-};
-
 // Main component
 const NosAvis = () => {
   const [activeTab, setActiveTab] = useState("agence");
-  
-  // Effet pour charger le script Google au chargement de la page (simulé)
-  /* useEffect(() => {
-    // Cette fonction serait utilisée pour charger le script Google Reviews
-    const loadGoogleReviewsScript = () => {
-      const script = document.createElement('script');
-      script.src = 'https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places';
-      script.async = true;
-      script.onload = initializeGoogleReviews;
-      document.head.appendChild(script);
-    };
-    
-    // Cette fonction initialiserait les widgets de review
-    const initializeGoogleReviews = () => {
-      // Code pour initialiser les widgets Google Reviews
-    };
-    
-    // Appel de la fonction de chargement (commenté pour l'instant)
-    // loadGoogleReviewsScript();
-  }, []); */
   
   return (
     <Layout>
@@ -190,7 +130,13 @@ const NosAvis = () => {
           <Separator className="bg-sable my-6 w-1/3 mx-auto" />
         </div>
         
+        {/* Google Reviews Integration - New component */}
+        <div className="mb-16">
+          <GoogleReviews />
+        </div>
+        
         {/* Agent reviews tabs */}
+        <h2 className="text-2xl font-playfair text-cuivre mb-6 text-center">Témoignages clients par agent</h2>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-4xl mx-auto">
           <TabsList className="bg-sable-30 w-full flex justify-center mb-8">
             {agentsWithReviews.map(agent => (
@@ -250,9 +196,6 @@ const NosAvis = () => {
             </TabsContent>
           ))}
         </Tabs>
-        
-        {/* Google Reviews Integration Information */}
-        <GoogleReviewsIntegration />
         
         {/* Call-to-action section */}
         <div className="text-center mt-16">
