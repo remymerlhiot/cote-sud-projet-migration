@@ -109,7 +109,7 @@ const ServiceSection = ({ className }: ServiceSectionProps) => {
       if (extractedServices.length > 0) {
         setServices(extractedServices);
       } else {
-        // Default services
+        // Default services with updated text as requested
         setServices([
           {
             id: "estimation",
@@ -119,12 +119,12 @@ const ServiceSection = ({ className }: ServiceSectionProps) => {
           {
             id: "diffusion",
             title: "UNE DIFFUSION CIBLÉE",
-            content: "Nous mettons en place une stratégie de communication efficace pour promouvoir votre bien auprès des acheteurs potentiels. Notre diffusion ciblée inclut notre réseau de clients qualifiés, notre site internet et les plateformes immobilières de référence."
+            content: "Une diffusion sur le site et les réseaux sociaux pour une meilleure projection du bien. Validation de l'annonce avec les propriétaires. Diffusion de l'annonce sur les supports choisis."
           },
           {
             id: "offre",
             title: "L'OFFRE D'ACHAT",
-            content: "Nous vous accompagnons dans la négociation et la validation des offres d'achat, en vous conseillant sur les conditions suspensives et en sécurisant l'ensemble de la transaction jusqu'à la signature définitive chez le notaire."
+            content: "Transmission des offres d'achat avec les documents de solvabilité de l'acquéreur."
           }
         ]);
       }

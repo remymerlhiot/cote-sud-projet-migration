@@ -4,19 +4,21 @@ import { Plus, Minus } from "lucide-react";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cleanElementorHtml } from "@/utils/elementorCleaner";
+
 type ServiceItem = {
   id: string;
   title: string;
   content: string;
 };
+
 const ServicesSection = () => {
   const [services, setServices] = useState<ServiceItem[]>([]);
-  // Mise à jour de l'URL de l'image de fond avec celle spécifiée
   const [backgroundImage, setBackgroundImage] = useState<string>("https://cote-sud.immo/wp-content/uploads/2024/11/champs-de-lavandes-sur-sainte-victoire.jpg");
   const {
     data: pageData,
     isLoading
   } = useCustomPage("new-home");
+  
   useEffect(() => {
     if (pageData?.content) {
       // Extract services and background image from WordPress content
@@ -29,6 +31,7 @@ const ServicesSection = () => {
       // Look for the services section (using standard selectors)
       const servicesSection = doc.querySelector(".services-section") || doc.querySelector("#services-section") || findServicesSectionByHeading(doc);
       let extractedServices: ServiceItem[] = [];
+      
       if (servicesSection) {
         // Look for service titles within the services section
         const serviceTitles = Array.from(servicesSection.querySelectorAll("h3, .service-title, .elementor-heading-title"));
@@ -103,19 +106,19 @@ const ServicesSection = () => {
         console.log("Extracted services:", extractedServices);
         setServices(extractedServices);
       } else {
-        // Default services if nothing found in WordPress content
+        // Default services with updated text as requested
         setServices([{
           id: "estimation",
           title: "L'ESTIMATION",
-          content: "Nous réalisons un rapport détaillé du bien et déterminons sa valeur après une analyse géographique et de marché pour optimiser le prix de vente et obtenir le prix juste du bien."
+          content: "Nous prenons un soin particulier à établir et déterminer la valeur précise du bien, grâce à notre forte connaissance du marché local et des méthodes d'évaluation différentes, afin d'obtenir le juste prix du bien."
         }, {
           id: "diffusion",
           title: "UNE DIFFUSION CIBLÉE",
-          content: "Nous mettons en place une stratégie de communication efficace pour promouvoir votre bien auprès des acheteurs potentiels. Notre diffusion ciblée inclut notre réseau de clients qualifiés, notre site internet et les plateformes immobilières de référence."
+          content: "Une diffusion sur le site et les réseaux sociaux pour une meilleure projection du bien. Validation de l'annonce avec les propriétaires. Diffusion de l'annonce sur les supports choisis."
         }, {
           id: "offre",
           title: "L'OFFRE D'ACHAT",
-          content: "Nous vous accompagnons dans la négociation et la validation des offres d'achat, en vous conseillant sur les conditions suspensives et en sécurisant l'ensemble de la transaction jusqu'à la signature définitive chez le notaire."
+          content: "Transmission des offres d'achat avec les documents de solvabilité de l'acquéreur."
         }]);
       }
     }
@@ -202,6 +205,7 @@ const ServicesSection = () => {
     }
     return null;
   }
+
   return <section className="relative mb-20">
       <div className="w-full h-[600px] bg-cover bg-center" style={{
       backgroundImage: `url('${backgroundImage}')`
@@ -223,7 +227,7 @@ const ServicesSection = () => {
                       <AccordionTrigger className="text-[#CD9B59] hover:no-underline py-4 flex justify-between">
                         <span>{service.title}</span>
                         <div className="flex items-center">
-                          
+                          <Plus className="h-4 w-4 shrink-0 text-[#CD9B59] transition-all group-data-[state=open]:hidden" />
                           <Minus className="h-4 w-4 shrink-0 text-[#CD9B59] transition-all hidden group-data-[state=open]:block" />
                         </div>
                       </AccordionTrigger>
@@ -240,4 +244,5 @@ const ServicesSection = () => {
       </div>
     </section>;
 };
+
 export default ServicesSection;
