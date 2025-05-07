@@ -1,15 +1,18 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Accordion, 
   AccordionContent, 
   AccordionItem, 
   AccordionTrigger 
 } from "@/components/ui/accordion";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Upload, X } from "lucide-react";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cleanElementorHtml } from "@/utils/elementorCleaner";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type ServiceItem = {
   id: string;
@@ -20,6 +23,8 @@ type ServiceItem = {
 const ServicesSection = () => {
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [backgroundImage, setBackgroundImage] = useState<string>("/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png");
+  const [isCustomBackground, setIsCustomBackground] = useState<boolean>(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const { data: pageData, isLoading } = useCustomPage("new-home");
 
   useEffect(() => {
@@ -29,7 +34,9 @@ const ServicesSection = () => {
       const doc = parser.parseFromString(cleanElementorHtml(pageData.content), "text/html");
       
       // Look for background image in the services section
-      extractBackgroundImage(doc);
+      if (!isCustomBackground) {
+        extractBackgroundImage(doc);
+      }
       
       // Look for the services section (using standard selectors)
       const servicesSection = doc.querySelector(".services-section") || 
@@ -151,7 +158,7 @@ const ServicesSection = () => {
         ]);
       }
     }
-  }, [pageData]);
+  }, [pageData, isCustomBackground]);
 
   // Function to extract background image from the WordPress content
   function extractBackgroundImage(doc: Document) {
@@ -241,6 +248,34 @@ const ServicesSection = () => {
     return null;
   }
 
+  // Handle custom background image upload
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        if (result) {
+          setBackgroundImage(result);
+          setIsCustomBackground(true);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Reset to default/extracted background
+  const resetBackground = () => {
+    setIsCustomBackground(false);
+    if (pageData?.content) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(cleanElementorHtml(pageData.content), "text/html");
+      extractBackgroundImage(doc);
+    } else {
+      setBackgroundImage("/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png");
+    }
+  };
+
   return (
     <section className="relative mb-20">
       <div className="w-full h-[600px] bg-cover bg-center" style={{ backgroundImage: `url('${backgroundImage}')` }}>
@@ -250,6 +285,67 @@ const ServicesSection = () => {
               <h2 className="text-2xl md:text-3xl font-playfair font-normal text-[#CD9B59] mb-6">
                 SERVICES DE L'AGENCE
               </h2>
+              
+              {/* Background Image Controls */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="bg-[#2A2B31]/50 text-[#CD9B59] border-[#CD9B59] hover:bg-[#2A2B31]/70">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Modifier l'arrière-plan
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Image d'arrière-plan</DialogTitle>
+                    <DialogDescription>
+                      Choisissez une image personnalisée pour l'arrière-plan de la section Services.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="background" className="text-right">
+                        Image
+                      </Label>
+                      <div className="col-span-3">
+                        <Input 
+                          id="background" 
+                          type="file" 
+                          ref={imageInputRef}
+                          accept="image/*" 
+                          onChange={handleImageUpload}
+                          className="cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                    
+                    {isCustomBackground && (
+                      <div className="flex justify-end">
+                        <Button 
+                          variant="ghost" 
+                          className="text-red-500 hover:text-red-700"
+                          onClick={resetBackground}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Réinitialiser
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {backgroundImage && (
+                      <div className="mt-2">
+                        <p className="text-sm font-medium mb-2">Aperçu :</p>
+                        <div className="relative w-full h-32 overflow-hidden rounded-md">
+                          <img 
+                            src={backgroundImage} 
+                            alt="Aperçu de l'arrière-plan" 
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             <div className="md:w-2/3 p-8 md:p-12">
               {isLoading ? (
