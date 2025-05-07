@@ -1,6 +1,6 @@
 
 import React from "react";
-import TeamMember, { TeamMemberProps } from "./TeamMember";
+import TeamMember from "./TeamMember";
 import { Separator } from "@/components/ui/separator";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,26 +20,18 @@ const TeamSection: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <section className="py-12">
+      <section className="py-12 bg-cream">
         <div className="text-center mb-10">
           <Skeleton className="h-8 w-48 mx-auto mb-4" />
-          <Skeleton className="h-4 w-full max-w-2xl mx-auto" />
           <Separator className="w-24 h-0.5 bg-gold/30 mx-auto mt-6" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-cream border-gold/20 rounded-lg p-6">
-              <div className="flex flex-col items-center">
-                <Skeleton className="h-24 w-24 rounded-full" />
-                <Skeleton className="h-6 w-32 mt-4" />
-                <Skeleton className="h-4 w-24 mt-2" />
-                <div className="flex gap-3 mt-3">
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                </div>
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 max-w-5xl mx-auto px-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex flex-col items-center">
+              <Skeleton className="h-32 w-48 rounded-[50%/60%]" />
+              <Skeleton className="h-6 w-32 mt-4" />
+              <Skeleton className="h-4 w-24 mt-2" />
             </div>
           ))}
         </div>
@@ -50,9 +42,9 @@ const TeamSection: React.FC = () => {
   // Error state
   if (isError) {
     return (
-      <section className="py-12">
+      <section className="py-12 bg-cream">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-playfair font-light text-gold mb-4">
+          <h2 className="text-3xl font-playfair font-light text-gold uppercase mb-4">
             Notre Équipe
           </h2>
           <p className="text-red-500">
@@ -65,23 +57,15 @@ const TeamSection: React.FC = () => {
   }
 
   return (
-    <section className="py-12" id="notre-equipe">
+    <section className="py-12 bg-cream" id="notre-equipe">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-playfair font-light text-gold mb-4">
+        <h2 className="text-3xl font-playfair font-light text-gold uppercase mb-4">
           Notre Équipe
         </h2>
-        <p className="max-w-2xl mx-auto text-gray-600">
-          Une équipe de professionnels <span className="font-medium">spécialisés dans l'immobilier</span> de luxe sur la Côte d'Azur, à votre service pour tous vos projets.
-        </p>
-        {isFromWordPress && (
-          <p className="text-xs text-gray-400 mt-2">
-            Informations synchronisées avec le site WordPress
-          </p>
-        )}
-        <Separator className="w-24 h-0.5 bg-gold/30 mx-auto mt-6" />
+        <Separator className="w-24 h-0.5 bg-gold/30 mx-auto mt-2" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 max-w-5xl mx-auto px-4">
         {teamMembers.map((member, index) => (
           <TeamMember key={index} {...member} />
         ))}
