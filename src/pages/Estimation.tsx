@@ -17,7 +17,9 @@ const Estimation: React.FC = () => {
     // Nettoyage lors du démontage du composant
     return () => {
       // Suppression du script lors du démontage du composant
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
   
