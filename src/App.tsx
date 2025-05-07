@@ -11,6 +11,7 @@ import PageTest from "./pages/PageTest";
 import DynamicPage from "./pages/DynamicPage";
 import PropertyDetail from "./pages/PropertyDetail";
 import NotreHistoire from "./pages/NotreHistoire";
+import Estimation from "./pages/Estimation";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/nos-biens" element={<NosBiens />} />
           <Route path="/page-test" element={<PageTest />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
+          <Route path="/estimation" element={<Estimation />} />
           
           {/* Dynamic page routes */}
           <Route path="/page/:slug" element={<DynamicPage />} />

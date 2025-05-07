@@ -32,6 +32,12 @@ export default {
 				'gold': '#CD9B59',
 				'gold-dark': '#b78a4d',
 				'cream': '#f2e9da',
+				'cuivre': '#B17226',
+				'sable': '#C8A977',
+				'sable-30': '#EEE4D6',
+				'sable-50': '#E3D3BA',
+				'sable-80': '#D3BA92',
+				'anthracite': '#37373A',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
