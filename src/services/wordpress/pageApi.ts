@@ -1,5 +1,4 @@
 
-import { toast } from "@/components/ui/sonner";
 import { API_BASE_URL, CUSTOM_API_BASE_URL } from "./config";
 import { WordPressPage, CustomWordPressPage } from "./types";
 
@@ -16,7 +15,7 @@ export const fetchPages = async (): Promise<any[]> => {
     return data;
   } catch (error) {
     console.error("Failed to fetch pages:", error);
-    toast.error("Impossible de récupérer les pages");
+    // Removed toast notification
     return [];
   }
 };
@@ -46,7 +45,7 @@ export const fetchPageBySlug = async (slug: string): Promise<WordPressPage | nul
     return null;
   } catch (error) {
     console.error(`Failed to fetch page with slug "${slug}":`, error);
-    toast.error("Impossible de récupérer la page");
+    // Removed toast notification
     return null;
   }
 };
@@ -64,7 +63,7 @@ export const fetchCustomPageBySlug = async (slug: string): Promise<CustomWordPre
     return data;
   } catch (error) {
     console.error(`Failed to fetch custom page with slug "${slug}":`, error);
-    toast.error("Impossible de récupérer la page personnalisée");
+    // Removed toast notification
     return null;
   }
 };

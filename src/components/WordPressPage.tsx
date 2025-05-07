@@ -10,6 +10,7 @@ interface WordPressPageProps {
   showTitle?: boolean;
   cleaningOptions?: CleaningOptions;
   extractSection?: string;
+  hideErrorMessages?: boolean;
 }
 
 const WordPressPage: React.FC<WordPressPageProps> = ({ 
@@ -17,7 +18,8 @@ const WordPressPage: React.FC<WordPressPageProps> = ({
   className = "",
   showTitle = true,
   cleaningOptions,
-  extractSection
+  extractSection,
+  hideErrorMessages = false
 }) => {
   const { data: page, isLoading, isError } = usePageBySlug(slug);
 
@@ -51,24 +53,28 @@ const WordPressPage: React.FC<WordPressPageProps> = ({
     );
   }
 
-  if (isError) {
+  if (isError && !hideErrorMessages) {
     return <div className="text-center p-8 text-red-500">Erreur lors du chargement de la page</div>;
   }
 
-  if (!page) {
+  if (!page && !hideErrorMessages) {
     return <div className="text-center p-8 text-[#CD9B59]">Page introuvable</div>;
+  }
+  
+  if (!page && hideErrorMessages) {
+    return null;
   }
 
   return (
     <div className={`wordpress-page ${className}`}>
-      {showTitle && (
+      {showTitle && page && (
         <h1 
           className="text-3xl font-light text-[#CD9B59] mb-6"
           dangerouslySetInnerHTML={{ __html: page.title.rendered }}
         />
       )}
       
-      {page.featured_media_url && (
+      {page?.featured_media_url && (
         <div className="featured-image mb-8">
           <img 
             src={page.featured_media_url} 
@@ -78,10 +84,12 @@ const WordPressPage: React.FC<WordPressPageProps> = ({
         </div>
       )}
       
-      <div 
-        className="page-content prose max-w-none prose-headings:text-[#CD9B59] prose-headings:font-light elementor-content"
-        dangerouslySetInnerHTML={{ __html: processedContent }}
-      />
+      {page && (
+        <div 
+          className="page-content prose max-w-none prose-headings:text-[#CD9B59] prose-headings:font-light elementor-content"
+          dangerouslySetInnerHTML={{ __html: processedContent }}
+        />
+      )}
     </div>
   );
 };

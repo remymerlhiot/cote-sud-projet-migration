@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -55,6 +56,25 @@ interface State {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
+// Ignore list to prevent notification display
+export const WORDPRESS_NOTIFICATION_TEXTS = [
+  "impossible de récupérer",
+  "Impossible de récupérer",
+  "failed to fetch",
+  "Failed to fetch",
+  "wordpress"
+];
+
+// Function to check if a toast should be ignored
+const shouldIgnoreToast = (toast: ToasterToast): boolean => {
+  const title = typeof toast.title === 'string' ? toast.title.toLowerCase() : '';
+  const description = typeof toast.description === 'string' ? toast.description.toLowerCase() : '';
+  
+  return WORDPRESS_NOTIFICATION_TEXTS.some(text => 
+    title.includes(text.toLowerCase()) || description.includes(text.toLowerCase())
+  );
+};
+
 const addToRemoveQueue = (toastId: string) => {
   if (toastTimeouts.has(toastId)) {
     return
@@ -74,6 +94,11 @@ const addToRemoveQueue = (toastId: string) => {
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "ADD_TOAST":
+      // Filter WordPress notifications
+      if (shouldIgnoreToast(action.toast)) {
+        console.log("WordPress notification ignored:", action.toast);
+        return state;
+      }
       return {
         ...state,
         toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
@@ -141,6 +166,16 @@ type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
   const id = genId()
+
+  // Skip WordPress notifications
+  if (shouldIgnoreToast({ ...props, id })) {
+    console.log("WordPress notification toast skipped:", props);
+    return {
+      id,
+      dismiss: () => {},
+      update: () => {},
+    };
+  }
 
   const update = (props: ToasterToast) =>
     dispatch({
