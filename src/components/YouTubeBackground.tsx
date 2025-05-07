@@ -75,9 +75,8 @@ const YouTubeBackground = ({
               event.target.playVideo();
             }
             
-            // Handle potential playback errors
-            if (event.data === window.YT.PlayerState.UNSTARTED || 
-                event.data === window.YT.PlayerState.CUED) {
+            // Handle potential playback errors - Fix: check for specific state value instead of using UNSTARTED constant
+            if (event.data === 0 || event.data === 5) { // 0=ENDED (already handled), 5=CUED
               setTimeout(() => {
                 try {
                   event.target.playVideo();
