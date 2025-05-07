@@ -7,7 +7,6 @@ import { toast } from "@/components/ui/sonner";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { TeamMemberProps } from "@/components/team/TeamMember";
 import { Phone, Mail, Linkedin } from "lucide-react";
-
 interface CustomWordPressPageProps {
   slug: string;
   className?: string;
@@ -19,9 +18,8 @@ interface CustomWordPressPageProps {
   debugMode?: boolean;
   hideContent?: boolean; // New prop to control content visibility
 }
-
-const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({ 
-  slug, 
+const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
+  slug,
   className = "",
   showTitle = true,
   cleaningOptions,
@@ -31,52 +29,51 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
   debugMode = false,
   hideContent = false // Default to showing content
 }) => {
-  const { data: page, isLoading, isError } = useCustomPage(slug);
+  const {
+    data: page,
+    isLoading,
+    isError
+  } = useCustomPage(slug);
   const [showOriginalHtml, setShowOriginalHtml] = useState<boolean>(false);
   const [originalContent, setOriginalContent] = useState<string>("");
   const [processedContent, setProcessedContent] = useState<string>("");
-  
+
   // Use our custom hook to get team members if styling is enabled
-  const { teamMembers, isFromWordPress } = styleTeamSection ? useTeamMembers() : { teamMembers: [], isFromWordPress: false };
+  const {
+    teamMembers,
+    isFromWordPress
+  } = styleTeamSection ? useTeamMembers() : {
+    teamMembers: [],
+    isFromWordPress: false
+  };
 
   // Process and clean the HTML content
   const processedHtmlContent = useMemo(() => {
     if (!page?.content) return "";
-    
     let content = page.content;
-    
+
     // Clean the Elementor HTML
     content = cleanElementorHtml(content, cleaningOptions);
-    
+
     // Debug mode: store original content before team removal or styling
     const originalContentBeforeProcessing = content;
-    
+
     // Make sure we don't try to style the team section if we're going to hide it
     const shouldStyleTeam = styleTeamSection && !hideTeamSection;
-    
+
     // Style team section if requested (only if we're not hiding it)
     if (shouldStyleTeam) {
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "text/html");
-        
+
         // Similar selectors as the team section remover, but now to style instead of remove
-        const commonSelectors = [
-          "[id*='equipe'], [id*='team'], [class*='equipe'], [class*='team']",
-          "section:has(h1:contains('Notre Équipe')), section:has(h2:contains('Notre Équipe')), section:has(h3:contains('Notre Équipe'))",
-          "section:has(h1:contains('Notre équipe')), section:has(h2:contains('Notre équipe')), section:has(h3:contains('Notre équipe'))",
-          "section:has(h1:contains('NOTRE ÉQUIPE')), section:has(h2:contains('NOTRE ÉQUIPE')), section:has(h3:contains('NOTRE ÉQUIPE'))",
-          "div:has(h1:contains('Notre Équipe')), div:has(h2:contains('Notre Équipe')), div:has(h3:contains('Notre Équipe'))",
-          "div:has(h1:contains('Notre équipe')), div:has(h2:contains('Notre équipe')), div:has(h3:contains('Notre équipe'))",
-          "div:has(h1:contains('NOTRE ÉQUIPE')), div:has(h2:contains('NOTRE ÉQUIPE')), div:has(h3:contains('NOTRE ÉQUIPE'))",
-          "section:has(h1:contains('L'équipe')), section:has(h2:contains('L'équipe')), section:has(h3:contains('L'équipe'))",
-          "div:has(h1:contains('L'équipe')), div:has(h2:contains('L'équipe')), div:has(h3:contains('L'équipe'))"
-        ];
-        
+        const commonSelectors = ["[id*='equipe'], [id*='team'], [class*='equipe'], [class*='team']", "section:has(h1:contains('Notre Équipe')), section:has(h2:contains('Notre Équipe')), section:has(h3:contains('Notre Équipe'))", "section:has(h1:contains('Notre équipe')), section:has(h2:contains('Notre équipe')), section:has(h3:contains('Notre équipe'))", "section:has(h1:contains('NOTRE ÉQUIPE')), section:has(h2:contains('NOTRE ÉQUIPE')), section:has(h3:contains('NOTRE ÉQUIPE'))", "div:has(h1:contains('Notre Équipe')), div:has(h2:contains('Notre Équipe')), div:has(h3:contains('Notre Équipe'))", "div:has(h1:contains('Notre équipe')), div:has(h2:contains('Notre équipe')), div:has(h3:contains('Notre équipe'))", "div:has(h1:contains('NOTRE ÉQUIPE')), div:has(h2:contains('NOTRE ÉQUIPE')), div:has(h3:contains('NOTRE ÉQUIPE'))", "section:has(h1:contains('L'équipe')), section:has(h2:contains('L'équipe')), section:has(h3:contains('L'équipe'))", "div:has(h1:contains('L'équipe')), div:has(h2:contains('L'équipe')), div:has(h3:contains('L'équipe'))"];
+
         // Try all selectors
         let teamSectionFound = false;
         let styledTeamSection: Element | null = null;
-        
+
         // Loop through all selectors to find the team section
         for (const selector of commonSelectors) {
           try {
@@ -95,7 +92,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             console.log(`Selector failed: ${selector}`, e);
           }
         }
-        
+
         // If we didn't find using selectors, try by section ID
         if (!teamSectionFound) {
           const sectionIds = ["notre-equipe", "team", "equipe", "lequipe", "notre-team"];
@@ -109,7 +106,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             }
           }
         }
-        
+
         // If we found a team section, style it
         if (teamSectionFound && styledTeamSection) {
           // Create title section in our custom style
@@ -125,28 +122,21 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             ${isFromWordPress ? '<p class="text-xs text-gray-400 mt-2">Informations synchronisées avec le site WordPress</p>' : ''}
             <div class="w-24 h-0.5 bg-gold/30 mx-auto mt-6"></div>
           `;
-          
+
           // Create grid container for team members
           const teamGrid = document.createElement('div');
           teamGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8';
-          
+
           // Generate team member cards if we have data
           if (teamMembers.length > 0) {
             teamMembers.forEach((member: TeamMemberProps) => {
-              const initials = member.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("");
-                
+              const initials = member.name.split(" ").map(n => n[0]).join("");
               const memberCard = document.createElement('div');
               memberCard.className = 'bg-cream border border-gold/20 hover:shadow-md transition-shadow duration-300 rounded-lg p-6';
               memberCard.innerHTML = `
                 <div class="flex flex-col items-center text-center">
                   <div class="h-24 w-24 border-2 border-gold mb-4 rounded-full overflow-hidden flex items-center justify-center bg-gold/10">
-                    ${member.imageUrl ? 
-                      `<img src="${member.imageUrl}" alt="${member.name}" class="w-full h-full object-cover" />` : 
-                      `<div class="text-gold text-lg">${initials}</div>`
-                    }
+                    ${member.imageUrl ? `<img src="${member.imageUrl}" alt="${member.name}" class="w-full h-full object-cover" />` : `<div class="text-gold text-lg">${initials}</div>`}
                   </div>
                   <h3 class="font-playfair text-xl text-gold mb-1">${member.name}</h3>
                   ${member.role ? `<p class="text-sm text-gray-600 mb-3">${member.role}</p>` : ''}
@@ -194,53 +184,45 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             noDataMessage.textContent = 'Aucune information sur l\'équipe n\'est disponible pour le moment.';
             teamGrid.appendChild(noDataMessage);
           }
-          
+
           // Replace the original team section content with our styled version
           styledTeamSection.innerHTML = '';
           styledTeamSection.className = 'py-12';
           styledTeamSection.id = 'notre-equipe';
           styledTeamSection.appendChild(titleSection);
           styledTeamSection.appendChild(teamGrid);
-          
           console.log("Successfully styled team section");
         } else {
           console.log("No team section found to style");
         }
-        
+
         // Update content with the styled version
         content = doc.body.innerHTML;
-        
       } catch (error) {
         console.error("Error styling team section:", error);
       }
     }
-    
+
     // Remove team section if requested
     if (hideTeamSection) {
       try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "text/html");
-        
+
         // Aggressive approach to find and remove team sections
         let teamSectionRemoved = false;
-        
+
         // 1. More precise selectors based on common WordPress/Elementor patterns
         const commonSelectors = [
-          // Using attribute contains to match id or class containing team-related terms
-          "[id*='equipe'], [id*='team'], [class*='equipe'], [class*='team']",
-          // Heading-based selectors (more specific)
-          "section:has(h1:contains('Notre Équipe')), section:has(h2:contains('Notre Équipe')), section:has(h3:contains('Notre Équipe'))",
-          "section:has(h1:contains('Notre équipe')), section:has(h2:contains('Notre équipe')), section:has(h3:contains('Notre équipe'))",
-          "section:has(h1:contains('NOTRE ÉQUIPE')), section:has(h2:contains('NOTRE ÉQUIPE')), section:has(h3:contains('NOTRE ÉQUIPE'))",
-          // Same for div containers
-          "div:has(h1:contains('Notre Équipe')), div:has(h2:contains('Notre Équipe')), div:has(h3:contains('Notre Équipe'))",
-          "div:has(h1:contains('Notre équipe')), div:has(h2:contains('Notre équipe')), div:has(h3:contains('Notre équipe'))",
-          "div:has(h1:contains('NOTRE ÉQUIPE')), div:has(h2:contains('NOTRE ÉQUIPE')), div:has(h3:contains('NOTRE ÉQUIPE'))",
-          // "L'équipe" variations
-          "section:has(h1:contains('L'équipe')), section:has(h2:contains('L'équipe')), section:has(h3:contains('L'équipe'))",
-          "div:has(h1:contains('L'équipe')), div:has(h2:contains('L'équipe')), div:has(h3:contains('L'équipe'))"
-        ];
-        
+        // Using attribute contains to match id or class containing team-related terms
+        "[id*='equipe'], [id*='team'], [class*='equipe'], [class*='team']",
+        // Heading-based selectors (more specific)
+        "section:has(h1:contains('Notre Équipe')), section:has(h2:contains('Notre Équipe')), section:has(h3:contains('Notre Équipe'))", "section:has(h1:contains('Notre équipe')), section:has(h2:contains('Notre équipe')), section:has(h3:contains('Notre équipe'))", "section:has(h1:contains('NOTRE ÉQUIPE')), section:has(h2:contains('NOTRE ÉQUIPE')), section:has(h3:contains('NOTRE ÉQUIPE'))",
+        // Same for div containers
+        "div:has(h1:contains('Notre Équipe')), div:has(h2:contains('Notre Équipe')), div:has(h3:contains('Notre Équipe'))", "div:has(h1:contains('Notre équipe')), div:has(h2:contains('Notre équipe')), div:has(h3:contains('Notre équipe'))", "div:has(h1:contains('NOTRE ÉQUIPE')), div:has(h2:contains('NOTRE ÉQUIPE')), div:has(h3:contains('NOTRE ÉQUIPE'))",
+        // "L'équipe" variations
+        "section:has(h1:contains('L'équipe')), section:has(h2:contains('L'équipe')), section:has(h3:contains('L'équipe'))", "div:has(h1:contains('L'équipe')), div:has(h2:contains('L'équipe')), div:has(h3:contains('L'équipe'))"];
+
         // Try all selectors
         for (const selector of commonSelectors) {
           try {
@@ -256,7 +238,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             console.log(`Selector failed: ${selector}`, e);
           }
         }
-        
+
         // 2. Find by section ID directly (common in Elementor)
         const sectionIds = ["notre-equipe", "team", "equipe", "lequipe", "notre-team"];
         sectionIds.forEach(id => {
@@ -267,41 +249,26 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             teamSectionRemoved = true;
           }
         });
-        
+
         // 3. Broader text-based search - look for sections that might contain team headings
         if (!teamSectionRemoved) {
           // Find all headings that could indicate a team section
           const allHeadings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
-          
           allHeadings.forEach(heading => {
             const headingText = heading.textContent?.toLowerCase() || '';
-            
+
             // Check for team-related keywords in headings
-            if (
-              headingText.includes('notre équipe') || 
-              headingText.includes('notre equipe') ||
-              headingText.includes('l\'équipe') || 
-              headingText.includes('l\'equipe') ||
-              headingText.includes('team') ||
-              headingText.includes('équipe') ||
-              headingText.includes('equipe')
-            ) {
+            if (headingText.includes('notre équipe') || headingText.includes('notre equipe') || headingText.includes('l\'équipe') || headingText.includes('l\'equipe') || headingText.includes('team') || headingText.includes('équipe') || headingText.includes('equipe')) {
               // Walk up the DOM to find a parent section/div that represents the whole team section
               let parent = heading.parentElement;
               let sectionFound = false;
               const MAX_DEPTH = 5; // Don't go too far up the tree
               let depth = 0;
-              
+
               // Find the appropriate container to remove (section, div with multiple children, etc.)
               while (parent && depth < MAX_DEPTH && !sectionFound) {
                 // If we found a section element or a substantial div, remove it
-                if (
-                  parent.tagName === 'SECTION' || 
-                  (parent.tagName === 'DIV' && 
-                   (parent.children.length > 2 || 
-                    parent.classList.length > 0 || 
-                    parent.id))
-                ) {
+                if (parent.tagName === 'SECTION' || parent.tagName === 'DIV' && (parent.children.length > 2 || parent.classList.length > 0 || parent.id)) {
                   console.log(`Found team section via heading text: "${headingText}"`);
                   parent.parentNode?.removeChild(parent);
                   teamSectionRemoved = true;
@@ -311,7 +278,7 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
                 parent = parent.parentElement;
                 depth++;
               }
-              
+
               // If we couldn't find a proper parent container, remove at least the heading's parent
               if (!sectionFound && heading.parentElement) {
                 console.log(`Removing heading parent for: "${headingText}"`);
@@ -321,25 +288,23 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             }
           });
         }
-        
+
         // 4. Most aggressive approach - look for any element containing team-related text
         if (!teamSectionRemoved) {
           // Get all larger container elements that could be team sections
           const containers = doc.querySelectorAll('section, div.elementor-section, div.elementor-container, div[class*="section"], div[class*="container"]');
-          
           containers.forEach(container => {
             const containerText = container.textContent?.toLowerCase() || '';
-            
+
             // If container contains multiple team-related keywords, likely a team section
             const keywords = ['équipe', 'equipe', 'team', 'membre'];
             let keywordCount = 0;
-            
             keywords.forEach(keyword => {
               if (containerText.includes(keyword)) {
                 keywordCount++;
               }
             });
-            
+
             // If multiple keywords found and container is substantial, remove it
             if (keywordCount >= 2 && container.children.length > 2) {
               console.log(`Found team section by keyword density: ${keywordCount} keywords`);
@@ -348,10 +313,10 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
             }
           });
         }
-        
+
         // Set the cleaned content back
         content = doc.body.innerHTML;
-        
+
         // Debug: report if we successfully removed a team section
         if (teamSectionRemoved) {
           console.log("Successfully removed one or more team sections");
@@ -362,31 +327,27 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
         console.error("Error removing team section:", error);
       }
     }
-    
+
     // Extract specific section if requested
     if (extractSection) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, "text/html");
       const section = doc.querySelector(extractSection);
-      
       if (section) {
         return section.innerHTML;
       } else {
         // If specific section not found, try to find it in the elementor_data
-        const elementorDoc = page.elementor_data ? 
-          parser.parseFromString(`<div>${page.elementor_data}</div>`, "text/html") : null;
-        
+        const elementorDoc = page.elementor_data ? parser.parseFromString(`<div>${page.elementor_data}</div>`, "text/html") : null;
         const elementorSection = elementorDoc?.querySelector(extractSection);
         return elementorSection ? elementorSection.innerHTML : content;
       }
     }
-    
+
     // In debug mode, store the content for comparison
     if (debugMode) {
       setOriginalContent(originalContentBeforeProcessing);
       setProcessedContent(content);
     }
-    
     return content;
   }, [page, cleaningOptions, extractSection, hideTeamSection, styleTeamSection, teamMembers, isFromWordPress, debugMode]);
 
@@ -396,86 +357,45 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
       console.log("WordPress page debug mode enabled");
     }
   }, [debugMode]);
-
   if (isLoading) {
-    return (
-      <div className="space-y-4">
+    return <div className="space-y-4">
         {showTitle && <Skeleton className="h-12 w-3/4" />}
         <Skeleton className="h-64 w-full" />
         <Skeleton className="h-32 w-full" />
-      </div>
-    );
+      </div>;
   }
-
   if (isError) {
     return <div className="text-center p-8 text-red-500">Erreur lors du chargement de la page</div>;
   }
-
   if (!page) {
     return <div className="text-center p-8 text-[#CD9B59]">Page introuvable</div>;
   }
-
-  return (
-    <div className={`wordpress-page ${className}`}>
-      {showTitle && page.title && (
-        <h1 className="text-3xl font-playfair font-light text-[#CD9B59] mb-6">
-          {page.title}
-        </h1>
-      )}
+  return <div className={`wordpress-page ${className}`}>
+      {showTitle && page.title}
       
-      {page.featured_image && (
-        <div className="featured-image mb-8">
-          <img 
-            src={page.featured_image} 
-            alt={page.title || "Featured image"} 
-            className="w-full h-auto rounded-lg"
-          />
-        </div>
-      )}
+      {page.featured_image && <div className="featured-image mb-8">
+          <img src={page.featured_image} alt={page.title || "Featured image"} className="w-full h-auto rounded-lg" />
+        </div>}
       
-      {debugMode && (
-        <div className="mb-4 p-2 bg-amber-50 border border-amber-200 rounded">
+      {debugMode && <div className="mb-4 p-2 bg-amber-50 border border-amber-200 rounded">
           <p className="text-sm text-amber-800 mb-2">Mode debug activé</p>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => {
-              setShowOriginalHtml(!showOriginalHtml);
-              toast.info(showOriginalHtml ? "Affichage du contenu traité" : "Affichage du contenu original");
-            }}
-            className="text-xs"
-          >
+          <Button variant="outline" size="sm" onClick={() => {
+        setShowOriginalHtml(!showOriginalHtml);
+        toast.info(showOriginalHtml ? "Affichage du contenu traité" : "Affichage du contenu original");
+      }} className="text-xs">
             {showOriginalHtml ? "Voir contenu traité" : "Voir contenu original"}
           </Button>
-        </div>
-      )}
+        </div>}
       
-      {!hideContent && (
-        <div 
-          className="page-content prose max-w-none prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light font-raleway elementor-content"
-          dangerouslySetInnerHTML={{ 
-            __html: debugMode && showOriginalHtml 
-              ? originalContent
-              : processedHtmlContent 
-          }}
-        />
-      )}
+      {!hideContent && <div className="page-content prose max-w-none prose-headings:text-gold prose-headings:font-playfair prose-headings:font-light font-raleway elementor-content" dangerouslySetInnerHTML={{
+      __html: debugMode && showOriginalHtml ? originalContent : processedHtmlContent
+    }} />}
       
-      {!hideTeamSection && page.media_list && page.media_list.length > 0 && (
-        <div className="media-gallery mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {page.media_list.map((imageUrl, index) => (
-            <div key={index} className="media-item">
-              <img 
-                src={imageUrl} 
-                alt={`Media ${index + 1} - ${page.title || ""}`} 
-                className="w-full h-auto rounded-lg"
-              />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+      {!hideTeamSection && page.media_list && page.media_list.length > 0 && <div className="media-gallery mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {page.media_list.map((imageUrl, index) => <div key={index} className="media-item">
+              <img src={imageUrl} alt={`Media ${index + 1} - ${page.title || ""}`} className="w-full h-auto rounded-lg" />
+            </div>)}
+        </div>}
+    </div>;
 };
-
 export default CustomWordPressPage;
