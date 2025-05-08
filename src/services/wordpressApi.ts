@@ -4,8 +4,8 @@
 
 export * from "./wordpress";
 export {
-  fetchWordPressProperties as fetchProperties,
-  fetchWordPressPropertyById as fetchPropertyById,
+  fetchProperties as fetchProperties,
+  fetchPropertyById as fetchPropertyById,
   transformPropertyData as transformFTPPropertyData
 } from "./wordpress";
 

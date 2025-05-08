@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { TransformedProperty, getValidImageUrl } from "@/hooks/useProperties";
+import { TransformedProperty } from "@/hooks/useProperties";
 import { Link } from "react-router-dom";
 
 type PropertyProps = {
@@ -39,6 +39,9 @@ const PropertyCard = ({ property }: PropertyProps) => {
   // Get primary image or fallback
   const displayImage = property.image;
 
+  // Extract property type from title if not explicitly defined
+  const displayType = property.propertyType || property.title?.split(' ')[0] || "PROPRIÉTÉ";
+
   return (
     <Link to={`/property/${property.id}`} className="block h-full">
       <Card className="overflow-hidden border-none shadow-md h-full bg-white hover:shadow-lg transition-all duration-300">
@@ -50,11 +53,11 @@ const PropertyCard = ({ property }: PropertyProps) => {
               className="w-full h-56 object-cover"
             />
             <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
-              {property.ref}
+              {property.ref || `REF ${property.id}`}
             </div>
-            {property.propertyType && (
+            {displayType && (
               <div className="absolute top-3 left-1/2 transform -translate-x-1/2 bg-[#C8A977]/90 text-white px-3 py-1 text-xs font-medium uppercase">
-                {property.propertyType}
+                {displayType}
               </div>
             )}
             {renderFeatureBadges()}
@@ -64,25 +67,25 @@ const PropertyCard = ({ property }: PropertyProps) => {
               {property.title}
             </h3>
             <p className="text-xs text-[#37373A] mb-2 uppercase">
-              {property.location}
+              {property.location || "Localisation confidentielle"}
               {property.postalCode ? ` - ${property.postalCode}` : ''}
             </p>
             <p className="font-semibold text-lg mb-4 text-[#B17226]">
-              {property.price}
+              {property.price || "Prix sur demande"}
             </p>
 
             <div className="grid grid-cols-3 gap-2 border-t border-gray-200 pt-4 mb-4">
               <div className="flex flex-col items-center">
                 <p className="text-[10px] text-gray-600">Surface</p>
-                <p className="font-medium text-sm">{hasValidArea ? property.area : "Non spécifié"}</p>
+                <p className="font-medium text-sm">{hasValidArea ? property.area : "NC"}</p>
               </div>
               <div className="flex flex-col items-center border-l border-r border-gray-200">
                 <p className="text-[10px] text-gray-600">Pièces</p>
-                <p className="font-medium text-sm">{hasValidRooms ? property.rooms : "Non spécifié"}</p>
+                <p className="font-medium text-sm">{hasValidRooms ? property.rooms : "NC"}</p>
               </div>
               <div className="flex flex-col items-center">
                 <p className="text-[10px] text-gray-600">Chambres</p>
-                <p className="font-medium text-sm">{hasValidBedrooms ? property.bedrooms : "Non spécifié"}</p>
+                <p className="font-medium text-sm">{hasValidBedrooms ? property.bedrooms : "NC"}</p>
               </div>
             </div>
             
@@ -125,3 +128,4 @@ const PropertyCard = ({ property }: PropertyProps) => {
 };
 
 export default PropertyCard;
+
