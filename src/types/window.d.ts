@@ -1,5 +1,8 @@
 
+// Add YouTube API declarations
 interface Window {
-  originalWordPressContent?: string;
-  processedWordPressContent?: string;
+  onYouTubeIframeAPIReady?: () => void;
+  YT?: {
+    Player: any;
+  };
 }
