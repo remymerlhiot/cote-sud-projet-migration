@@ -125,12 +125,14 @@ const DifferenceSection = () => {
     return null;
   }
 
-  return <section className="container mx-auto mb-20 px-4">
-      <h2 className="text-2xl md:text-3xl font-playfair font-normal text-[#CD9B59] text-center mb-12">
+  return (
+    <section className="container mx-auto mb-20 px-4">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-sable text-center mb-16">
         {content.title}
       </h2>
       
-      {isLoading ? <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+      {isLoading ? (
+        <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
           <div className="md:w-1/3">
             <Skeleton className="w-full h-[300px] rounded-full" />
           </div>
@@ -143,27 +145,35 @@ const DifferenceSection = () => {
             <Skeleton className="h-6 w-full mb-2" />
             <Skeleton className="h-12 w-48 mt-4" />
           </div>
-        </div> : <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+        </div>
+      ) : (
+        <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
           <div className="md:w-1/3">
-            <div className="overflow-hidden rounded-full aspect-square border-4 border-[#C8A977] shadow-lg">
+            <div className="overflow-hidden rounded-full aspect-square border-4 border-sable shadow-lg">
               <img src={content.image} alt="AXO Côté Sud - La différence" className="w-full h-full object-cover" />
             </div>
           </div>
           <div className="md:w-2/3">
-            {content.mainText.map((paragraph, index) => <p key={`main-${index}`} className="text-gray-700 mb-4">
+            {content.mainText.map((paragraph, index) => (
+              <p key={`main-${index}`} className="text-anthracite mb-4">
                 {paragraph}
-              </p>)}
+              </p>
+            ))}
             
-            <h3 className="text-2xl font-playfair font-normal text-[#C8A977] mb-6">
+            <h3 className="text-2xl md:text-3xl font-playfair font-normal text-sable mb-8">
               {content.accompagnementTitle}
             </h3>
             
-            {content.accompagnementText.map((paragraph, index) => <p key={`accomp-${index}`} className="text-gray-700 mb-6">
+            {content.accompagnementText.map((paragraph, index) => (
+              <p key={`accomp-${index}`} className="text-anthracite mb-6">
                 {paragraph}
-              </p>)}
+              </p>
+            ))}
           </div>
-        </div>}
-    </section>;
+        </div>
+      )}
+    </section>
+  );
 };
 
 export default DifferenceSection;
