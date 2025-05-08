@@ -1,8 +1,7 @@
 
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchPropertyById, transformPropertyData } from "@/services/wordpressApi";
+import { usePropertyById } from "@/hooks/useProperties";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,18 +12,10 @@ import { Button } from "@/components/ui/button";
 
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const propertyId = id ? parseInt(id, 10) : 0;
+  const propertyId = id ? id : "0";
 
-  // Fetch property details
-  const { data: property, isLoading, error } = useQuery({
-    queryKey: ["property", propertyId],
-    queryFn: () => fetchPropertyById(propertyId),
-    enabled: !!propertyId && propertyId > 0,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  // Transform the property data for display
-  const displayData = property ? transformPropertyData(property) : null;
+  // Fetch property details using our new hook
+  const { data: displayData, isLoading, error } = usePropertyById(propertyId);
 
   // Helper function to determine the color class based on DPE rating
   const getDpeColorClass = (dpe?: string) => {
@@ -112,11 +103,6 @@ const PropertyDetail = () => {
               alt={displayData.title} 
               className="w-full h-auto object-cover rounded-md"
             />
-            {displayData.dpe && (
-              <div className={`absolute top-4 right-4 ${getDpeColorClass(displayData.dpe)} px-3 py-2 rounded-md text-sm font-medium`}>
-                DPE: {displayData.dpe.toUpperCase()}
-              </div>
-            )}
           </div>
           
           {/* Property quick info */}

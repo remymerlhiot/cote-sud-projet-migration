@@ -12,3 +12,6 @@ export * from "./transformers";
 export * from "./propertyApi";
 export * from "./pageApi";
 export * from "./mediaApi";
+
+// Re-export FTP property API
+export * from "../ftpPropertyApi";

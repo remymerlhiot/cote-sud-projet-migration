@@ -1,13 +1,15 @@
+
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import PropertyCard from "@/components/PropertyCard";
-import { useProperties, transformPropertyData, TransformedProperty } from "@/hooks/useWordPress";
-import { toast } from "@/components/ui/sonner";
 import { useState } from "react";
 import AutoplayPlugin from "embla-carousel-autoplay";
+import { useProperties, TransformedProperty } from "@/hooks/useProperties";
+import { toast } from "@/components/ui/sonner";
+
 const PropertyCarousel = () => {
-  // Fetch properties from WordPress API
+  // Fetch properties from our FTP service
   const {
-    data: wpProperties,
+    data: properties,
     isLoading,
     error
   } = useProperties();
@@ -86,13 +88,14 @@ const PropertyCarousel = () => {
     toast.error("Impossible de récupérer les biens immobiliers. Affichage des données de secours.");
   }
 
-  // Transform and sort properties by date (most recent first)
-  const displayProperties = wpProperties && wpProperties.length > 0 ? wpProperties.map(prop => transformPropertyData(prop)).sort((a, b) => {
+  // Get properties to display (real or fallback)
+  const displayProperties = properties && properties.length > 0 ? properties.sort((a, b) => {
     // Sort by date (newest first)
     const dateA = new Date(a.date || "");
     const dateB = new Date(b.date || "");
     return dateB.getTime() - dateA.getTime();
   }) : fallbackProperties;
+  
   return <section className="container mx-auto mb-20 px-4 py-[20px]">
       <Carousel className="mx-auto max-w-6xl" plugins={[AutoplayPlugin({
       delay: 4000,

@@ -1,44 +1,23 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { WordPressProperty, transformPropertyData, TransformedProperty } from "@/services/wordpress";
+import { TransformedProperty } from "@/hooks/useProperties";
 import { Link } from "react-router-dom";
 
 type PropertyProps = {
-  property: WordPressProperty | TransformedProperty;
+  property: TransformedProperty;
 };
 
 const PropertyCard = ({ property }: PropertyProps) => {
-  // Toujours transformer les données pour assurer une structure cohérente
-  const displayData: TransformedProperty = 'acf' in property 
-    ? transformPropertyData(property as WordPressProperty) 
-    : property as TransformedProperty;
-
-  // Helper function to determine the color class based on DPE rating
-  const getDpeColorClass = (dpe?: string) => {
-    if (!dpe) return "bg-gray-200";
-    
-    switch(dpe.toUpperCase()) {
-      case "A": return "bg-green-500";
-      case "B": return "bg-green-400";
-      case "C": return "bg-yellow-300";
-      case "D": return "bg-yellow-500";
-      case "E": return "bg-orange-500";
-      case "F": return "bg-red-500";
-      case "G": return "bg-red-700";
-      default: return "bg-gray-200";
-    }
-  };
-
   // Check if we have valid data for each property field
-  const hasValidArea = displayData.area && displayData.area !== "Non spécifié";
-  const hasValidRooms = displayData.rooms && displayData.rooms !== "Non spécifié";
-  const hasValidBedrooms = displayData.bedrooms && displayData.bedrooms !== "Non spécifié";
+  const hasValidArea = property.area && property.area !== "Non spécifié";
+  const hasValidRooms = property.rooms && property.rooms !== "Non spécifié";
+  const hasValidBedrooms = property.bedrooms && property.bedrooms !== "Non spécifié";
   
   // Additional feature badges
   const renderFeatureBadges = () => {
     const badges = [];
     
-    if (displayData.isNewConstruction) {
+    if (property.isNewConstruction) {
       badges.push(
         <span key="new" className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
           NEUF
@@ -46,7 +25,7 @@ const PropertyCard = ({ property }: PropertyProps) => {
       );
     }
     
-    if (displayData.isPrestigious) {
+    if (property.isPrestigious) {
       badges.push(
         <span key="prestige" className="absolute top-3 right-16 bg-[#B17226] text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
           PRESTIGE
@@ -58,84 +37,73 @@ const PropertyCard = ({ property }: PropertyProps) => {
   };
 
   return (
-    <Link to={`/property/${displayData.id}`} className="block h-full">
+    <Link to={`/property/${property.id}`} className="block h-full">
       <Card className="overflow-hidden border-none shadow-md h-full bg-white hover:shadow-lg transition-all duration-300">
         <CardContent className="p-0 relative">
           <div className="relative">
             <img 
-              src={displayData.image} 
-              alt={displayData.title} 
+              src={property.image} 
+              alt={property.title} 
               className="w-full h-56 object-cover"
             />
             <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
-              {displayData.ref}
+              {property.ref}
             </div>
-            {displayData.propertyType && (
+            {property.propertyType && (
               <div className="absolute top-3 left-1/2 transform -translate-x-1/2 bg-[#C8A977]/90 text-white px-3 py-1 text-xs font-medium uppercase">
-                {displayData.propertyType}
-              </div>
-            )}
-            {displayData.dpe && (
-              <div className={`absolute bottom-3 right-3 ${getDpeColorClass(displayData.dpe)} text-white px-2 py-1 text-xs font-medium rounded-sm`}>
-                DPE: {displayData.dpe.toUpperCase()}
+                {property.propertyType}
               </div>
             )}
             {renderFeatureBadges()}
           </div>
           <div className="p-4 text-center">
             <h3 className="text-lg font-serif mt-2 text-[#C8A977]">
-              {displayData.title}
+              {property.title}
             </h3>
             <p className="text-xs text-[#37373A] mb-2 uppercase">
-              {displayData.location}
-              {displayData.postalCode ? ` - ${displayData.postalCode}` : ''}
+              {property.location}
+              {property.postalCode ? ` - ${property.postalCode}` : ''}
             </p>
             <p className="font-semibold text-lg mb-4 text-[#B17226]">
-              {displayData.price}
+              {property.price}
             </p>
 
             <div className="grid grid-cols-3 gap-2 border-t border-gray-200 pt-4 mb-4">
               <div className="flex flex-col items-center">
                 <p className="text-[10px] text-gray-600">Surface</p>
-                <p className="font-medium text-sm">{hasValidArea ? displayData.area : "Non spécifié"}</p>
+                <p className="font-medium text-sm">{hasValidArea ? property.area : "Non spécifié"}</p>
               </div>
               <div className="flex flex-col items-center border-l border-r border-gray-200">
                 <p className="text-[10px] text-gray-600">Pièces</p>
-                <p className="font-medium text-sm">{hasValidRooms ? displayData.rooms : "Non spécifié"}</p>
+                <p className="font-medium text-sm">{hasValidRooms ? property.rooms : "Non spécifié"}</p>
               </div>
               <div className="flex flex-col items-center">
                 <p className="text-[10px] text-gray-600">Chambres</p>
-                <p className="font-medium text-sm">{hasValidBedrooms ? displayData.bedrooms : "Non spécifié"}</p>
+                <p className="font-medium text-sm">{hasValidBedrooms ? property.bedrooms : "Non spécifié"}</p>
               </div>
             </div>
             
-            {displayData.description && (
-              <div className="text-left border-t border-gray-200 pt-4">
-                <p className="text-xs text-[#37373A] line-clamp-3">{displayData.description}</p>
-              </div>
-            )}
-            
             {/* Additional property features */}
-            {(displayData.hasBalcony || displayData.hasTerrasse || displayData.hasPool || 
-              displayData.garageCount !== "0" || displayData.bathrooms) && (
+            {(property.hasBalcony || property.hasTerrasse || property.hasPool || 
+              property.garageCount !== "0" || property.bathrooms) && (
               <div className="mt-3 flex flex-wrap justify-center gap-2">
-                {displayData.hasBalcony && (
+                {property.hasBalcony && (
                   <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Balcon</span>
                 )}
-                {displayData.hasTerrasse && (
+                {property.hasTerrasse && (
                   <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Terrasse</span>
                 )}
-                {displayData.hasPool && (
+                {property.hasPool && (
                   <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Piscine</span>
                 )}
-                {displayData.garageCount !== "0" && displayData.garageCount && (
+                {property.garageCount !== "0" && property.garageCount && (
                   <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
-                    {parseInt(displayData.garageCount) > 1 ? `${displayData.garageCount} Garages` : "Garage"}
+                    {parseInt(property.garageCount) > 1 ? `${property.garageCount} Garages` : "Garage"}
                   </span>
                 )}
-                {displayData.bathrooms && (
+                {property.bathrooms && (
                   <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
-                    {parseInt(displayData.bathrooms) > 1 ? `${displayData.bathrooms} SDB` : "1 SDB"}
+                    {parseInt(property.bathrooms) > 1 ? `${property.bathrooms} SDB` : "1 SDB"}
                   </span>
                 )}
               </div>
