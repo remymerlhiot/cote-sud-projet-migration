@@ -1,8 +1,7 @@
-
 import Layout from "@/components/Layout";
 import PartnerSection from "@/components/partner/PartnerSection";
 import PartnerVideoGallery from "@/components/partner/PartnerVideoGallery";
-import { Handshake, Pencil, Hammer, Home, PalmTree } from "lucide-react";
+import { Handshake, Pencil, Hammer, Home, TreePalm } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const Partenaires = () => {
@@ -173,7 +172,7 @@ const Partenaires = () => {
           <PartnerSection 
             title="L'EXTÉRIEUR"
             subtitle="Paysagisme et aménagements extérieurs"
-            icon={<PalmTree className="text-cuivre" />}
+            icon={<TreePalm className="text-cuivre" />}
             imageOnRight={false}
             imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
           >
