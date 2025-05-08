@@ -24,7 +24,7 @@ const Partenaires = () => {
             subtitle="Notaires, courtiers, conciergeries"
             icon={<HandHelping className="text-cuivre" />}
             imageOnRight={false}
-            imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
+            imageSrc="https://cote-sud.immo/wp-content/uploads/2025/03/Design-sans-titre-5.png"
           >
             <p className="mb-4">
               Nos partenaires vous offrent des solutions sur-mesure pour garantir une expérience fluide et sereine.
@@ -55,7 +55,7 @@ const Partenaires = () => {
             subtitle="Architectes, maîtres d'oeuvres"
             icon={<DraftingCompass className="text-cuivre" />}
             imageOnRight={true}
-            imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
+            imageSrc="https://cote-sud.immo/wp-content/uploads/2025/03/Design-sans-titre-7.png"
           >
             <p className="mb-4">
               Collaborez avec les architectes les plus talentueux pour sublimer vos biens et les maîtres d'oeuvres pour la bonne réalisation de l'ouvrage.
@@ -86,7 +86,7 @@ const Partenaires = () => {
             subtitle="Entreprises générales et spécialistes"
             icon={<HardHat className="text-cuivre" />}
             imageOnRight={false}
-            imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
+            imageSrc="https://cote-sud.immo/wp-content/uploads/2025/03/Design-sans-titre-6.png"
           >
             <p className="mb-4">
               Des entreprises locales soigneusement sélectionnées pour des réalisations de qualité.
@@ -117,7 +117,7 @@ const Partenaires = () => {
             subtitle="Décorateurs, Home staging, Feng shui"
             icon={<Armchair className="text-cuivre" />}
             imageOnRight={true}
-            imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
+            imageSrc="https://cote-sud.immo/wp-content/uploads/2025/03/Design-sans-titre-8.png"
           >
             <p className="mb-4">
               Nos spécialistes transforment votre propriété pour révéler tout son potentiel. Apportez une touche de raffinement et de modernité grâce à nos décorateurs partenaires.
@@ -148,7 +148,7 @@ const Partenaires = () => {
             subtitle="Paysagistes, piscinistes"
             icon={<TreePalm className="text-cuivre" />}
             imageOnRight={false}
-            imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
+            imageSrc="https://cote-sud.immo/wp-content/uploads/2025/03/Design-sans-titre-9.png"
           >
             <p className="mb-4">
               Transformez vos extérieurs avec nos partenaires créatifs.
