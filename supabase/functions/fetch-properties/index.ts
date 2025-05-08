@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
+import { parse as parseXML } from "https://deno.land/x/xml@2.1.3/mod.ts";
 import { FTPClient } from "https://deno.land/x/ftp@v0.3.1/mod.ts";
 
 // CORS headers for browser requests
@@ -10,53 +10,59 @@ const corsHeaders = {
 };
 
 // Function to parse XML to JSON
-function parseXML(xmlString: string) {
+function processXMLData(xmlString: string) {
   try {
-    // Use Deno DOM library to parse XML
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+    // Use Deno-compatible XML parser
+    const result = parseXML(xmlString, { preserveOrder: true });
     
-    if (!xmlDoc) {
+    if (!result) {
       console.error("Failed to parse XML document");
       return [];
     }
     
     // Extract properties
     const properties = [];
-    const annonces = xmlDoc.getElementsByTagName("ANNONCE");
     
-    if (!annonces) {
+    // Find the LISTEANNONCES element
+    const listeAnnonces = findElement(result, "LISTEANNONCES");
+    if (!listeAnnonces || !listeAnnonces.children) {
+      console.error("No LISTEANNONCES found in XML");
+      return [];
+    }
+    
+    // Extract ANNONCE elements
+    const annonces = findElements(listeAnnonces, "ANNONCE");
+    if (!annonces || annonces.length === 0) {
       console.error("No ANNONCE elements found in XML");
       return [];
     }
     
-    for (let i = 0; i < annonces.length; i++) {
-      const annonce = annonces[i];
+    for (const annonce of annonces) {
       const property = {
-        id: getNodeValue(annonce, "ID"),
-        reference: getNodeValue(annonce, "REFERENCE"),
-        type: getNodeValue(annonce, "TYPE"),
-        title: getNodeValue(annonce, "TITRE"),
-        description: getNodeValue(annonce, "DESCRIPTIF"),
-        price: getNodeValue(annonce, "PRIX"),
-        address: getNodeValue(annonce, "ADRESSE"),
-        postalCode: getNodeValue(annonce, "CP"),
-        city: getNodeValue(annonce, "VILLE"),
-        country: getNodeValue(annonce, "PAYS"),
-        surface: getNodeValue(annonce, "SURFACE"),
-        rooms: getNodeValue(annonce, "NB_PIECES"),
-        bedrooms: getNodeValue(annonce, "NB_CHAMBRES"),
-        bathrooms: getNodeValue(annonce, "NB_SDB"),
-        constructionYear: getNodeValue(annonce, "ANNEE_CONSTRUCTION"),
+        id: getElementValue(annonce, "ID"),
+        reference: getElementValue(annonce, "REFERENCE"),
+        type: getElementValue(annonce, "TYPE"),
+        title: getElementValue(annonce, "TITRE"),
+        description: getElementValue(annonce, "DESCRIPTIF"),
+        price: getElementValue(annonce, "PRIX"),
+        address: getElementValue(annonce, "ADRESSE"),
+        postalCode: getElementValue(annonce, "CP"),
+        city: getElementValue(annonce, "VILLE"),
+        country: getElementValue(annonce, "PAYS"),
+        surface: getElementValue(annonce, "SURFACE"),
+        rooms: getElementValue(annonce, "NB_PIECES"),
+        bedrooms: getElementValue(annonce, "NB_CHAMBRES"),
+        bathrooms: getElementValue(annonce, "NB_SDB"),
+        constructionYear: getElementValue(annonce, "ANNEE_CONSTRUCTION"),
         features: {
-          hasBalcony: getNodeValue(annonce, "BALCON") === "1",
-          hasPool: getNodeValue(annonce, "PISCINE") === "1",
-          hasElevator: getNodeValue(annonce, "ASCENSEUR") === "1", 
-          hasGarage: getNodeValue(annonce, "GARAGE") === "1",
-          hasTerrasse: getNodeValue(annonce, "TERRASSE") === "1",
+          hasBalcony: getElementValue(annonce, "BALCON") === "1",
+          hasPool: getElementValue(annonce, "PISCINE") === "1",
+          hasElevator: getElementValue(annonce, "ASCENSEUR") === "1", 
+          hasGarage: getElementValue(annonce, "GARAGE") === "1",
+          hasTerrasse: getElementValue(annonce, "TERRASSE") === "1",
         },
-        photos: parsePhotos(annonce),
-        dpe: getNodeValue(annonce, "DPE"),
+        photos: extractPhotos(annonce),
+        dpe: getElementValue(annonce, "DPE"),
       };
       
       properties.push(property);
@@ -69,31 +75,64 @@ function parseXML(xmlString: string) {
   }
 }
 
-// Helper to extract node value
-function getNodeValue(parentNode: Element, tagName: string): string {
-  try {
-    const node = parentNode.getElementsByTagName(tagName)[0];
-    return node ? node.textContent || "" : "";
-  } catch (e) {
-    return "";
+// Helper function to find an element by name in the parsed XML
+function findElement(elements: any[], tagName: string): any {
+  if (!elements || !Array.isArray(elements)) return null;
+  
+  for (const item of elements) {
+    if (item.name === tagName) {
+      return item;
+    }
+    
+    if (item.children) {
+      const found = findElement(item.children, tagName);
+      if (found) return found;
+    }
   }
+  
+  return null;
+}
+
+// Helper function to find all elements with a specific name
+function findElements(parent: any, tagName: string): any[] {
+  const result = [];
+  
+  if (!parent || !parent.children || !Array.isArray(parent.children)) return result;
+  
+  for (const item of parent.children) {
+    if (item.name === tagName) {
+      result.push(item);
+    }
+  }
+  
+  return result;
+}
+
+// Helper function to get element value
+function getElementValue(parent: any, tagName: string): string {
+  if (!parent || !parent.children) return "";
+  
+  const element = findElement(parent.children, tagName);
+  
+  if (!element || !element.children || !element.children.length) return "";
+  
+  // Element value is usually in the first child's text property
+  return element.children[0]?.text || "";
 }
 
 // Helper to extract photos
-function parsePhotos(annonce: Element): string[] {
-  try {
-    const photos = [];
-    const photoNodes = annonce.getElementsByTagName("PHOTO");
-    
-    for (let i = 0; i < photoNodes.length; i++) {
-      const url = photoNodes[i].textContent;
+function extractPhotos(annonce: any): string[] {
+  const photos = [];
+  const photoElements = findElements(annonce, "PHOTO");
+  
+  for (const photoElement of photoElements) {
+    if (photoElement.children && photoElement.children.length > 0) {
+      const url = photoElement.children[0]?.text;
       if (url) photos.push(url);
     }
-    
-    return photos;
-  } catch (e) {
-    return [];
   }
+  
+  return photos;
 }
 
 // For development, mock XML data instead of FTP
@@ -295,7 +334,7 @@ serve(async (req) => {
       try {
         const xmlContent = await fetchXMLFromFTP();
         if (xmlContent) {
-          cachedProperties = parseXML(xmlContent);
+          cachedProperties = processXMLData(xmlContent);
           lastFetched = now;
           console.log(`Successfully fetched ${cachedProperties.length} properties`);
         }
@@ -305,7 +344,7 @@ serve(async (req) => {
         if (cachedProperties.length === 0) {
           console.log("Using mock data as fallback");
           const mockXML = getMockXMLData();
-          cachedProperties = parseXML(mockXML);
+          cachedProperties = processXMLData(mockXML);
         } else {
           // Otherwise use stale cache and log warning
           console.warn("Using stale cache due to FTP error");
