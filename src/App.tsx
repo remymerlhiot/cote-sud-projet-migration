@@ -13,7 +13,7 @@ import PropertyDetail from "./pages/PropertyDetail";
 import NotreHistoire from "./pages/NotreHistoire";
 import Estimation from "./pages/Estimation";
 import NosAvis from "./pages/NosAvis"; 
-import Partenaires from "./pages/Partenaires"; // Import the new Partenaires page
+import Partenaires from "./pages/Partenaires";
 
 const queryClient = new QueryClient();
 
@@ -30,11 +30,10 @@ const App = () => (
           <Route path="/property/:id" element={<PropertyDetail />} />
           <Route path="/estimation" element={<Estimation />} />
           <Route path="/nos-avis" element={<NosAvis />} />
-          <Route path="/partenaires" element={<Partenaires />} /> {/* Add new route for Partenaires */}
+          <Route path="/partenaires" element={<Partenaires />} />
           
           {/* Dynamic page routes */}
           <Route path="/page/:slug" element={<DynamicPage />} />
-          <Route path="/contact" element={<DynamicPage slug="contact" />} />
           <Route path="/services" element={<DynamicPage slug="services" />} />
           <Route path="/new-home" element={<DynamicPage slug="new-home" />} />
           <Route path="/notre-histoire" element={<NotreHistoire />} />
