@@ -4,7 +4,6 @@ import {
   fetchWordPressProperties, 
   fetchWordPressPropertyById,
   transformPropertyData,
-  WordPressProperty,
   TransformedProperty
 } from "@/services/wordpress";
 
@@ -14,9 +13,8 @@ export const useProperties = () => {
     queryKey: ["properties"],
     queryFn: async () => {
       const wpProperties = await fetchWordPressProperties();
-      // Transform each property to our standard format and sort by price (highest to lowest)
-      return wpProperties.map(prop => transformPropertyData(prop))
-        .sort((a, b) => b.priceNumber - a.priceNumber);
+      // Les propriétés sont déjà transformées par fetchWordPressProperties
+      return wpProperties.sort((a, b) => b.priceNumber - a.priceNumber);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -31,10 +29,7 @@ export const usePropertyById = (id: string | number) => {
       const numericId = parseInt(stringId);
       if (isNaN(numericId)) return null;
 
-      const wpProperty = await fetchWordPressPropertyById(numericId);
-      if (!wpProperty) return null;
-      // Transform to our standard format
-      return transformPropertyData(wpProperty);
+      return await fetchWordPressPropertyById(numericId);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!id,

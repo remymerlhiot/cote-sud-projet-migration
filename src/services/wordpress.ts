@@ -8,10 +8,10 @@ export * from "./wordpress/transformers";
 export * from "./wordpress/pageApi";
 export * from "./wordpress/mediaApi";
 
-// Export propertyApi en évitant les conflits de nommage
+// Export propertyApi en renommant les fonctions pour éviter les conflits
 export { 
-  fetchProperties,
-  fetchPropertyById,
+  fetchProperties as fetchWordPressProperties,
+  fetchPropertyById as fetchWordPressPropertyById,
   transformPropertyData
 } from "./wordpress/propertyApi";
 

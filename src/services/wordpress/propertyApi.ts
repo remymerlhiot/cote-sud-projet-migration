@@ -69,3 +69,6 @@ export const fetchPropertyById = async (id: number): Promise<TransformedProperty
     return null;
   }
 };
+
+// Re-exporter explicitement la fonction transformPropertyData
+export { transformPropertyData } from "./transformers";

@@ -6,10 +6,9 @@ import {
   fetchMedia, 
   fetchPageBySlug,
   fetchWordPressPropertyById,
-  WordPressProperty,
-  WordPressAnnonce,
   transformPropertyData,
-  TransformedProperty
+  TransformedProperty,
+  WordPressProperty
 } from "@/services/wordpress";
 
 export const useProperties = () => {
