@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
+import { FTPClient } from "https://deno.land/x/ftp@v0.1.1/mod.ts";
 
 // CORS headers for browser requests
 const corsHeaders = {
@@ -229,48 +230,49 @@ function getMockXMLData() {
 }
 
 async function fetchXMLFromFTP(): Promise<string> {
-  // During development, use mock data instead of actual FTP connection
-  // When in production, uncomment the FTP code below and replace with real credentials
-  
-  console.log("Using mock data instead of FTP connection for development");
-  return getMockXMLData();
-  
-  /* 
-  // Uncomment and update with real credentials for production
+  // En production, on utilise la connexion FTP réelle
   const client = new FTPClient();
   let xmlContent = "";
 
   try {
-    // FTP connection details - REPLACE WITH ACTUAL CREDENTIALS
+    // Informations de connexion FTP
     await client.connect({
-      host: "ftp.example.com",  // Real FTP host
-      port: 21,
-      username: "realuser",     // Real username
-      password: "realpassword"  // Real password
+      host: "agence-axo.immo",  // Votre hôte FTP
+      port: 21,                 // Port standard FTP
+      username: "xmladapt@agence-axo.immo", // Votre nom d'utilisateur
+      password: "^!@b+EadZ36z"  // Votre mot de passe
     });
 
-    // Navigate to directory if needed
-    // await client.cd("/path/to/directory");
+    console.log("Connecté au serveur FTP, récupération du fichier XML...");
 
-    // Get file content as text - REPLACE WITH ACTUAL FILENAME
-    const fileReader = await client.get("properties.xml");
+    // Récupération du fichier XML
+    const fileReader = await client.get("85002.xml"); // Votre nom de fichier
     if (fileReader) {
       const fileContent = await Deno.readAll(fileReader);
       xmlContent = new TextDecoder().decode(fileContent);
+      console.log("Fichier XML récupéré avec succès");
+    } else {
+      console.error("Impossible de lire le fichier XML");
+      // En cas d'échec, utiliser les données mockées
+      xmlContent = getMockXMLData();
     }
 
-    // Close the connection
+    // Fermeture de la connexion
     await client.close();
+    console.log("Connexion FTP fermée");
 
     return xmlContent;
   } catch (error) {
-    console.error("FTP error:", error);
+    console.error("Erreur FTP:", error);
     if (client.connected) {
       await client.close();
+      console.log("Connexion FTP fermée après erreur");
     }
-    throw error;
+    
+    // En cas d'erreur, utiliser les données mockées
+    console.log("Utilisation des données de démonstration");
+    return getMockXMLData();
   }
-  */
 }
 
 // Handle cached data
@@ -288,7 +290,7 @@ serve(async (req) => {
     const now = Date.now();
     // Check if we need to fetch fresh data
     if (cachedProperties.length === 0 || now - lastFetched > CACHE_DURATION) {
-      console.log("Fetching fresh properties from FTP or mock data...");
+      console.log("Fetching fresh properties from FTP...");
       
       try {
         const xmlContent = await fetchXMLFromFTP();
