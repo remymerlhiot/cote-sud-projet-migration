@@ -1,4 +1,3 @@
-
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { useLocation } from "react-router-dom";
 import { Home, Phone, Menu, X } from "lucide-react";
@@ -6,12 +5,10 @@ import YouTubeBackground from "./YouTubeBackground";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
 const Header = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
   const isActive = (path: string) => {
     return location.pathname === path;
   };
@@ -27,48 +24,46 @@ const Header = () => {
   }, [location.pathname]);
 
   // Navigation links used in both desktop and mobile menus
-  const navigationLinks = [
-    { path: "/", label: "Accueil" },
-    { path: "/notre-histoire", label: "Notre Histoire" },
-    { path: "/nos-biens", label: "Nos Biens" },
-    { path: "/estimation", label: "Estimation" },
-    { path: "/partenaires", label: "Partenaires" },
-    { path: "/nos-avis", label: "Nos Avis" }
-  ];
+  const navigationLinks = [{
+    path: "/",
+    label: "Accueil"
+  }, {
+    path: "/notre-histoire",
+    label: "Notre Histoire"
+  }, {
+    path: "/nos-biens",
+    label: "Nos Biens"
+  }, {
+    path: "/estimation",
+    label: "Estimation"
+  }, {
+    path: "/partenaires",
+    label: "Partenaires"
+  }, {
+    path: "/nos-avis",
+    label: "Nos Avis"
+  }];
 
   // Mobile Menu Component
-  const MobileMenu = () => (
-    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+  const MobileMenu = () => <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <SheetTrigger asChild>
-        <button 
-          className="md:hidden absolute top-4 right-4 z-50 bg-[#CD9B59]/80 p-2 rounded-md text-white" 
-          aria-label="Menu"
-        >
+        <button className="md:hidden absolute top-4 right-4 z-50 bg-[#CD9B59]/80 p-2 rounded-md text-white" aria-label="Menu">
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </SheetTrigger>
       <SheetContent side="right" className="bg-anthracite w-[80%] p-0">
         <div className="pt-12 pb-6 px-4 flex flex-col h-full">
           <div className="flex justify-center mb-8">
-            <img 
-              alt="AXO Côté Sud" 
-              className="h-16 w-auto" 
-              src="/lovable-uploads/97689347-4c31-4d84-bcba-5f3e6f50b63e.png" 
-            />
+            <img alt="AXO Côté Sud" className="h-16 w-auto" src="/lovable-uploads/97689347-4c31-4d84-bcba-5f3e6f50b63e.png" />
           </div>
           <nav className="flex-1">
             <ul className="flex flex-col space-y-1">
-              {navigationLinks.map((link) => (
-                <li key={link.path}>
-                  <a 
-                    href={link.path}
-                    className={`block py-3 px-4 text-white text-center uppercase font-medium transition-colors
-                      ${isActive(link.path) ? 'bg-[#CD9B59]' : 'hover:bg-[#CD9B59]/50'}`}
-                  >
+              {navigationLinks.map(link => <li key={link.path}>
+                  <a href={link.path} className={`block py-3 px-4 text-white text-center uppercase font-medium transition-colors
+                      ${isActive(link.path) ? 'bg-[#CD9B59]' : 'hover:bg-[#CD9B59]/50'}`}>
                     {link.label}
                   </a>
-                </li>
-              ))}
+                </li>)}
             </ul>
           </nav>
           <div className="mt-auto pt-6 border-t border-sable-30/20">
@@ -85,29 +80,16 @@ const Header = () => {
           </div>
         </div>
       </SheetContent>
-    </Sheet>
-  );
-
-  return (
-    <header className="relative">
+    </Sheet>;
+  return <header className="relative">
       <div className="relative h-[180px] md:h-[220px] overflow-hidden">
         {/* YouTube Video Background avec les nouveaux paramètres */}
-        <YouTubeBackground 
-          videoId={youtubeVideoId} 
-          startTime={startTime} 
-          endTime={endTime} 
-          overlayColor="#B17226" 
-          overlayOpacity={0.36} 
-        />
+        <YouTubeBackground videoId={youtubeVideoId} startTime={startTime} endTime={endTime} overlayColor="#B17226" overlayOpacity={0.36} />
         
         <div className="absolute inset-0">
           {/* Logo */}
           <div className="absolute inset-0 flex flex-col justify-center items-center">
-            <img 
-              alt="AXO Côté Sud" 
-              className="h-16 w-auto mb-2 md:h-24" 
-              src="/lovable-uploads/97689347-4c31-4d84-bcba-5f3e6f50b63e.png" 
-            />
+            <img alt="AXO Côté Sud" className="h-16 w-auto mb-2 md:h-24" src="https://cote-sud.immo/wp-content/uploads/2024/10/AXO_COTE-SUD_PRESTIGE-PATRIMOINE_SABLE-CUIVRE-SABLE-2-768x400.png" />
           </div>
           
           {/* Mobile Menu */}
@@ -120,17 +102,12 @@ const Header = () => {
                 <div className="bg-[#CD9B59]/30 backdrop-blur-sm">
                   <NavigationMenu className="w-full">
                     <NavigationMenuList className="flex justify-center w-full space-x-0 mx-auto">
-                      {navigationLinks.map((link) => (
-                        <NavigationMenuItem key={link.path}>
-                          <NavigationMenuLink 
-                            href={link.path} 
-                            className={`text-white hover:bg-[#CD9B59] uppercase text-xs font-medium px-4 md:px-6 py-3 transition-colors
-                            ${isActive(link.path) ? 'bg-[#CD9B59]' : ''}`}
-                          >
+                      {navigationLinks.map(link => <NavigationMenuItem key={link.path}>
+                          <NavigationMenuLink href={link.path} className={`text-white hover:bg-[#CD9B59] uppercase text-xs font-medium px-4 md:px-6 py-3 transition-colors
+                            ${isActive(link.path) ? 'bg-[#CD9B59]' : ''}`}>
                             {link.label}
                           </NavigationMenuLink>
-                        </NavigationMenuItem>
-                      ))}
+                        </NavigationMenuItem>)}
                     </NavigationMenuList>
                   </NavigationMenu>
                 </div>
@@ -153,8 +130,6 @@ const Header = () => {
           </div>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Header;
