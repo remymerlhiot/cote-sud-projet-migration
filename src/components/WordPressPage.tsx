@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import { usePageBySlug } from "@/hooks/useWordPress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cleanElementorHtml, CleaningOptions } from "@/utils/elementorCleaner";
+import { Separator } from "@/components/ui/separator";
 
 interface WordPressPageProps {
   slug: string;
@@ -58,7 +59,7 @@ const WordPressPage: React.FC<WordPressPageProps> = ({
   }
 
   if (!page && !hideErrorMessages) {
-    return <div className="text-center p-8 text-[#CD9B59]">Page introuvable</div>;
+    return <div className="text-center p-8 text-sable">Page introuvable</div>;
   }
   
   if (!page && hideErrorMessages) {
@@ -68,10 +69,13 @@ const WordPressPage: React.FC<WordPressPageProps> = ({
   return (
     <div className={`wordpress-page ${className}`}>
       {showTitle && page && (
-        <h1 
-          className="text-3xl font-light text-[#CD9B59] mb-6"
-          dangerouslySetInnerHTML={{ __html: page.title.rendered }}
-        />
+        <>
+          <h1 
+            className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-sable text-center mb-6"
+            dangerouslySetInnerHTML={{ __html: page.title.rendered }}
+          />
+          <Separator className="w-24 h-0.5 bg-sable/30 mx-auto mb-12" />
+        </>
       )}
       
       {page?.featured_media_url && (
@@ -86,7 +90,7 @@ const WordPressPage: React.FC<WordPressPageProps> = ({
       
       {page && (
         <div 
-          className="page-content prose max-w-none prose-headings:text-[#CD9B59] prose-headings:font-light elementor-content"
+          className="page-content prose max-w-none prose-headings:text-sable prose-headings:font-light elementor-content"
           dangerouslySetInnerHTML={{ __html: processedContent }}
         />
       )}

@@ -10,13 +10,13 @@ const Partenaires = () => {
     <Layout>
       <div className="bg-sable-30/50 py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl md:text-5xl font-playfair text-cuivre text-center mb-6">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-cuivre text-center mb-6">
             NOS PARTENAIRES
           </h1>
           <p className="text-center text-anthracite max-w-3xl mx-auto mb-8">
             Pour vous accompagner dans vos projets immobiliers, nous collaborons avec les meilleurs professionnels.
           </p>
-          <Separator className="bg-sable-80 h-[2px] max-w-md mx-auto mb-12" />
+          <Separator className="bg-sable h-[2px] max-w-md mx-auto mb-12" />
 
           {/* L'ACCOMPAGNEMENT */}
           <PartnerSection 

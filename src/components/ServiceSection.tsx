@@ -203,7 +203,7 @@ const ServiceSection = ({ className }: ServiceSectionProps) => {
       }}
     >
       <div className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl md:text-4xl font-light text-[#CD9B59] text-center mb-12">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-sable text-center mb-16">
           SERVICES DE L'AGENCE
         </h2>
         
@@ -221,13 +221,13 @@ const ServiceSection = ({ className }: ServiceSectionProps) => {
                   <AccordionItem 
                     key={service.id} 
                     value={service.id} 
-                    className="border-b border-[#CD9B59]/30 last:border-0"
+                    className="border-b border-sable/30 last:border-0"
                   >
-                    <AccordionTrigger className="text-[#CD9B59] hover:no-underline py-4 flex justify-between">
+                    <AccordionTrigger className="text-sable hover:no-underline py-4 flex justify-between">
                       <span>{service.title}</span>
                       <div className="flex items-center">
-                        <Plus className="h-4 w-4 shrink-0 text-[#CD9B59] transition-all group-data-[state=open]:hidden" />
-                        <Minus className="h-4 w-4 shrink-0 text-[#CD9B59] transition-all hidden group-data-[state=open]:block" />
+                        <Plus className="h-4 w-4 shrink-0 text-sable transition-all group-data-[state=open]:hidden" />
+                        <Minus className="h-4 w-4 shrink-0 text-sable transition-all hidden group-data-[state=open]:block" />
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="text-white animate-accordion-down">

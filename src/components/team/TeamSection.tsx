@@ -23,7 +23,7 @@ const TeamSection: React.FC = () => {
       <section className="py-12 bg-cream">
         <div className="text-center mb-10">
           <Skeleton className="h-8 w-48 mx-auto mb-4" />
-          <Separator className="w-24 h-0.5 bg-gold/30 mx-auto mt-6" />
+          <Separator className="w-24 h-0.5 bg-sable/30 mx-auto mt-6" />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 max-w-5xl mx-auto px-4">
@@ -44,13 +44,13 @@ const TeamSection: React.FC = () => {
     return (
       <section className="py-12 bg-cream">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-playfair font-light text-gold uppercase mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-sable mb-6">
             Notre Équipe
           </h2>
           <p className="text-red-500">
             Une erreur est survenue lors du chargement des informations de l'équipe.
           </p>
-          <Separator className="w-24 h-0.5 bg-gold/30 mx-auto mt-6" />
+          <Separator className="w-24 h-0.5 bg-sable/30 mx-auto mt-6" />
         </div>
       </section>
     );
@@ -59,10 +59,10 @@ const TeamSection: React.FC = () => {
   return (
     <section className="py-12 bg-cream" id="notre-equipe">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-playfair font-light text-gold uppercase mb-4">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-sable mb-6">
           Notre Équipe
         </h2>
-        <Separator className="w-24 h-0.5 bg-gold/30 mx-auto mt-2" />
+        <Separator className="w-24 h-0.5 bg-sable/30 mx-auto mt-2" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 max-w-5xl mx-auto px-4">

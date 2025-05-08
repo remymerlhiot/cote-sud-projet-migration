@@ -1,6 +1,7 @@
 
 import React, { ReactNode } from 'react';
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 interface PartnerSectionProps {
   title: string;
@@ -27,12 +28,18 @@ const PartnerSection = ({
       )}>
         {/* Text content */}
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-3 mb-4">
             {icon && <div className="w-6 h-6">{icon}</div>}
-            <h2 className="text-2xl md:text-3xl font-playfair text-cuivre">{title}</h2>
+            <h3 className="text-2xl md:text-3xl font-playfair font-normal text-cuivre">
+              {title}
+            </h3>
           </div>
-          <h3 className="text-lg md:text-xl text-anthracite mb-4">{subtitle}</h3>
-          <div className="text-anthracite">{children}</div>
+          <p className="text-lg md:text-xl text-anthracite mb-8">
+            {subtitle}
+          </p>
+          <div className="text-anthracite">
+            {children}
+          </div>
         </div>
         
         {/* Image */}
