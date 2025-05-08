@@ -30,6 +30,9 @@ export interface FTPProperty {
   dpe: string;
 }
 
+// Default fallback image if property has no photos
+const FALLBACK_IMAGE = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+
 // Fetch properties from the FTP service via our edge function
 export const fetchProperties = async (): Promise<FTPProperty[]> => {
   try {
@@ -44,7 +47,13 @@ export const fetchProperties = async (): Promise<FTPProperty[]> => {
       console.log("FTP API Complete Property Response:", data.properties[0]);
     }
     
-    return data.properties || [];
+    // Sort properties by price (highest to lowest) before returning
+    const properties = data.properties || [];
+    return properties.sort((a: FTPProperty, b: FTPProperty) => {
+      const priceA = parseInt(a.price.replace(/[^0-9]/g, '')) || 0;
+      const priceB = parseInt(b.price.replace(/[^0-9]/g, '')) || 0;
+      return priceB - priceA;
+    });
   } catch (error) {
     console.error("Failed to fetch properties:", error);
     toast.error("Impossible de récupérer les biens immobiliers");
@@ -77,6 +86,12 @@ export const fetchPropertyById = async (id: string): Promise<FTPProperty | null>
   }
 };
 
+// Helper to get valid image URL
+export const getValidImageUrl = (photos: string[], index = 0): string => {
+  if (!photos || !photos.length) return FALLBACK_IMAGE;
+  return photos[index] || FALLBACK_IMAGE;
+};
+
 // Transform FTP property data to match our existing format
 export const transformFTPPropertyData = (ftpProperty: FTPProperty): TransformedProperty => {
   // Helper to format price
@@ -90,19 +105,21 @@ export const transformFTPPropertyData = (ftpProperty: FTPProperty): TransformedP
     return `${formattedPrice} €`;
   };
 
+  // Get numeric price for sorting
+  const priceNumber = parseInt(ftpProperty.price.replace(/[^0-9]/g, '')) || 0;
+
   return {
     id: parseInt(ftpProperty.id) || 0,
     title: ftpProperty.type || ftpProperty.title || "Propriété",
     location: ftpProperty.city || "Non spécifié",
     ref: ftpProperty.reference || `REF ${ftpProperty.id}`,
     price: formatPrice(ftpProperty.price),
-    priceNumber: parseInt(ftpProperty.price.replace(/[^0-9]/g, '')) || 0,
+    priceNumber: priceNumber,
     area: ftpProperty.surface ? `${ftpProperty.surface}m²` : "Non spécifié",
     rooms: ftpProperty.rooms || "Non spécifié",
     bedrooms: ftpProperty.bedrooms || "Non spécifié",
-    image: ftpProperty.photos && ftpProperty.photos.length > 0 
-      ? ftpProperty.photos[0] 
-      : "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png", // Fallback image
+    image: getValidImageUrl(ftpProperty.photos), // Primary image for card
+    allImages: ftpProperty.photos || [], // All images for gallery
     date: new Date().toISOString(), // Using current date as fallback
     description: ftpProperty.description || "",
     fullContent: ftpProperty.description || "",
@@ -124,6 +141,6 @@ export const transformFTPPropertyData = (ftpProperty: FTPProperty): TransformedP
     toilets: "",
     heatingType: "",
     isNewConstruction: false,
-    isPrestigious: false,
+    isPrestigious: priceNumber > 1000000, // Mark properties over 1M€ as prestigious
   };
 };

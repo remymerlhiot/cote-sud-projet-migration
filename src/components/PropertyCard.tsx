@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { TransformedProperty } from "@/hooks/useProperties";
+import { TransformedProperty, getValidImageUrl } from "@/hooks/useProperties";
 import { Link } from "react-router-dom";
 
 type PropertyProps = {
@@ -36,13 +36,16 @@ const PropertyCard = ({ property }: PropertyProps) => {
     return badges;
   };
 
+  // Get primary image or fallback
+  const displayImage = property.image;
+
   return (
     <Link to={`/property/${property.id}`} className="block h-full">
       <Card className="overflow-hidden border-none shadow-md h-full bg-white hover:shadow-lg transition-all duration-300">
         <CardContent className="p-0 relative">
           <div className="relative">
             <img 
-              src={property.image} 
+              src={displayImage} 
               alt={property.title} 
               className="w-full h-56 object-cover"
             />

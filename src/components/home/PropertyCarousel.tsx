@@ -1,3 +1,4 @@
+
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import PropertyCard from "@/components/PropertyCard";
 import { useState } from "react";
@@ -87,13 +88,8 @@ const PropertyCarousel = () => {
     toast.error("Impossible de récupérer les biens immobiliers. Affichage des données de secours.");
   }
 
-  // Get properties to display (real or fallback)
-  const displayProperties = properties && properties.length > 0 ? properties.sort((a, b) => {
-    // Sort by date (newest first)
-    const dateA = new Date(a.date || "");
-    const dateB = new Date(b.date || "");
-    return dateB.getTime() - dateA.getTime();
-  }) : fallbackProperties;
+  // Get properties to display (real or fallback) - already sorted by price (highest to lowest) from the useProperties hook
+  const displayProperties = properties && properties.length > 0 ? properties : fallbackProperties;
   
   return (
     <section className="container mx-auto mb-20 px-4 py-[20px]">

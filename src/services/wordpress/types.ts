@@ -1,4 +1,3 @@
-
 // Types for WordPress API responses
 export interface WordPressProperty {
   id: number;
@@ -153,12 +152,12 @@ export interface TransformedProperty {
   location: string;
   ref: string;
   price: string;
-  priceNumber: number;
+  priceNumber: number;  // Numeric price for sorting and comparisons
   area: string;
   rooms: string;
   bedrooms: string;
-  dpe: string;
   image: string;
+  allImages?: string[];  // All property images for gallery
   date: string;
   description: string;
   fullContent: string;
@@ -169,16 +168,16 @@ export interface TransformedProperty {
   hasTerrasse: boolean;
   hasPool: boolean;
   garageCount: string;
-  // Nouveaux champs
+  dpe: string;
   postalCode?: string;
   address?: string;
+  bathrooms?: string;
+  country?: string;
   landArea?: string;
   floorNumber?: string;
   totalFloors?: string;
-  bathrooms?: string;
   toilets?: string;
   heatingType?: string;
   isNewConstruction?: boolean;
   isPrestigious?: boolean;
-  country?: string;
 }

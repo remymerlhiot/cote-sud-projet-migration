@@ -1,18 +1,22 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { usePropertyById } from "@/hooks/useProperties";
+import { usePropertyById, getValidImageUrl } from "@/hooks/useProperties";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const propertyId = id ? id : "0";
+
+  // State for tracking current photo in gallery
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   // Fetch property details using our new hook
   const { data: displayData, isLoading, error } = usePropertyById(propertyId);
@@ -76,6 +80,9 @@ const PropertyDetail = () => {
     );
   }
 
+  // Get all property images - fallback to an array with just the main image if allImages doesn't exist
+  const propertyImages = displayData.allImages?.length ? displayData.allImages : [displayData.image];
+
   return (
     <div className="flex flex-col min-h-screen bg-cream font-raleway">
       <Header />
@@ -96,13 +103,45 @@ const PropertyDetail = () => {
             {displayData.title}
           </h1>
           
-          {/* Property image */}
+          {/* Property image gallery */}
           <div className="mb-8 relative">
-            <img 
-              src={displayData.image} 
-              alt={displayData.title} 
-              className="w-full h-auto object-cover rounded-md"
-            />
+            {propertyImages.length > 1 ? (
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {propertyImages.map((image, index) => (
+                    <CarouselItem key={index}>
+                      <div className="aspect-video w-full">
+                        <img 
+                          src={image} 
+                          alt={`${displayData.title} - Vue ${index + 1}`} 
+                          className="w-full h-full object-cover rounded-md"
+                          onError={(e) => {
+                            // Replace broken images with fallback
+                            e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                          }}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white text-[#CD9B59] border-[#CD9B59]" />
+                <CarouselNext className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white text-[#CD9B59] border-[#CD9B59]" />
+              </Carousel>
+            ) : (
+              <img 
+                src={displayData.image} 
+                alt={displayData.title} 
+                className="w-full h-auto object-cover rounded-md"
+                onError={(e) => {
+                  e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                }}
+              />
+            )}
+            
+            {/* Price badge */}
+            <div className="absolute top-4 right-4 bg-[#B17226] text-white px-4 py-2 rounded-md text-lg font-semibold">
+              {displayData.price}
+            </div>
           </div>
           
           {/* Property quick info */}
@@ -114,12 +153,13 @@ const PropertyDetail = () => {
                   <p className="font-medium">{displayData.ref}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Prix</p>
-                  <p className="font-bold text-lg text-[#CD9B59]">{displayData.price}</p>
+                  <p className="text-sm text-gray-600">Type</p>
+                  <p className="font-medium">{displayData.propertyType}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Localisation</p>
                   <p className="font-medium">{displayData.location}</p>
+                  {displayData.postalCode && <p className="text-xs text-gray-500">{displayData.postalCode}</p>}
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Surface</p>
@@ -145,21 +185,85 @@ const PropertyDetail = () => {
             </Card>
             <Card className="border-none shadow-sm">
               <CardContent className="p-4 text-center">
-                <p className="text-sm text-gray-600">Date de publication</p>
-                <p className="font-medium">
-                  {new Date(displayData.date || "").toLocaleDateString("fr-FR")}
-                </p>
+                <p className="text-sm text-gray-600">Salle(s) de bain</p>
+                <p className="font-bold text-xl">{displayData.bathrooms || "Non spécifié"}</p>
               </CardContent>
             </Card>
           </div>
           
+          {/* Additional features */}
+          {(displayData.hasBalcony || displayData.hasTerrasse || displayData.hasPool || displayData.hasElevator || 
+            displayData.garageCount !== "0" || displayData.constructionYear) && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-playfair text-[#CD9B59] mb-4">Caractéristiques</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {displayData.hasBalcony && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>Balcon</span>
+                  </div>
+                )}
+                {displayData.hasTerrasse && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>Terrasse</span>
+                  </div>
+                )}
+                {displayData.hasPool && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>Piscine</span>
+                  </div>
+                )}
+                {displayData.hasElevator && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>Ascenseur</span>
+                  </div>
+                )}
+                {displayData.garageCount !== "0" && displayData.garageCount && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>{parseInt(displayData.garageCount) > 1 ? `${displayData.garageCount} Garages` : "Garage"}</span>
+                  </div>
+                )}
+                {displayData.constructionYear && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>Construction: {displayData.constructionYear}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* DPE Rating if available */}
+          {displayData.dpe && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-playfair text-[#CD9B59] mb-4">Performance Énergétique</h2>
+              <div className="flex items-center">
+                <span className={`${getDpeColorClass(displayData.dpe)} px-4 py-2 rounded-md font-bold text-lg`}>
+                  {displayData.dpe.toUpperCase()}
+                </span>
+                <span className="ml-3 text-sm text-gray-600">
+                  Diagnostic de Performance Énergétique
+                </span>
+              </div>
+            </div>
+          )}
+          
           {/* Property full description */}
           <div className="mb-8">
             <h2 className="text-2xl font-playfair text-[#CD9B59] mb-4">Description</h2>
-            <div 
-              className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: displayData.fullContent }}
-            />
+            <div className="prose max-w-none">
+              {displayData.fullContent ? (
+                <div dangerouslySetInnerHTML={{ __html: displayData.fullContent }} />
+              ) : (
+                <p className="text-gray-600">
+                  {displayData.description || "Aucune description disponible pour ce bien."}
+                </p>
+              )}
+            </div>
           </div>
           
           {/* Contact info */}

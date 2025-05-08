@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchProperties, fetchPropertyById, transformFTPPropertyData } from "@/services/ftpPropertyApi";
+import { fetchProperties, fetchPropertyById, transformFTPPropertyData, getValidImageUrl } from "@/services/ftpPropertyApi";
 import type { TransformedProperty } from "@/services/wordpress/types";
 
 // Fetch all properties
@@ -9,8 +9,9 @@ export const useProperties = () => {
     queryKey: ["properties"],
     queryFn: async () => {
       const ftpProperties = await fetchProperties();
-      // Transform each property to our standard format
-      return ftpProperties.map(prop => transformFTPPropertyData(prop));
+      // Transform each property to our standard format and sort by price (highest to lowest)
+      return ftpProperties.map(prop => transformFTPPropertyData(prop))
+        .sort((a, b) => b.priceNumber - a.priceNumber);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -32,6 +33,6 @@ export const usePropertyById = (id: string | number) => {
   });
 };
 
-// Re-export the transform function and types for convenience
-export { transformFTPPropertyData };
+// Re-export the transform function and helper functions
+export { transformFTPPropertyData, getValidImageUrl };
 export type { TransformedProperty };
