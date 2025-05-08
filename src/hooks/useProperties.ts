@@ -1,38 +1,53 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchProperties, fetchPropertyById, transformFTPPropertyData, getValidImageUrl } from "@/services/ftpPropertyApi";
-import type { TransformedProperty } from "@/services/wordpress/types";
+import { 
+  fetchWordPressProperties, 
+  fetchWordPressPropertyById,
+  transformPropertyData,
+  WordPressProperty,
+  TransformedProperty
+} from "@/services/wordpress";
 
-// Fetch all properties
+// Fetch all properties using WordPress API instead of FTP
 export const useProperties = () => {
   return useQuery({
     queryKey: ["properties"],
     queryFn: async () => {
-      const ftpProperties = await fetchProperties();
+      const wpProperties = await fetchWordPressProperties();
       // Transform each property to our standard format and sort by price (highest to lowest)
-      return ftpProperties.map(prop => transformFTPPropertyData(prop))
+      return wpProperties.map(prop => transformPropertyData(prop))
         .sort((a, b) => b.priceNumber - a.priceNumber);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
-// Fetch a single property by ID
+// Fetch a single property by ID from WordPress
 export const usePropertyById = (id: string | number) => {
   return useQuery({
     queryKey: ["property", id],
     queryFn: async () => {
       const stringId = id.toString();
-      const ftpProperty = await fetchPropertyById(stringId);
-      if (!ftpProperty) return null;
+      const numericId = parseInt(stringId);
+      if (isNaN(numericId)) return null;
+
+      const wpProperty = await fetchWordPressPropertyById(numericId);
+      if (!wpProperty) return null;
       // Transform to our standard format
-      return transformFTPPropertyData(ftpProperty);
+      return transformPropertyData(wpProperty);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!id,
   });
 };
 
-// Re-export the transform function and helper functions
-export { transformFTPPropertyData, getValidImageUrl };
+// Re-export the transform function and helper functions from WordPress services
+export { transformPropertyData };
+
+// Re-export the image validation helper to maintain compatibility
+export const getValidImageUrl = (url: string | undefined): string => {
+  if (!url) return "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+  return url;
+};
+
 export type { TransformedProperty };
