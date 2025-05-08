@@ -1,38 +1,30 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { TransformedProperty } from "@/hooks/useProperties";
 import { Link } from "react-router-dom";
-
 type PropertyProps = {
   property: TransformedProperty;
 };
-
-const PropertyCard = ({ property }: PropertyProps) => {
+const PropertyCard = ({
+  property
+}: PropertyProps) => {
   // Check if we have valid data for each property field
   const hasValidArea = property.area && property.area !== "Non spécifié";
   const hasValidRooms = property.rooms && property.rooms !== "Non spécifié";
   const hasValidBedrooms = property.bedrooms && property.bedrooms !== "Non spécifié";
-  
+
   // Additional feature badges
   const renderFeatureBadges = () => {
     const badges = [];
-    
     if (property.isNewConstruction) {
-      badges.push(
-        <span key="new" className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
+      badges.push(<span key="new" className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
           NEUF
-        </span>
-      );
+        </span>);
     }
-    
     if (property.isPrestigious) {
-      badges.push(
-        <span key="prestige" className="absolute top-3 right-16 bg-[#B17226] text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
+      badges.push(<span key="prestige" className="absolute top-3 right-16 bg-[#B17226] text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
           PRESTIGE
-        </span>
-      );
+        </span>);
     }
-    
     return badges;
   };
 
@@ -41,35 +33,24 @@ const PropertyCard = ({ property }: PropertyProps) => {
 
   // Extract property type from title if not explicitly defined
   const displayType = property.propertyType || property.title?.split(' ')[0] || "PROPRIÉTÉ";
-
-  return (
-    <Link to={`/property/${property.id}`} className="block h-full">
+  return <Link to={`/property/${property.id}`} className="block h-full">
       <Card className="overflow-hidden border-none shadow-md h-full bg-white hover:shadow-lg transition-all duration-300">
         <CardContent className="p-0 relative">
           <div className="relative">
-            <img 
-              src={displayImage} 
-              alt={property.title} 
-              className="w-full h-56 object-cover"
-            />
+            <img src={displayImage} alt={property.title} className="w-full h-56 object-cover" />
             <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
               {property.ref || `REF ${property.id}`}
             </div>
-            {displayType && (
-              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 bg-[#C8A977]/90 text-white px-3 py-1 text-xs font-medium uppercase">
+            {displayType && <div className="absolute top-3 left-1/2 transform -translate-x-1/2 bg-[#C8A977]/90 text-white px-3 py-1 text-xs font-medium uppercase">
                 {displayType}
-              </div>
-            )}
+              </div>}
             {renderFeatureBadges()}
           </div>
           <div className="p-4 text-center">
             <h3 className="text-lg font-serif mt-2 text-[#C8A977]">
               {property.title}
             </h3>
-            <p className="text-xs text-[#37373A] mb-2 uppercase">
-              {property.location || "Localisation confidentielle"}
-              {property.postalCode ? ` - ${property.postalCode}` : ''}
-            </p>
+            
             <p className="font-semibold text-lg mb-4 text-[#B17226]">
               {property.price || "Prix sur demande"}
             </p>
@@ -90,30 +71,17 @@ const PropertyCard = ({ property }: PropertyProps) => {
             </div>
             
             {/* Additional property features */}
-            {(property.hasBalcony || property.hasTerrasse || property.hasPool || 
-              property.garageCount !== "0" || property.bathrooms) && (
-              <div className="mt-3 flex flex-wrap justify-center gap-2">
-                {property.hasBalcony && (
-                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Balcon</span>
-                )}
-                {property.hasTerrasse && (
-                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Terrasse</span>
-                )}
-                {property.hasPool && (
-                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Piscine</span>
-                )}
-                {property.garageCount !== "0" && property.garageCount && (
-                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
+            {(property.hasBalcony || property.hasTerrasse || property.hasPool || property.garageCount !== "0" || property.bathrooms) && <div className="mt-3 flex flex-wrap justify-center gap-2">
+                {property.hasBalcony && <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Balcon</span>}
+                {property.hasTerrasse && <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Terrasse</span>}
+                {property.hasPool && <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Piscine</span>}
+                {property.garageCount !== "0" && property.garageCount && <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
                     {parseInt(property.garageCount) > 1 ? `${property.garageCount} Garages` : "Garage"}
-                  </span>
-                )}
-                {property.bathrooms && (
-                  <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
+                  </span>}
+                {property.bathrooms && <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
                     {parseInt(property.bathrooms) > 1 ? `${property.bathrooms} SDB` : "1 SDB"}
-                  </span>
-                )}
-              </div>
-            )}
+                  </span>}
+              </div>}
             
             <div className="mt-4 flex justify-center">
               <span className="inline-block px-4 py-2 bg-[#C8A977] text-white text-xs rounded-sm hover:bg-[#B17226] transition-colors">
@@ -123,9 +91,6 @@ const PropertyCard = ({ property }: PropertyProps) => {
           </div>
         </CardContent>
       </Card>
-    </Link>
-  );
+    </Link>;
 };
-
 export default PropertyCard;
-
