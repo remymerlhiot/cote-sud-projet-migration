@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
-import { FTPClient } from "https://deno.land/x/ftp@v0.1.1/mod.ts";
+import { FTPClient } from "https://deno.land/x/ftp@v0.3.1/mod.ts";
 
 // CORS headers for browser requests
 const corsHeaders = {
