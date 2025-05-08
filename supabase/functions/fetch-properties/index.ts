@@ -1,4 +1,6 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 
 // CORS headers for browser requests
 const corsHeaders = {
@@ -9,13 +11,23 @@ const corsHeaders = {
 // Function to parse XML to JSON
 function parseXML(xmlString: string) {
   try {
-    // Basic XML parsing - in a production environment, use a more robust XML parser
+    // Use Deno DOM library to parse XML
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+    
+    if (!xmlDoc) {
+      console.error("Failed to parse XML document");
+      return [];
+    }
     
     // Extract properties
     const properties = [];
     const annonces = xmlDoc.getElementsByTagName("ANNONCE");
+    
+    if (!annonces) {
+      console.error("No ANNONCE elements found in XML");
+      return [];
+    }
     
     for (let i = 0; i < annonces.length; i++) {
       const annonce = annonces[i];
