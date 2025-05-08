@@ -1,4 +1,3 @@
-
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import PropertyCard from "@/components/PropertyCard";
 import { useState } from "react";
@@ -96,24 +95,35 @@ const PropertyCarousel = () => {
     return dateB.getTime() - dateA.getTime();
   }) : fallbackProperties;
   
-  return <section className="container mx-auto mb-20 px-4 py-[20px]">
-      <Carousel className="mx-auto max-w-6xl" plugins={[AutoplayPlugin({
-      delay: 4000,
-      stopOnInteraction: true,
-      stopOnMouseEnter: true
-    })]} opts={{
-      align: "start",
-      loop: true
-    }}>
+  return (
+    <section className="container mx-auto mb-20 px-4 py-[20px]">
+      <Carousel 
+        className="mx-auto max-w-6xl" 
+        plugins={[AutoplayPlugin({
+          delay: 4000,
+          stopOnInteraction: true,
+          stopOnMouseEnter: true
+        })]} 
+        opts={{
+          align: "start",
+          loop: true
+        }}
+      >
         <div className="relative">
           <CarouselContent>
-            {displayProperties.length > 0 ? displayProperties.map(property => <CarouselItem key={property.id} className="md:basis-1/3 pl-4 animate-fadeIn">
+            {displayProperties.length > 0 ? (
+              displayProperties.map(property => (
+                <CarouselItem key={property.id} className="md:basis-1/3 pl-4 animate-fadeIn">
                   <PropertyCard property={property} />
-                </CarouselItem>) : <CarouselItem className="basis-full pl-4">
+                </CarouselItem>
+              ))
+            ) : (
+              <CarouselItem className="basis-full pl-4">
                 <div className="text-center p-12 bg-white rounded shadow">
                   <p>Aucun bien immobilier disponible pour le moment.</p>
                 </div>
-              </CarouselItem>}
+              </CarouselItem>
+            )}
           </CarouselContent>
           <div className="absolute -left-6 top-1/2 transform -translate-y-1/2">
             <CarouselPrevious className="relative static transform-none h-8 w-8 border-[#CD9B59] bg-white text-[#CD9B59] hover:bg-[#CD9B59] hover:text-white" />
@@ -123,6 +133,8 @@ const PropertyCarousel = () => {
           </div>
         </div>
       </Carousel>
-    </section>;
+    </section>
+  );
 };
+
 export default PropertyCarousel;

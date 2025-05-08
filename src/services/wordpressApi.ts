@@ -3,4 +3,7 @@
 // for backward compatibility, now including our new FTP service
 
 export * from "./wordpress";
-export * from "./ftpPropertyApi";
+export {
+  fetchWordPressProperties,
+  fetchWordPressPropertyById
+} from "./wordpress";

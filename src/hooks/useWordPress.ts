@@ -1,11 +1,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { 
-  fetchProperties, 
+  fetchWordPressProperties, 
   fetchPages, 
   fetchMedia, 
   fetchPageBySlug,
-  fetchPropertyById,
+  fetchWordPressPropertyById,
   WordPressProperty,
   WordPressAnnonce,
   transformPropertyData,
@@ -15,7 +15,7 @@ import {
 export const useProperties = () => {
   return useQuery({
     queryKey: ["properties"],
-    queryFn: fetchProperties,
+    queryFn: fetchWordPressProperties,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
@@ -23,7 +23,7 @@ export const useProperties = () => {
 export const usePropertyById = (id: number) => {
   return useQuery({
     queryKey: ["property", id],
-    queryFn: () => fetchPropertyById(id),
+    queryFn: () => fetchWordPressPropertyById(id),
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!id,
   });
