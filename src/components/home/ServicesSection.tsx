@@ -4,11 +4,13 @@ import { Plus, Minus } from "lucide-react";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cleanElementorHtml } from "@/utils/elementorCleaner";
+
 type ServiceItem = {
   id: string;
   title: string;
   content: string;
 };
+
 const ServicesSection = () => {
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [backgroundImage, setBackgroundImage] = useState<string>("https://cote-sud.immo/wp-content/uploads/2024/11/champs-de-lavandes-sur-sainte-victoire.jpg");
@@ -202,32 +204,32 @@ const ServicesSection = () => {
     return null;
   }
   return <section className="relative mb-20">
-      <div className="w-full h-[600px] bg-cover bg-center" style={{
+      <div className="w-full h-[700px] bg-cover bg-center" style={{
       backgroundImage: `url('${backgroundImage}')`
     }}>
         <div className="absolute inset-0 bg-black/60">
           <div className="container mx-auto h-full flex flex-col md:flex-row items-center">
-            <div className="md:w-1/3 text-center md:text-left p-8 md:p-12">
-              <h2 className="text-2xl md:text-3xl font-playfair font-normal text-[#CD9B59] mb-6">
+            <div className="md:w-1/3 text-center md:text-left p-8 md:p-16">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-[#C8A977] mb-6">
                 SERVICES DE L'AGENCE
               </h2>
             </div>
-            <div className="md:w-2/3 p-8 md:p-12">
-              {isLoading ? <div className="space-y-4">
-                  <Skeleton className="h-10 w-full bg-white/10" />
-                  <Skeleton className="h-10 w-full bg-white/10" />
-                  <Skeleton className="h-10 w-full bg-white/10" />
-                </div> : <Accordion type="single" collapsible className="bg-[#2A2B31]/90 rounded-md p-4">
-                  {services.map(service => <AccordionItem key={service.id} value={service.id} className="border-b border-[#CD9B59]/30 last:border-0">
-                      <AccordionTrigger className="text-[#CD9B59] hover:no-underline py-4 flex justify-between">
+            <div className="md:w-2/3 p-8 md:p-16">
+              {isLoading ? <div className="space-y-6">
+                  <Skeleton className="h-14 w-full bg-white/10" />
+                  <Skeleton className="h-14 w-full bg-white/10" />
+                  <Skeleton className="h-14 w-full bg-white/10" />
+                </div> : <Accordion type="single" collapsible className="bg-[#2A2B31]/90 rounded-md p-6 lg:p-8">
+                  {services.map(service => <AccordionItem key={service.id} value={service.id} className="border-b border-[#C8A977]/30 last:border-0">
+                      <AccordionTrigger className="text-[#C8A977] hover:no-underline py-6 text-lg md:text-xl flex justify-between">
                         <span>{service.title}</span>
                         <div className="flex items-center">
-                          
-                          <Minus className="h-4 w-4 shrink-0 text-[#CD9B59] transition-all hidden group-data-[state=open]:block" />
+                          <Plus className="h-5 w-5 shrink-0 text-[#C8A977] transition-all group-data-[state=open]:hidden" />
+                          <Minus className="h-5 w-5 shrink-0 text-[#C8A977] transition-all hidden group-data-[state=open]:block" />
                         </div>
                       </AccordionTrigger>
-                      <AccordionContent className="text-white animate-accordion-down">
-                        <div className="pt-2 pb-4">
+                      <AccordionContent className="text-white text-base md:text-lg animate-accordion-down">
+                        <div className="pt-4 pb-6">
                           {service.content}
                         </div>
                       </AccordionContent>
@@ -239,4 +241,5 @@ const ServicesSection = () => {
       </div>
     </section>;
 };
+
 export default ServicesSection;
