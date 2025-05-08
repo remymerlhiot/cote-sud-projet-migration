@@ -1,7 +1,8 @@
+
 import Layout from "@/components/Layout";
 import PartnerSection from "@/components/partner/PartnerSection";
 import PartnerVideoGallery from "@/components/partner/PartnerVideoGallery";
-import { Handshake, Pencil, Hammer, Home, TreePalm } from "lucide-react";
+import { HandHelping, DraftingCompass, HardHat, Armchair, TreePalm } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const Partenaires = () => {
@@ -13,29 +14,20 @@ const Partenaires = () => {
             NOS PARTENAIRES
           </h1>
           <p className="text-center text-anthracite max-w-3xl mx-auto mb-8">
-            Pour vous accompagner dans tous vos projets immobiliers, AXO Côté Sud s'entoure 
-            des meilleurs professionnels. Découvrez nos partenaires qui sauront vous 
-            conseiller et vous accompagner avec le même niveau d'exigence.
+            Pour vous accompagner dans vos projets immobiliers, nous collaborons avec les meilleurs professionnels.
           </p>
           <Separator className="bg-sable-80 h-[2px] max-w-md mx-auto mb-12" />
 
           {/* L'ACCOMPAGNEMENT */}
           <PartnerSection 
             title="L'ACCOMPAGNEMENT"
-            subtitle="Experts en financement et assurance"
-            icon={<Handshake className="text-cuivre" />}
+            subtitle="Notaires, courtiers, conciergeries"
+            icon={<HandHelping className="text-cuivre" />}
             imageOnRight={false}
             imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
           >
             <p className="mb-4">
-              Pour concrétiser votre projet immobilier, nos partenaires vous accompagnent 
-              dans toutes les démarches financières et administratives pour garantir une 
-              transaction sereine.
-            </p>
-            <p>
-              Courtiers en prêt immobilier, assureurs, notaires... Ces professionnels 
-              vous feront bénéficier de leurs services et expertises pour vous 
-              permettre de réaliser votre projet dans les meilleures conditions.
+              Nos partenaires vous offrent des solutions sur-mesure pour garantir une expérience fluide et sereine.
             </p>
           </PartnerSection>
 
@@ -60,19 +52,13 @@ const Partenaires = () => {
           {/* LA CONCEPTION */}
           <PartnerSection 
             title="LA CONCEPTION, PLANS ET SUIVI"
-            subtitle="Architecture et plans personnalisés"
-            icon={<Pencil className="text-cuivre" />}
+            subtitle="Architectes, maîtres d'oeuvres"
+            icon={<DraftingCompass className="text-cuivre" />}
             imageOnRight={true}
             imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
           >
             <p className="mb-4">
-              Nos architectes et maîtres d'œuvre partenaires vous aident à concevoir 
-              votre projet, de l'esquisse initiale jusqu'au suivi de chantier.
-            </p>
-            <p>
-              Ils vous accompagnent dans la création de plans sur mesure, le dépôt des 
-              autorisations d'urbanisme, et coordonnent les différents corps de métier
-              pour garantir un résultat à la hauteur de vos attentes.
+              Collaborez avec les architectes les plus talentueux pour sublimer vos biens et les maîtres d'oeuvres pour la bonne réalisation de l'ouvrage.
             </p>
           </PartnerSection>
 
@@ -97,19 +83,13 @@ const Partenaires = () => {
           {/* LES TRAVAUX */}
           <PartnerSection 
             title="LES TRAVAUX"
-            subtitle="Artisans et entrepreneurs qualifiés"
-            icon={<Hammer className="text-cuivre" />}
+            subtitle="Entreprises générales et spécialistes"
+            icon={<HardHat className="text-cuivre" />}
             imageOnRight={false}
             imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
           >
             <p className="mb-4">
-              Pour transformer, rénover ou construire votre bien, nous vous mettons
-              en relation avec notre réseau d'artisans et d'entrepreneurs de confiance.
-            </p>
-            <p>
-              Qu'il s'agisse de gros œuvre, de plomberie, d'électricité ou de finitions,
-              ces professionnels expérimentés réalisent des travaux de qualité dans les
-              règles de l'art et les délais impartis.
+              Des entreprises locales soigneusement sélectionnées pour des réalisations de qualité.
             </p>
           </PartnerSection>
 
@@ -134,19 +114,13 @@ const Partenaires = () => {
           {/* L'INTÉRIEUR */}
           <PartnerSection 
             title="L'INTÉRIEUR"
-            subtitle="Décoration et aménagement"
-            icon={<Home className="text-cuivre" />}
+            subtitle="Décorateurs, Home staging, Feng shui"
+            icon={<Armchair className="text-cuivre" />}
             imageOnRight={true}
             imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
           >
             <p className="mb-4">
-              Nos partenaires spécialistes de la décoration et de l'aménagement intérieur
-              vous conseillent pour créer un espace qui vous ressemble et valoriser votre bien.
-            </p>
-            <p>
-              Décorateurs, cuisinistes, menuisiers... Ils mettent leur talent et leur 
-              créativité à votre service pour transformer votre intérieur en un lieu 
-              unique et harmonieux.
+              Nos spécialistes transforment votre propriété pour révéler tout son potentiel. Apportez une touche de raffinement et de modernité grâce à nos décorateurs partenaires.
             </p>
           </PartnerSection>
 
@@ -171,20 +145,13 @@ const Partenaires = () => {
           {/* L'EXTÉRIEUR */}
           <PartnerSection 
             title="L'EXTÉRIEUR"
-            subtitle="Paysagisme et aménagements extérieurs"
+            subtitle="Paysagistes, piscinistes"
             icon={<TreePalm className="text-cuivre" />}
             imageOnRight={false}
             imageSrc="/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
           >
             <p className="mb-4">
-              Pour sublimer vos espaces extérieurs, nos partenaires paysagistes et 
-              spécialistes des aménagements extérieurs vous proposent des solutions 
-              adaptées au climat méditerranéen.
-            </p>
-            <p>
-              Création de jardins, installation de piscines, terrasses et pergolas...
-              Ils valorisent votre extérieur pour profiter pleinement de l'art de 
-              vivre provençal.
+              Transformez vos extérieurs avec nos partenaires créatifs.
             </p>
           </PartnerSection>
 
