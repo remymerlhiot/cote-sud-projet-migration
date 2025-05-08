@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useProperties } from "@/hooks/useWordPress";
-import { transformPropertyData } from "@/services/wordpress";
+import { useProperties, TransformedProperty } from "@/hooks/useProperties";
 import PropertyCard from "@/components/PropertyCard";
 import { toast } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TransformedProperty } from "@/services/wordpress/types";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ListFilter } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -42,24 +40,22 @@ const NosBiens = () => {
     toast.error("Impossible de récupérer les biens immobiliers");
   }
 
-  // Transformer les données et extraire les valeurs uniques pour les filtres
+  // Extraire les valeurs uniques pour les filtres
   useEffect(() => {
     if (properties && properties.length > 0) {
-      const transformedProperties = properties.map(prop => transformPropertyData(prop));
-      
       // Extraire les localisations uniques
       const uniqueLocations = Array.from(
-        new Set(transformedProperties.map(prop => prop.location))
+        new Set(properties.map(prop => prop.location))
       ).filter(loc => loc && loc !== "Non spécifié");
       
       // Extraire les types de propriété uniques
       const uniqueTypes = Array.from(
-        new Set(transformedProperties.map(prop => prop.propertyType))
+        new Set(properties.map(prop => prop.propertyType))
       ).filter(type => type && type !== "Non spécifié");
       
       setLocations(uniqueLocations as string[]);
       setPropertyTypes(uniqueTypes as string[]);
-      setFilteredProperties(transformedProperties);
+      setFilteredProperties(properties);
     }
   }, [properties]);
 
@@ -67,15 +63,13 @@ const NosBiens = () => {
   const applyFilters = () => {
     if (!properties) return;
     
-    const transformed = properties.map(prop => transformPropertyData(prop));
-    
-    const filtered = transformed.filter(property => {
+    const filtered = properties.filter(property => {
       // Filtre par prix
       if (minPrice && property.priceNumber < parseInt(minPrice)) return false;
       if (maxPrice && property.priceNumber > parseInt(maxPrice)) return false;
       
       // Filtre par surface
-      const areaNumerical = parseInt(property.area?.replace("m²", "")) || 0;
+      const areaNumerical = parseInt(property.area?.replace(/[^0-9]/g, '')) || 0;
       if (minSurface && areaNumerical < parseInt(minSurface)) return false;
       if (maxSurface && areaNumerical > parseInt(maxSurface)) return false;
       
@@ -104,8 +98,8 @@ const NosBiens = () => {
         case "price-desc":
           return b.priceNumber - a.priceNumber;
         case "surface-desc":
-          const areaA = parseInt(a.area?.replace("m²", "")) || 0;
-          const areaB = parseInt(b.area?.replace("m²", "")) || 0;
+          const areaA = parseInt(a.area?.replace(/[^0-9]/g, '')) || 0;
+          const areaB = parseInt(b.area?.replace(/[^0-9]/g, '')) || 0;
           return areaB - areaA;
         case "recent":
         default:
