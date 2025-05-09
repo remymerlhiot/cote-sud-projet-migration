@@ -1,9 +1,12 @@
 // src/hooks/useProperties.ts
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchWordPressProperties } from "@/services/wordpress/propertyApi";
-import { fetchProperties as fetchFTPProperties } from "@/services/ftpPropertyApi";
-import { transformFTPPropertyData } from "@/services/ftpPropertyApi";
+// Import depuis propertyApi.ts : fetchProperties et fetchPropertyById
+import {
+  fetchProperties as fetchWordPressProperties,
+  fetchPropertyById as fetchWordPressPropertyById,
+} from "@/services/wordpress/propertyApi";
+import { fetchProperties as fetchFTPProperties, transformFTPPropertyData } from "@/services/ftpPropertyApi";
 import type { TransformedProperty } from "@/services/wordpress/types";
 
 /**
@@ -42,9 +45,15 @@ export const usePropertyById = (id: string | number) => {
   return useQuery<TransformedProperty | null>({
     queryKey: ["property", id],
     queryFn: async () => {
+      // D'abord tenter sur WordPress
       const numericId = typeof id === "string" ? parseInt(id, 10) : id;
-      const all = await fetchAllProperties();
-      return all.find(p => p.id === numericId) ?? null;
+      const wpResult = await fetchWordPressPropertyById(numericId);
+      if (wpResult) return wpResult;
+
+      // Sinon, chercher dans le flux FTP
+      const ftpRaw = await fetchFTPProperties();
+      const ftpProps = ftpRaw.map(transformFTPPropertyData);
+      return ftpProps.find(p => p.id === numericId) ?? null;
     },
     staleTime: 5 * 60 * 1000,
     enabled: !!id,
