@@ -12,58 +12,114 @@ const corsHeaders = {
 // Function to parse XML to JSON
 function processXMLData(xmlString: string) {
   try {
-    // Use Deno-compatible XML parser
-    const result = parseXML(xmlString, { preserveOrder: true });
+    // Utiliser un parser XML compatible avec Deno
+    const result = parseXML(xmlString);
     
     if (!result) {
       console.error("Failed to parse XML document");
       return [];
     }
     
+    console.log("XML parsed successfully");
+    
     // Extract properties
     const properties = [];
     
-    // Find the LISTEANNONCES element
-    const listeAnnonces = findElement(result, "LISTEANNONCES");
-    if (!listeAnnonces || !listeAnnonces.children) {
-      console.error("No LISTEANNONCES found in XML");
+    // Find the LISTEANNONCES element (peut varier selon la structure XML)
+    const listeAnnonces = findElement(result, "LISTEANNONCES") || 
+                         findElement(result, "liste") ||
+                         findElement(result, "annonces") || 
+                         result;
+                         
+    if (!listeAnnonces) {
+      console.error("No property list element found in XML");
       return [];
     }
     
-    // Extract ANNONCE elements
-    const annonces = findElements(listeAnnonces, "ANNONCE");
-    if (!annonces || annonces.length === 0) {
-      console.error("No ANNONCE elements found in XML");
+    // Extract ANNONCE elements (peut varier selon la structure XML)
+    const annonces = findElements(listeAnnonces, "ANNONCE") || 
+                    findElements(listeAnnonces, "annonce") ||
+                    findElements(listeAnnonces, "bien") || 
+                    [];
+                    
+    if (annonces.length === 0) {
+      console.error("No property elements found in XML");
       return [];
     }
+    
+    console.log(`Found ${annonces.length} properties in XML`);
+    
+    const tagMappings = {
+      id: ["ID", "id", "identifiant", "reference"],
+      reference: ["REFERENCE", "reference", "ref"],
+      type: ["TYPE", "type", "type_bien"],
+      title: ["TITRE", "titre", "title", "nom"],
+      description: ["DESCRIPTIF", "description", "desc"],
+      price: ["PRIX", "prix", "price"],
+      address: ["ADRESSE", "adresse", "address"],
+      postalCode: ["CP", "code_postal", "zip"],
+      city: ["VILLE", "ville", "city"],
+      country: ["PAYS", "pays", "country"],
+      surface: ["SURFACE", "surface_habitable", "surface", "area"],
+      rooms: ["NB_PIECES", "pieces", "nb_pieces", "rooms"],
+      bedrooms: ["NB_CHAMBRES", "chambres", "nb_chambres", "bedrooms"],
+      bathrooms: ["NB_SDB", "sdb", "nb_sdb", "bathrooms"],
+      constructionYear: ["ANNEE_CONSTRUCTION", "annee", "year_built"],
+      balcon: ["BALCON", "balcon", "balcony"],
+      piscine: ["PISCINE", "piscine", "pool"],
+      ascenseur: ["ASCENSEUR", "ascenseur", "elevator"],
+      garage: ["GARAGE", "garage"],
+      terrasse: ["TERRASSE", "terrasse"],
+      dpe: ["DPE", "dpe", "classe_energie"]
+    };
+    
+    // Helper to get value with multiple possible tag names
+    const getTagValue = (annonce: any, mappings: string[]) => {
+      for (const tag of mappings) {
+        const value = getElementValue(annonce, tag);
+        if (value) return value;
+      }
+      return "";
+    };
     
     for (const annonce of annonces) {
+      // Journaliser pour debug
+      console.log("Processing property:", getTagValue(annonce, tagMappings.reference));
+      
       const property = {
-        id: getElementValue(annonce, "ID"),
-        reference: getElementValue(annonce, "REFERENCE"),
-        type: getElementValue(annonce, "TYPE"),
-        title: getElementValue(annonce, "TITRE"),
-        description: getElementValue(annonce, "DESCRIPTIF"),
-        price: getElementValue(annonce, "PRIX"),
-        address: getElementValue(annonce, "ADRESSE"),
-        postalCode: getElementValue(annonce, "CP"),
-        city: getElementValue(annonce, "VILLE"),
-        country: getElementValue(annonce, "PAYS"),
-        surface: getElementValue(annonce, "SURFACE"),
-        rooms: getElementValue(annonce, "NB_PIECES"),
-        bedrooms: getElementValue(annonce, "NB_CHAMBRES"),
-        bathrooms: getElementValue(annonce, "NB_SDB"),
-        constructionYear: getElementValue(annonce, "ANNEE_CONSTRUCTION"),
+        id: getTagValue(annonce, tagMappings.id),
+        reference: getTagValue(annonce, tagMappings.reference),
+        type: getTagValue(annonce, tagMappings.type),
+        title: getTagValue(annonce, tagMappings.title),
+        description: getTagValue(annonce, tagMappings.description),
+        price: getTagValue(annonce, tagMappings.price),
+        address: getTagValue(annonce, tagMappings.address),
+        postalCode: getTagValue(annonce, tagMappings.postalCode),
+        city: getTagValue(annonce, tagMappings.city),
+        country: getTagValue(annonce, tagMappings.country),
+        surface: getTagValue(annonce, tagMappings.surface),
+        rooms: getTagValue(annonce, tagMappings.rooms),
+        bedrooms: getTagValue(annonce, tagMappings.bedrooms),
+        bathrooms: getTagValue(annonce, tagMappings.bathrooms),
+        constructionYear: getTagValue(annonce, tagMappings.constructionYear),
         features: {
-          hasBalcony: getElementValue(annonce, "BALCON") === "1",
-          hasPool: getElementValue(annonce, "PISCINE") === "1",
-          hasElevator: getElementValue(annonce, "ASCENSEUR") === "1", 
-          hasGarage: getElementValue(annonce, "GARAGE") === "1",
-          hasTerrasse: getElementValue(annonce, "TERRASSE") === "1",
+          hasBalcony: getTagValue(annonce, tagMappings.balcon) === "1",
+          hasPool: getTagValue(annonce, tagMappings.piscine) === "1",
+          hasElevator: getTagValue(annonce, tagMappings.ascenseur) === "1", 
+          hasGarage: getTagValue(annonce, tagMappings.garage) === "1",
+          hasTerrasse: getTagValue(annonce, tagMappings.terrasse) === "1",
         },
         photos: extractPhotos(annonce),
-        dpe: getElementValue(annonce, "DPE"),
+        dpe: getTagValue(annonce, tagMappings.dpe),
       };
+      
+      // Journaliser les données critiques manquantes
+      if (!property.surface || !property.rooms) {
+        console.warn(`[XML] Données manquantes pour la propriété ${property.reference}`, {
+          surface: property.surface,
+          rooms: property.rooms
+        });
+      }
       
       properties.push(property);
     }
@@ -76,18 +132,30 @@ function processXMLData(xmlString: string) {
 }
 
 // Helper function to find an element by name in the parsed XML
-function findElement(elements: any[], tagName: string): any {
-  if (!elements || !Array.isArray(elements)) return null;
+function findElement(elements: any, tagName: string): any {
+  if (!elements) return null;
   
-  for (const item of elements) {
-    if (item.name === tagName) {
-      return item;
+  // Si elements est un objet et contient directement la propriété tagName
+  if (elements[tagName]) return elements[tagName];
+  
+  // Si elements est un tableau
+  if (Array.isArray(elements)) {
+    for (const item of elements) {
+      if (item.name === tagName || item.tagName === tagName) {
+        return item;
+      }
+      
+      // Recherche récursive dans les enfants
+      if (item.children || item.elements) {
+        const found = findElement(item.children || item.elements, tagName);
+        if (found) return found;
+      }
     }
-    
-    if (item.children) {
-      const found = findElement(item.children, tagName);
-      if (found) return found;
-    }
+  }
+  
+  // Si elements a des propriétés children ou elements
+  if (elements.children || elements.elements) {
+    return findElement(elements.children || elements.elements, tagName);
   }
   
   return null;
@@ -95,13 +163,39 @@ function findElement(elements: any[], tagName: string): any {
 
 // Helper function to find all elements with a specific name
 function findElements(parent: any, tagName: string): any[] {
-  const result = [];
+  const result: any[] = [];
   
-  if (!parent || !parent.children || !Array.isArray(parent.children)) return result;
+  if (!parent) return result;
   
-  for (const item of parent.children) {
-    if (item.name === tagName) {
-      result.push(item);
+  // Si parent est un tableau d'éléments
+  if (Array.isArray(parent)) {
+    for (const item of parent) {
+      if (item.name === tagName || item.tagName === tagName) {
+        result.push(item);
+      }
+    }
+    return result;
+  }
+  
+  // Si parent est un objet avec la propriété tagName
+  if (parent[tagName]) {
+    const elements = parent[tagName];
+    if (Array.isArray(elements)) {
+      return elements;
+    } else {
+      return [elements];
+    }
+  }
+  
+  // Si parent a des children
+  if (parent.children || parent.elements) {
+    const children = parent.children || parent.elements;
+    if (Array.isArray(children)) {
+      for (const child of children) {
+        if (child.name === tagName || child.tagName === tagName) {
+          result.push(child);
+        }
+      }
     }
   }
   
@@ -110,25 +204,77 @@ function findElements(parent: any, tagName: string): any[] {
 
 // Helper function to get element value
 function getElementValue(parent: any, tagName: string): string {
-  if (!parent || !parent.children) return "";
+  const element = findElement(parent, tagName);
   
-  const element = findElement(parent.children, tagName);
+  if (!element) return "";
   
-  if (!element || !element.children || !element.children.length) return "";
+  // Si l'élément est une chaîne de caractères simple
+  if (typeof element === 'string') return element;
   
-  // Element value is usually in the first child's text property
-  return element.children[0]?.text || "";
+  // Si l'élément a une propriété text ou value
+  if (element.text) return element.text;
+  if (element.value) return element.value;
+  
+  // Si l'élément a des enfants de type texte
+  if (element.children && Array.isArray(element.children)) {
+    for (const child of element.children) {
+      if (typeof child === 'string') return child;
+      if (child.type === 'text') return child.text || "";
+    }
+  }
+  
+  // Si l'élément a un contenu
+  if (element.content) return element.content;
+  
+  return "";
 }
 
 // Helper to extract photos
 function extractPhotos(annonce: any): string[] {
   const photos = [];
-  const photoElements = findElements(annonce, "PHOTO");
+  
+  // Essayer plusieurs structures possibles
+  const photoElements = 
+    findElements(annonce, "PHOTO") || 
+    findElements(annonce, "photo") || 
+    findElements(annonce, "image") || 
+    findElements(annonce, "IMAGES") || 
+    [];
   
   for (const photoElement of photoElements) {
-    if (photoElement.children && photoElement.children.length > 0) {
-      const url = photoElement.children[0]?.text;
-      if (url) photos.push(url);
+    // Si photoElement est une chaîne de caractères
+    if (typeof photoElement === 'string' && photoElement.trim() !== '') {
+      photos.push(photoElement);
+      continue;
+    }
+    
+    // Si photoElement a une propriété text ou value
+    if (photoElement.text && photoElement.text.trim() !== '') {
+      photos.push(photoElement.text);
+      continue;
+    }
+    if (photoElement.value && photoElement.value.trim() !== '') {
+      photos.push(photoElement.value);
+      continue;
+    }
+    
+    // Si photoElement a un attribut url ou src
+    if (photoElement.attributes) {
+      const url = photoElement.attributes.url || photoElement.attributes.src;
+      if (url) {
+        photos.push(url);
+        continue;
+      }
+    }
+    
+    // Si photoElement a une URL dans son contenu (enfants texte)
+    if (photoElement.children && Array.isArray(photoElement.children)) {
+      for (const child of photoElement.children) {
+        if (typeof child === 'string' && child.trim() !== '') {
+          photos.push(child);
+          break;
+        }
+      }
     }
   }
   
@@ -303,13 +449,17 @@ async function fetchXMLFromFTP(): Promise<string> {
     return xmlContent;
   } catch (error) {
     console.error("Erreur FTP:", error);
-    if (client.connected) {
-      await client.close();
-      console.log("Connexion FTP fermée après erreur");
+    if (client && client.connected) {
+      try {
+        await client.close();
+        console.log("Connexion FTP fermée après erreur");
+      } catch (closeError) {
+        console.error("Erreur lors de la fermeture de la connexion FTP:", closeError);
+      }
     }
     
     // En cas d'erreur, utiliser les données mockées
-    console.log("Utilisation des données de démonstration");
+    console.log("Utilisation des données de démonstration suite à l'erreur FTP");
     return getMockXMLData();
   }
 }
@@ -329,20 +479,23 @@ serve(async (req) => {
     const now = Date.now();
     // Check if we need to fetch fresh data
     if (cachedProperties.length === 0 || now - lastFetched > CACHE_DURATION) {
-      console.log("Fetching fresh properties from FTP...");
+      console.log("Fetching fresh properties from FTP or mock data...");
       
       try {
         const xmlContent = await fetchXMLFromFTP();
         if (xmlContent) {
+          console.log(`XML content fetched: ${xmlContent.length} bytes`);
           cachedProperties = processXMLData(xmlContent);
           lastFetched = now;
           console.log(`Successfully fetched ${cachedProperties.length} properties`);
+        } else {
+          console.error("No XML content retrieved");
         }
       } catch (ftpError) {
         console.error("Failed to fetch from FTP:", ftpError);
         // If cache is empty, use mock data as fallback
         if (cachedProperties.length === 0) {
-          console.log("Using mock data as fallback");
+          console.log("Using mock data as fallback due to error");
           const mockXML = getMockXMLData();
           cachedProperties = processXMLData(mockXML);
         } else {

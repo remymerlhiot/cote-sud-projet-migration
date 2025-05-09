@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePropertyById } from "@/hooks/useProperties";
@@ -36,20 +37,33 @@ const PropertyDetail = () => {
 
   // Format date to French format with proper validation
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "";
+    if (!dateString || dateString === "Non spécifié") return "Date non disponible";
     
     // Check if the date string is valid
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      console.warn("Invalid date string:", dateString);
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.warn("Invalid date string:", dateString);
+        return "Date non disponible";
+      }
+      
+      return new Intl.DateTimeFormat('fr-FR', { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      }).format(date);
+    } catch (error) {
+      console.error("Error formatting date:", error);
       return "Date non disponible";
     }
-    
-    return new Intl.DateTimeFormat('fr-FR', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    }).format(date);
+  };
+
+  // Display helper that montre "NC" pour les valeurs manquantes
+  const displayValue = (value?: string | number | null) => {
+    if (value === undefined || value === null || value === "" || value === "Non spécifié") {
+      return "NC";
+    }
+    return value;
   };
 
   if (isLoading) {
@@ -99,7 +113,10 @@ const PropertyDetail = () => {
   const propertyImages = displayData.allImages?.length ? displayData.allImages : [displayData.image];
 
   // Check if the property has an agent/negotiator information
-  const hasAgentInfo = displayData.negotiatorName || displayData.negotiatorPhone || displayData.negotiatorEmail;
+  const hasAgentInfo = displayData.negotiatorName && 
+                      displayData.negotiatorName !== "Non spécifié" && 
+                      (displayData.negotiatorPhone !== "Non spécifié" || 
+                       displayData.negotiatorEmail !== "Non spécifié");
 
   return (
     <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
@@ -125,14 +142,14 @@ const PropertyDetail = () => {
           <div className="flex flex-wrap justify-between items-center mb-4">
             <div className="flex items-center">
               <span className="text-lg font-medium">{displayData.location}</span>
-              {displayData.postalCode && <span className="text-sm ml-2 text-gray-500">({displayData.postalCode})</span>}
+              {displayData.postalCode && displayData.postalCode !== "Non spécifié" && <span className="text-sm ml-2 text-gray-500">({displayData.postalCode})</span>}
             </div>
             <span className="text-sm text-gray-500">Ref. {displayData.ref}</span>
           </div>
           
           {/* Property tags */}
           <div className="flex flex-wrap gap-2 mb-6">
-            {displayData.propertyType && (
+            {displayData.propertyType && displayData.propertyType !== "Non spécifié" && (
               <Badge className="bg-[#C8A977] hover:bg-[#C8A977]/80">{displayData.propertyType}</Badge>
             )}
             {displayData.isNewConstruction && (
@@ -197,16 +214,16 @@ const PropertyDetail = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Type</p>
-                  <p className="font-medium">{displayData.propertyType}</p>
+                  <p className="font-medium">{displayValue(displayData.propertyType)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Localisation</p>
                   <p className="font-medium">{displayData.location}</p>
-                  {displayData.postalCode && <p className="text-xs text-gray-500">{displayData.postalCode}</p>}
+                  {displayData.postalCode && displayData.postalCode !== "Non spécifié" && <p className="text-xs text-gray-500">{displayData.postalCode}</p>}
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Surface</p>
-                  <p className="font-medium">{displayData.area}</p>
+                  <p className="font-medium">{displayValue(displayData.area)}</p>
                 </div>
               </div>
             </CardContent>
@@ -217,19 +234,19 @@ const PropertyDetail = () => {
             <Card className="border-none shadow-sm">
               <CardContent className="p-4 text-center">
                 <p className="text-sm text-gray-600">Pièces</p>
-                <p className="font-bold text-xl">{displayData.rooms || "Non spécifié"}</p>
+                <p className="font-bold text-xl">{displayValue(displayData.rooms)}</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-sm">
               <CardContent className="p-4 text-center">
                 <p className="text-sm text-gray-600">Chambres</p>
-                <p className="font-bold text-xl">{displayData.bedrooms || "Non spécifié"}</p>
+                <p className="font-bold text-xl">{displayValue(displayData.bedrooms)}</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-sm">
               <CardContent className="p-4 text-center">
                 <p className="text-sm text-gray-600">Salle(s) de bain</p>
-                <p className="font-bold text-xl">{displayData.bathrooms || "Non spécifié"}</p>
+                <p className="font-bold text-xl">{displayValue(displayData.bathrooms)}</p>
               </CardContent>
             </Card>
           </div>
@@ -270,7 +287,7 @@ const PropertyDetail = () => {
                     <span>{parseInt(displayData.garageCount) > 1 ? `${displayData.garageCount} Garages` : "Garage"}</span>
                   </div>
                 )}
-                {displayData.constructionYear && (
+                {displayData.constructionYear && displayData.constructionYear !== "Non spécifié" && (
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
                     <span>Construction: {displayData.constructionYear}</span>
@@ -282,13 +299,13 @@ const PropertyDetail = () => {
                     <span>Meublé</span>
                   </div>
                 )}
-                {displayData.floorNumber && (
+                {displayData.floorNumber && displayData.floorNumber !== "Non spécifié" && (
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
                     <span>Étage: {displayData.floorNumber}</span>
                   </div>
                 )}
-                {displayData.heatingType && (
+                {displayData.heatingType && displayData.heatingType !== "Non spécifié" && (
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
                     <span>Chauffage: {displayData.heatingType}</span>
@@ -308,7 +325,7 @@ const PropertyDetail = () => {
                 </span>
                 <span className="ml-0 sm:ml-3 mt-2 sm:mt-0 text-sm text-gray-600">
                   Diagnostic de Performance Énergétique 
-                  {displayData.dpeValue && ` - ${displayData.dpeValue} kWh/m²/an`}
+                  {displayData.dpeValue && displayData.dpeValue !== "Non spécifié" && ` - ${displayData.dpeValue} kWh/m²/an`}
                 </span>
               </div>
               
@@ -319,7 +336,7 @@ const PropertyDetail = () => {
                   </span>
                   <span className="ml-0 sm:ml-3 mt-2 sm:mt-0 text-sm text-gray-600">
                     Émissions de Gaz à Effet de Serre
-                    {displayData.dpeGesValue && ` - ${displayData.dpeGesValue} kgCO₂/m²/an`}
+                    {displayData.dpeGesValue && displayData.dpeGesValue !== "Non spécifié" && ` - ${displayData.dpeGesValue} kgCO₂/m²/an`}
                   </span>
                 </div>
               )}

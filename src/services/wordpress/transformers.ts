@@ -1,4 +1,14 @@
+
 import { WordPressProperty, TransformedProperty } from "./types";
+
+// Définition des synonymes pour les champs communs
+const SYNONYMS = {
+  surface: ["surf_hab", "surface", "area", "surface_totale", "superficie", "surface_habitable"],
+  rooms: ["piece", "rooms", "nombre_pieces", "nb_pieces", "pieces"],
+  bedrooms: ["nb_chambre", "bedrooms", "nombre_chambres", "nb_chambres", "chambres"],
+  bathrooms: ["nb_sdb", "nb_salle_deau", "nombre_sdb", "salles_de_bain", "sdb"],
+  price: ["prix_affiche", "prix", "price", "prix_vente"]
+};
 
 // Helper function to transform WordPress property data
 export const transformPropertyData = (wpProperty: WordPressProperty): TransformedProperty => {
@@ -28,8 +38,7 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
     return images;
   };
   
-  // Helper function to get field value with priority from direct properties
-  // This checks both root level and ACF level and multiple possible field names
+  // Fonction améliorée pour obtenir la valeur d'un champ avec synonymes
   const getFieldValue = (fields: string[], fallback: string = "Non spécifié"): string => {
     // First check at root level
     for (const field of fields) {
@@ -105,17 +114,17 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
   const country = getFieldValue(['pays'], "France");
   
   // Extract price information with all possible fields
-  const priceString = getFieldValue(['prix_affiche', 'prix', 'price'], "Prix sur demande");
+  const priceString = getFieldValue(SYNONYMS.price, "Prix sur demande");
   // Parse numeric price for sorting
   const priceNumber = parseInt(priceString.replace(/[^0-9]/g, '')) || 0;
   
   // Extract property details with all possible fields
-  const area = getFieldValue(['surf_hab', 'area', 'surface']);
+  const area = getFieldValue(SYNONYMS.surface);
   const formattedArea = area !== "Non spécifié" && !area.includes("m²") ? `${area}m²` : area;
   
-  const rooms = getFieldValue(['piece', 'rooms']);
-  const bedrooms = getFieldValue(['nb_chambre', 'bedrooms']);
-  const bathrooms = getFieldValue(['nb_sdb', 'nb_salle_deau']);
+  const rooms = getFieldValue(SYNONYMS.rooms);
+  const bedrooms = getFieldValue(SYNONYMS.bedrooms);
+  const bathrooms = getFieldValue(SYNONYMS.bathrooms);
   const toilets = getFieldValue(['nb_wc']);
   const landArea = getFieldValue(['surf_terrain']);
   const floorNumber = getFieldValue(['num_etage']);
@@ -158,6 +167,16 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
   const negotiatorCity = getFieldValue(['nego_ville']);
   const negotiatorPostalCode = getFieldValue(['nego_cp']);
   
+  // Loguer les valeurs critiques manquantes pour debug
+  if (area === "Non spécifié" || rooms === "Non spécifié") {
+    console.warn(`[TRANSFORM] Champs manquants pour ID ${wpProperty.id}`, { 
+      area, 
+      rooms, 
+      title, 
+      reference
+    });
+  }
+
   // Create the transformed property
   const transformedProperty: TransformedProperty = {
     id: wpProperty.id,

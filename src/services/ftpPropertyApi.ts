@@ -102,11 +102,20 @@ export const transformFTPPropertyData = (ftpProperty: FTPProperty): TransformedP
     // Format with spaces for thousands
     const formattedPrice = numericPrice.toLocaleString('fr-FR');
     
-    return `${formattedPrice} €`;
+    return numericPrice > 0 ? `${formattedPrice} €` : "Prix sur demande";
   };
 
   // Get numeric price for sorting
   const priceNumber = parseInt(ftpProperty.price.replace(/[^0-9]/g, '')) || 0;
+  
+  // Log des informations critiques pour débugger
+  if (!ftpProperty.surface || !ftpProperty.rooms) {
+    console.warn(`[FTP] Champs manquants pour ID ${ftpProperty.id}`, {
+      reference: ftpProperty.reference,
+      surface: ftpProperty.surface,
+      rooms: ftpProperty.rooms
+    });
+  }
 
   return {
     id: parseInt(ftpProperty.id) || 0,
@@ -142,5 +151,19 @@ export const transformFTPPropertyData = (ftpProperty: FTPProperty): TransformedP
     heatingType: "",
     isNewConstruction: false,
     isPrestigious: priceNumber > 1000000, // Mark properties over 1M€ as prestigious
+    isFurnished: false,
+    isViager: false,
+    dpeGes: "",
+    dpeValue: "",
+    dpeGesValue: "",
+    dpeDate: "",
+    
+    // Ajout des informations du négociateur (vides pour les propriétés FTP)
+    negotiatorName: "Non spécifié", 
+    negotiatorPhone: "Non spécifié", 
+    negotiatorEmail: "Non spécifié", 
+    negotiatorPhoto: "", 
+    negotiatorCity: "Non spécifié", 
+    negotiatorPostalCode: "Non spécifié"
   };
 };
