@@ -9,62 +9,51 @@ const SYNONYMS = {
   price: ["prix_affiche", "prix", "price", "prix_vente"]
 };
 
-// Helper function to get a field value or empty string if introuvable
-const getFieldValue = (fields: string[]): string => {
-  // 1) au niveau racine
-  for (const field of fields) {
-    const v = (wpProperty as any)[field];
-    if (v != null && v !== "") return String(v);
-  }
-  // 2) dans ACF
-  if (wpProperty.acf) {
+export const transformPropertyData = (wpProperty: WordPressProperty): TransformedProperty => {
+  // Helper pour lire un champ via ses synonymes
+  const getFieldValue = (fields: string[]): string => {
+    // 1) au niveau racine
     for (const field of fields) {
-      const v = (wpProperty.acf as any)[field];
+      const v = (wpProperty as any)[field];
       if (v != null && v !== "") return String(v);
     }
-  }
-  // 3) extraction dans le contenu HTML
-  if (wpProperty.content?.rendered) {
-    const html = wpProperty.content.rendered;
-    // exemple prix
-    if (fields.includes("prix") || fields.includes("prix_affiche")) {
+    // 2) dans ACF
+    if (wpProperty.acf) {
+      for (const field of fields) {
+        const v = (wpProperty.acf as any)[field];
+        if (v != null && v !== "") return String(v);
+      }
+    }
+    // 3) extraction dans le HTML du contenu
+    const html = wpProperty.content?.rendered || "";
+    if (fields.some(f => f.includes("prix"))) {
       const m = html.match(/Prix\s*[:\-]?\s*([\d\s.,]+)\s*€/i);
       if (m?.[1]) return `${m[1].trim()} €`;
     }
-    // exemple surface
-    if (fields.includes("surf_hab")) {
+    if (fields.some(f => f.includes("surf_hab"))) {
       const m = html.match(/Surface\s*[:\-]?\s*(\d+)\s*m²/i);
       if (m?.[1]) return m[1];
     }
-    // exemple pièces
-    if (fields.includes("piece")) {
+    if (fields.some(f => f.includes("piece"))) {
       const m = html.match(/(\d+)\s*pièces?/i);
       if (m?.[1]) return m[1];
     }
-  }
-  return "";
-};
+    return "";
+  };
 
-export const transformPropertyData = (wpProperty: WordPressProperty): TransformedProperty => {
-  console.log("Full WordPress Property Data:", wpProperty);
-  const featuredImage =
-    wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-    "/lovable-uploads/fallback.png";
-
-  // fonctions annexes inchangées…
   const getAllImages = (): string[] => {
     const imgs: string[] = [];
-    if (wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
-      imgs.push(wpProperty._embedded["wp:featuredmedia"][0].source_url);
-    }
+    const src = wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
+    if (src) imgs.push(src);
     return imgs.length ? imgs : ["/lovable-uploads/fallback.png"];
   };
+
   const convertToBoolean = (s: string) =>
     !!s && ["1", "true", "oui"].includes(s.toLowerCase());
 
-  // Extraction des champs
+  // Récupération et formatage des champs
   const priceRaw = getFieldValue(SYNONYMS.price);
-  const priceString = priceRaw ? priceRaw : "Prix sur demande";
+  const priceString = priceRaw || "Prix sur demande";
   const priceNumber = parseInt(priceRaw.replace(/[^0-9]/g, "")) || 0;
 
   const areaRaw = getFieldValue(SYNONYMS.surface);
@@ -74,20 +63,20 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
   const bedroomsRaw = getFieldValue(SYNONYMS.bedrooms);
   const bathroomsRaw = getFieldValue(SYNONYMS.bathrooms);
 
-  // Autres champs simplifiés…
+  // Autres champs
   const reference = getFieldValue(["reference", "mandat"]) || `REF ${wpProperty.id}`;
   const title = getFieldValue(["titre_fr", "title"]) || "Propriété";
   const location = getFieldValue(["ville", "localisation"]);
   const address = getFieldValue(["adresse"]);
   const postalCode = getFieldValue(["code_postal"]);
   const country = getFieldValue(["pays"]) || "France";
-  const contentHtml = wpProperty.content?.rendered || "";
-  const div = document.createElement("div");
-  div.innerHTML = contentHtml;
-  const cleaned = div.textContent || div.innerText || "";
-  const shortDescription = cleaned.slice(0, 200) + (cleaned.length > 200 ? "..." : "");
 
-  // Création de l'objet final
+  const html = wpProperty.content?.rendered || "";
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  const text = div.textContent || div.innerText || "";
+  const shortDescription = text.slice(0, 200) + (text.length > 200 ? "..." : "");
+
   const transformed: TransformedProperty = {
     id: wpProperty.id,
     title,
@@ -98,11 +87,11 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
     area: formattedArea,
     rooms: roomsRaw,
     bedrooms: bedroomsRaw,
-    image: featuredImage,
+    image: getAllImages()[0],
     allImages: getAllImages(),
     date: wpProperty.date || new Date().toISOString(),
     description: shortDescription,
-    fullContent: contentHtml,
+    fullContent: html,
     propertyType: getFieldValue(["type", "famille", "idtype"]),
     constructionYear: getFieldValue(["annee_constr"]),
     hasBalcony: convertToBoolean(getFieldValue(["balcon"])),
