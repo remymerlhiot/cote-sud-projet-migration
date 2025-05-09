@@ -61,10 +61,22 @@ const YouTubeBackground = ({
             if (endTime && playerRef.current) {
               // Vérifier périodiquement la position de lecture
               checkTimeInterval = setInterval(() => {
-                const currentTime = playerRef.current.getCurrentTime();
-                if (currentTime >= endTime) {
-                  // Revenir au début de la séquence (startTime)
-                  playerRef.current.seekTo(startTime);
+                // Guard against null player reference
+                if (!playerRef.current) return;
+                
+                try {
+                  const currentTime = playerRef.current.getCurrentTime();
+                  if (currentTime >= endTime) {
+                    // Revenir au début de la séquence (startTime)
+                    playerRef.current.seekTo(startTime);
+                  }
+                } catch (e) {
+                  console.error("Error checking video time:", e);
+                  // Clear the interval if there's an error
+                  if (checkTimeInterval) {
+                    clearInterval(checkTimeInterval);
+                    checkTimeInterval = null;
+                  }
                 }
               }, 1000); // Vérifier chaque seconde
             }

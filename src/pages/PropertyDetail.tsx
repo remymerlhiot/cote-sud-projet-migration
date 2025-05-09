@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePropertyById } from "@/hooks/useProperties";
@@ -35,10 +34,17 @@ const PropertyDetail = () => {
     }
   };
 
-  // Format date to French format
+  // Format date to French format with proper validation
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
+    
+    // Check if the date string is valid
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.warn("Invalid date string:", dateString);
+      return "Date non disponible";
+    }
+    
     return new Intl.DateTimeFormat('fr-FR', { 
       day: 'numeric', 
       month: 'long', 
@@ -293,7 +299,7 @@ const PropertyDetail = () => {
           )}
           
           {/* DPE Rating if available */}
-          {displayData.dpe && (
+          {displayData.dpe && displayData.dpe !== "Non spécifié" && (
             <div className="mb-8">
               <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#B17226] mb-4">Performance Énergétique</h2>
               <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4">
@@ -306,7 +312,7 @@ const PropertyDetail = () => {
                 </span>
               </div>
               
-              {displayData.dpeGes && (
+              {displayData.dpeGes && displayData.dpeGes !== "Non spécifié" && (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center">
                   <span className={`${getDpeColorClass(displayData.dpeGes)} px-4 py-2 rounded-md font-bold text-lg`}>
                     {displayData.dpeGes.toUpperCase()}
@@ -318,7 +324,7 @@ const PropertyDetail = () => {
                 </div>
               )}
               
-              {displayData.dpeDate && (
+              {displayData.dpeDate && displayData.dpeDate !== "Non spécifié" && (
                 <p className="text-xs text-gray-500 mt-4">
                   Date du diagnostic: {formatDate(displayData.dpeDate)}
                 </p>
@@ -347,7 +353,7 @@ const PropertyDetail = () => {
               <Card className="border-none shadow-md">
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                    {displayData.negotiatorPhoto && (
+                    {displayData.negotiatorPhoto && displayData.negotiatorPhoto !== "Non spécifié" && (
                       <div className="w-24 h-24 rounded-full overflow-hidden">
                         <img 
                           src={displayData.negotiatorPhoto} 
@@ -360,11 +366,11 @@ const PropertyDetail = () => {
                       </div>
                     )}
                     <div className="flex-1">
-                      {displayData.negotiatorName && (
+                      {displayData.negotiatorName && displayData.negotiatorName !== "Non spécifié" && (
                         <h3 className="font-medium text-lg">{displayData.negotiatorName}</h3>
                       )}
                       <div className="mt-2 space-y-1">
-                        {displayData.negotiatorPhone && (
+                        {displayData.negotiatorPhone && displayData.negotiatorPhone !== "Non spécifié" && (
                           <p className="flex items-center">
                             <span className="font-medium mr-2">Téléphone:</span>
                             <a href={`tel:${displayData.negotiatorPhone}`} className="text-[#B17226] hover:underline">
@@ -372,7 +378,7 @@ const PropertyDetail = () => {
                             </a>
                           </p>
                         )}
-                        {displayData.negotiatorEmail && (
+                        {displayData.negotiatorEmail && displayData.negotiatorEmail !== "Non spécifié" && (
                           <p className="flex items-center">
                             <span className="font-medium mr-2">Email:</span>
                             <a href={`mailto:${displayData.negotiatorEmail}`} className="text-[#B17226] hover:underline">
@@ -380,7 +386,8 @@ const PropertyDetail = () => {
                             </a>
                           </p>
                         )}
-                        {(displayData.negotiatorCity || displayData.negotiatorPostalCode) && (
+                        {(displayData.negotiatorCity || displayData.negotiatorPostalCode) && 
+                          (displayData.negotiatorCity !== "Non spécifié" || displayData.negotiatorPostalCode !== "Non spécifié") && (
                           <p className="flex items-center">
                             <span className="font-medium mr-2">Localisation:</span>
                             {displayData.negotiatorPostalCode} {displayData.negotiatorCity}
