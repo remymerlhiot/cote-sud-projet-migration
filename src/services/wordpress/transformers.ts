@@ -1,4 +1,3 @@
-
 import { WordPressProperty, TransformedProperty } from "./types";
 
 // Définition des synonymes pour les champs communs
@@ -10,224 +9,133 @@ const SYNONYMS = {
   price: ["prix_affiche", "prix", "price", "prix_vente"]
 };
 
-// Helper function to transform WordPress property data
-export const transformPropertyData = (wpProperty: WordPressProperty): TransformedProperty => {
-  // Log the complete property data for debugging
-  console.log("Full WordPress Property Data:", wpProperty);
-  
-  // Get featured image or fallback
-  const featuredImage = wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url || 
-    "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"; // Fallback image
-    
-  // Helper function to get all images from the property (featured + gallery)
-  const getAllImages = (): string[] => {
-    const images: string[] = [];
-    // Add featured image if available
-    if (wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
-      images.push(wpProperty._embedded["wp:featuredmedia"][0].source_url);
-    }
-    
-    // Try to find gallery images in the content or other fields
-    // This would need to be customized based on how gallery is stored
-    
-    // Return at least one image (fallback) if none are found
-    if (images.length === 0) {
-      images.push("/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png");
-    }
-    
-    return images;
-  };
-  
-  // Fonction améliorée pour obtenir la valeur d'un champ avec synonymes
-  const getFieldValue = (fields: string[], fallback: string = "Non spécifié"): string => {
-    // First check at root level
-    for (const field of fields) {
-      if (field in wpProperty && wpProperty[field as keyof WordPressProperty]) {
-        const value = wpProperty[field as keyof WordPressProperty];
-        if (typeof value === 'string' && value.trim() !== '') return value;
-        if (typeof value === 'number') return String(value);
-      }
-    }
-    
-    // Then check in ACF
-    if (wpProperty.acf) {
-      for (const field of fields) {
-        if (field in wpProperty.acf && wpProperty.acf[field as keyof typeof wpProperty.acf]) {
-          const value = wpProperty.acf[field as keyof typeof wpProperty.acf];
-          if (typeof value === 'string' && value.trim() !== '') return value;
-          if (typeof value === 'number') return String(value);
-        }
-      }
-    }
-    
-    // Check if title.rendered exists for title field
-    if (fields.includes('title') && wpProperty.title?.rendered) {
-      return wpProperty.title.rendered;
-    }
-    
-    // Check in content for specific patterns
-    if (wpProperty.content?.rendered) {
-      const contentText = wpProperty.content.rendered;
-      
-      // Extract price from content if needed
-      if (fields.includes('prix') || fields.includes('prix_affiche')) {
-        const priceMatches = contentText.match(/Prix\s*:\s*([\d\s.,]+)\s*€/i);
-        if (priceMatches && priceMatches[1]) {
-          return `${priceMatches[1].trim()} €`;
-        }
-      }
-      
-      // Extract surface from content if needed
-      if (fields.includes('surf_hab')) {
-        const surfaceMatches = contentText.match(/Surface\s*:\s*(\d+)\s*m²/i);
-        if (surfaceMatches && surfaceMatches[1]) {
-          return `${surfaceMatches[1]}m²`;
-        }
-      }
-      
-      // Extract rooms from content if needed
-      if (fields.includes('piece')) {
-        const roomsMatches = contentText.match(/(\d+)\s*pièces?/i);
-        if (roomsMatches && roomsMatches[1]) {
-          return roomsMatches[1];
-        }
-      }
-    }
-    
-    return fallback;
-  };
-  
-  // Helper to convert string value to boolean
-  const convertToBoolean = (value: string | undefined): boolean => {
-    if (!value) return false;
-    if (value === "1" || value.toLowerCase() === "true" || value.toLowerCase() === "oui") return true;
-    return false;
-  };
-  
-  // Extract all property information using all possible field names
-  const propertyType = getFieldValue(['type', 'famille', 'idtype']);
-  const title = getFieldValue(['titre_fr', 'title'], "Propriété");
-  const location = getFieldValue(['ville', 'localisation']);
-  const reference = getFieldValue(['reference', 'mandat'], `REF ${wpProperty.id}`);
-  const address = getFieldValue(['adresse']);
-  const postalCode = getFieldValue(['code_postal']);
-  const country = getFieldValue(['pays'], "France");
-  
-  // Extract price information with all possible fields
-  const priceString = getFieldValue(SYNONYMS.price, "Prix sur demande");
-  // Parse numeric price for sorting
-  const priceNumber = parseInt(priceString.replace(/[^0-9]/g, '')) || 0;
-  
-  // Extract property details with all possible fields
-  const area = getFieldValue(SYNONYMS.surface);
-  const formattedArea = area !== "Non spécifié" && !area.includes("m²") ? `${area}m²` : area;
-  
-  const rooms = getFieldValue(SYNONYMS.rooms);
-  const bedrooms = getFieldValue(SYNONYMS.bedrooms);
-  const bathrooms = getFieldValue(SYNONYMS.bathrooms);
-  const toilets = getFieldValue(['nb_wc']);
-  const landArea = getFieldValue(['surf_terrain']);
-  const floorNumber = getFieldValue(['num_etage']);
-  const totalFloors = getFieldValue(['nb_etage']);
-  const constructionYear = getFieldValue(['annee_constr']);
-  const heatingType = getFieldValue(['chauffage', 'nature_chauffage']);
-  
-  // Get DPE information
-  const dpe = getFieldValue(['dpe_lettre_consom_energ', 'dpe']);
-  const dpeValue = getFieldValue(['dpe_consom_energ']);
-  const dpeGes = getFieldValue(['dpe_lettre_emissions_ges']);
-  const dpeGesValue = getFieldValue(['dpe_emissions_ges']);
-  const dpeDate = getFieldValue(['dpe_date']);
-  
-  // Extract content without HTML tags for a clean description
-  const contentText = wpProperty.content?.rendered || "";
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = contentText;
-  const cleanedContent = tempDiv.textContent || tempDiv.innerText || "";
-  const shortDescription = cleanedContent.substring(0, 200) + (cleanedContent.length > 200 ? "..." : "");
-  
-  // Get property characteristics - convert string values to boolean
-  const hasBalcony = convertToBoolean(getFieldValue(['balcon']));
-  const hasElevator = convertToBoolean(getFieldValue(['ascenseur']));
-  const hasTerrasse = convertToBoolean(getFieldValue(['terrasse']));
-  const hasPool = convertToBoolean(getFieldValue(['piscine']));
-  const garageCount = getFieldValue(['nb_garage'], "0");
-  
-  // Additional property status flags
-  const isNewConstruction = convertToBoolean(getFieldValue(['neuf']));
-  const isPrestigious = convertToBoolean(getFieldValue(['prestige'])) || priceNumber > 1000000;
-  const isViager = convertToBoolean(getFieldValue(['viager']));
-  const isFurnished = convertToBoolean(getFieldValue(['meuble']));
-  
-  // Get negotiator information
-  const negotiatorName = getFieldValue(['nego_nom']);
-  const negotiatorPhone = getFieldValue(['nego_tel']);
-  const negotiatorEmail = getFieldValue(['nego_email']);
-  const negotiatorPhoto = getFieldValue(['photo_agent']);
-  const negotiatorCity = getFieldValue(['nego_ville']);
-  const negotiatorPostalCode = getFieldValue(['nego_cp']);
-  
-  // Loguer les valeurs critiques manquantes pour debug
-  if (area === "Non spécifié" || rooms === "Non spécifié") {
-    console.warn(`[TRANSFORM] Champs manquants pour ID ${wpProperty.id}`, { 
-      area, 
-      rooms, 
-      title, 
-      reference
-    });
+// Helper function to get a field value or empty string if introuvable
+const getFieldValue = (fields: string[]): string => {
+  // 1) au niveau racine
+  for (const field of fields) {
+    const v = (wpProperty as any)[field];
+    if (v != null && v !== "") return String(v);
   }
+  // 2) dans ACF
+  if (wpProperty.acf) {
+    for (const field of fields) {
+      const v = (wpProperty.acf as any)[field];
+      if (v != null && v !== "") return String(v);
+    }
+  }
+  // 3) extraction dans le contenu HTML
+  if (wpProperty.content?.rendered) {
+    const html = wpProperty.content.rendered;
+    // exemple prix
+    if (fields.includes("prix") || fields.includes("prix_affiche")) {
+      const m = html.match(/Prix\s*[:\-]?\s*([\d\s.,]+)\s*€/i);
+      if (m?.[1]) return `${m[1].trim()} €`;
+    }
+    // exemple surface
+    if (fields.includes("surf_hab")) {
+      const m = html.match(/Surface\s*[:\-]?\s*(\d+)\s*m²/i);
+      if (m?.[1]) return m[1];
+    }
+    // exemple pièces
+    if (fields.includes("piece")) {
+      const m = html.match(/(\d+)\s*pièces?/i);
+      if (m?.[1]) return m[1];
+    }
+  }
+  return "";
+};
 
-  // Create the transformed property
-  const transformedProperty: TransformedProperty = {
+export const transformPropertyData = (wpProperty: WordPressProperty): TransformedProperty => {
+  console.log("Full WordPress Property Data:", wpProperty);
+  const featuredImage =
+    wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+    "/lovable-uploads/fallback.png";
+
+  // fonctions annexes inchangées…
+  const getAllImages = (): string[] => {
+    const imgs: string[] = [];
+    if (wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
+      imgs.push(wpProperty._embedded["wp:featuredmedia"][0].source_url);
+    }
+    return imgs.length ? imgs : ["/lovable-uploads/fallback.png"];
+  };
+  const convertToBoolean = (s: string) =>
+    !!s && ["1", "true", "oui"].includes(s.toLowerCase());
+
+  // Extraction des champs
+  const priceRaw = getFieldValue(SYNONYMS.price);
+  const priceString = priceRaw ? priceRaw : "Prix sur demande";
+  const priceNumber = parseInt(priceRaw.replace(/[^0-9]/g, "")) || 0;
+
+  const areaRaw = getFieldValue(SYNONYMS.surface);
+  const formattedArea = areaRaw ? `${areaRaw}m²` : "";
+
+  const roomsRaw = getFieldValue(SYNONYMS.rooms);
+  const bedroomsRaw = getFieldValue(SYNONYMS.bedrooms);
+  const bathroomsRaw = getFieldValue(SYNONYMS.bathrooms);
+
+  // Autres champs simplifiés…
+  const reference = getFieldValue(["reference", "mandat"]) || `REF ${wpProperty.id}`;
+  const title = getFieldValue(["titre_fr", "title"]) || "Propriété";
+  const location = getFieldValue(["ville", "localisation"]);
+  const address = getFieldValue(["adresse"]);
+  const postalCode = getFieldValue(["code_postal"]);
+  const country = getFieldValue(["pays"]) || "France";
+  const contentHtml = wpProperty.content?.rendered || "";
+  const div = document.createElement("div");
+  div.innerHTML = contentHtml;
+  const cleaned = div.textContent || div.innerText || "";
+  const shortDescription = cleaned.slice(0, 200) + (cleaned.length > 200 ? "..." : "");
+
+  // Création de l'objet final
+  const transformed: TransformedProperty = {
     id: wpProperty.id,
-    title: title,
-    location: location,
+    title,
+    location,
     ref: reference,
     price: priceString,
-    priceNumber: priceNumber,
+    priceNumber,
     area: formattedArea,
-    rooms: rooms,
-    bedrooms: bedrooms,
+    rooms: roomsRaw,
+    bedrooms: bedroomsRaw,
     image: featuredImage,
     allImages: getAllImages(),
     date: wpProperty.date || new Date().toISOString(),
     description: shortDescription,
-    fullContent: wpProperty.content?.rendered || "",
-    propertyType: propertyType,
-    constructionYear: constructionYear,
-    hasBalcony: hasBalcony,
-    hasElevator: hasElevator,
-    hasTerrasse: hasTerrasse,
-    hasPool: hasPool,
-    garageCount: garageCount,
-    dpe: dpe,
-    postalCode: postalCode,
-    address: address,
-    landArea: landArea,
-    floorNumber: floorNumber,
-    totalFloors: totalFloors,
-    bathrooms: bathrooms,
-    toilets: toilets,
-    heatingType: heatingType,
-    isNewConstruction: isNewConstruction,
-    isPrestigious: isPrestigious,
-    isFurnished: isFurnished,
-    isViager: isViager,
-    dpeGes: dpeGes,
-    dpeValue: dpeValue,
-    dpeGesValue: dpeGesValue,
-    dpeDate: dpeDate,
-    country: country,
-    
-    // Ajout des informations du négociateur
-    negotiatorName: negotiatorName,
-    negotiatorPhone: negotiatorPhone,
-    negotiatorEmail: negotiatorEmail,
-    negotiatorPhoto: negotiatorPhoto,
-    negotiatorCity: negotiatorCity,
-    negotiatorPostalCode: negotiatorPostalCode
+    fullContent: contentHtml,
+    propertyType: getFieldValue(["type", "famille", "idtype"]),
+    constructionYear: getFieldValue(["annee_constr"]),
+    hasBalcony: convertToBoolean(getFieldValue(["balcon"])),
+    hasElevator: convertToBoolean(getFieldValue(["ascenseur"])),
+    hasTerrasse: convertToBoolean(getFieldValue(["terrasse"])),
+    hasPool: convertToBoolean(getFieldValue(["piscine"])),
+    garageCount: getFieldValue(["nb_garage"]),
+    dpe: getFieldValue(["dpe_lettre_consom_energ"]),
+    postalCode,
+    address,
+    landArea: getFieldValue(["surf_terrain"]),
+    floorNumber: getFieldValue(["num_etage"]),
+    totalFloors: getFieldValue(["nb_etage"]),
+    bathrooms: bathroomsRaw,
+    toilets: getFieldValue(["nb_wc"]),
+    heatingType: getFieldValue(["chauffage", "nature_chauffage"]),
+    isNewConstruction: convertToBoolean(getFieldValue(["neuf"])),
+    isPrestigious: convertToBoolean(getFieldValue(["prestige"])) || priceNumber > 1_000_000,
+    isFurnished: convertToBoolean(getFieldValue(["meuble"])),
+    isViager: convertToBoolean(getFieldValue(["viager"])),
+    dpeGes: getFieldValue(["dpe_lettre_emissions_ges"]),
+    dpeValue: getFieldValue(["dpe_consom_energ"]),
+    dpeGesValue: getFieldValue(["dpe_emissions_ges"]),
+    dpeDate: getFieldValue(["dpe_date"]),
+    country,
+    negotiatorName: getFieldValue(["nego_nom"]),
+    negotiatorPhone: getFieldValue(["nego_tel"]),
+    negotiatorEmail: getFieldValue(["nego_email"]),
+    negotiatorPhoto: getFieldValue(["photo_agent"]),
+    negotiatorCity: getFieldValue(["nego_ville"]),
+    negotiatorPostalCode: getFieldValue(["nego_cp"]),
   };
-  
-  console.log("Transformed property:", transformedProperty);
-  return transformedProperty;
+
+  console.log("Transformed property:", transformed);
+  return transformed;
 };
