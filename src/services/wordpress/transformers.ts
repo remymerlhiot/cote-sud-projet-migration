@@ -2,66 +2,99 @@
 
 import { WordPressProperty, TransformedProperty } from "./types";
 
+// Synonymes uniquement pour la recherche dans wpProperty.acf (au cas où)
+const SYNONYMS_ACF = {
+  surf_hab: ["surf_hab", "surface_habitable", "surface", "superficie"],
+  rooms:    ["piece", "nb_pieces", "nombre_pieces"],
+  bedrooms: ["nb_chambre", "nb_chambres", "chambres"],
+  bathrooms:["nb_sdb", "nb_sdb", "salles_de_bain"],
+  price:    ["prix_affiche", "prix", "prix_vente"]
+};
+
 /**
- * Transforme un objet WordPressProperty en TransformedProperty
- * en lisant directement les champs ACF présents sous wpProperty.acf
+ * Essaie de lire un champ personnalisé :
+ * 1) d'abord à la racine de wpProperty (flux REST direct)
+ * 2) si vide, dans wpProperty.acf via SYNONYMS_ACF
+ * @param wpProperty réponse brute REST
+ * @param keys liste de clés à tester
  */
+function readField(wpProperty: WordPressProperty, keys: string[]): string {
+  for (const key of keys) {
+    const v = (wpProperty as any)[key];
+    if (v != null && v !== "") {
+      return String(v);
+    }
+  }
+  // fallback : ACF
+  const acf = (wpProperty as any).acf || {};
+  for (const key of keys) {
+    const v = acf[key];
+    if (v != null && v !== "") {
+      return String(v);
+    }
+  }
+  return "";
+}
+
 export const transformPropertyData = (
   wpProperty: WordPressProperty
 ): TransformedProperty => {
-  const acf = wpProperty.acf || {};
+  // Lecture des champs principaux
+  const priceRaw = readField(wpProperty, SYNONYMS_ACF.price);
+  const price = priceRaw ? `${priceRaw} €` : "Prix sur demande";
+  const priceNumber = parseInt(priceRaw.replace(/[^0-9]/g, ""), 10) || 0;
 
-  // Lecture directe des ACF (vérifie bien que ces clés correspondent à tes champs)
-  const area       = acf.surf_hab              ? `${acf.surf_hab}m²`  : "";
-  const rooms      = acf.piece                  ? String(acf.piece)    : "";
-  const bedrooms   = acf.nb_chambre             ? String(acf.nb_chambre): "";
-  const bathrooms  = acf.nb_sdb                 ? String(acf.nb_sdb)   : "";
-  const priceRaw   = acf.prix                   ? String(acf.prix)     : "";
-  const price      = priceRaw                   ? `${priceRaw} €`      : "Prix sur demande";
-  const priceNumber= parseInt(priceRaw, 10) || 0;
+  const areaRaw = readField(wpProperty, SYNONYMS_ACF.surf_hab);
+  const area = areaRaw ? `${areaRaw}m²` : "";
 
-  // Métadonnées de base
-  const reference  = acf.mandat                  ? String(acf.mandat)   : `REF ${wpProperty.id}`;
-  const title      = wpProperty.title?.rendered  ? wpProperty.title.rendered.trim() : "Propriété";
-  const location   = acf.localisation            ? String(acf.localisation) : "";
-  const address    = acf.adresse                 ? String(acf.adresse) : "";
-  const postalCode = acf.code_postal             ? String(acf.code_postal) : "";
-  const country    = acf.pays                    ? String(acf.pays)     : "France";
+  const rooms    = readField(wpProperty, SYNONYMS_ACF.rooms);
+  const bedrooms = readField(wpProperty, SYNONYMS_ACF.bedrooms);
+  const bathrooms= readField(wpProperty, SYNONYMS_ACF.bathrooms);
+
+  // Métadatas
+  const reference  = readField(wpProperty, ["reference", "mandat"]) || `REF ${wpProperty.id}`;
+  const title      = wpProperty.title?.rendered?.trim() || "Propriété";
+  const location   = readField(wpProperty, ["ville", "localisation"]);
+  const address    = readField(wpProperty, ["adresse"]);
+  const postalCode = readField(wpProperty, ["code_postal"]);
+  const country    = readField(wpProperty, ["pays"]) || "France";
 
   // Images
   const featuredImage = wpProperty._embedded?.["wp:featuredmedia"]?.[0]?.source_url
     || "/lovable-uploads/fallback.png";
-  const allImages = wpProperty._embedded?.["wp:gallery"]?.map((m: any) => m.source_url)
+  const allImages = wpProperty._embedded?.["wp:featuredmedia"]?.map(m => m.source_url)
     || [featuredImage];
 
-  // Conversion simple en booléen
-  const toBool = (v: any) => v === "1" || v === 1 || v === true || v === "oui";
+  // Booléens basiques (champs qui valent "1" ou "oui")
+  const toBool = (v: string) => ["1", "true", "oui"].includes(v.toLowerCase());
 
   // Caractéristiques
-  const hasBalcony  = toBool(acf.balcon);
-  const hasTerrace = toBool(acf.terrasse);
-  const hasPool     = toBool(acf.piscine);
-  const hasElevator = toBool(acf.ascenseur);
-  const garageCount = acf.nb_garage ? String(acf.nb_garage) : "";
+  const hasBalcony   = toBool(readField(wpProperty, ["balcon"]));
+  const hasTerrace   = toBool(readField(wpProperty, ["terrasse"]));
+  const hasPool      = toBool(readField(wpProperty, ["piscine"]));
+  const hasElevator  = toBool(readField(wpProperty, ["ascenseur"]));
+  const garageCount  = readField(wpProperty, ["nb_garage"]);
 
-  // DPE/GES
-  const dpe          = acf.dpe_lettre_consom_energ  || "";
-  const dpeValue     = acf.dpe_consom_energ          ? String(acf.dpe_consom_energ) : "";
-  const dpeGes       = acf.dpe_lettre_emissions_ges  || "";
-  const dpeGesValue  = acf.dpe_emissions_ges         ? String(acf.dpe_emissions_ges) : "";
-  const dpeDate      = acf.dpe_date                  || "";
+  // DPE / GES
+  const dpe          = readField(wpProperty, ["dpe_lettre_consom_energ"]);
+  const dpeValue     = readField(wpProperty, ["dpe_consom_energ"]);
+  const dpeGes       = readField(wpProperty, ["dpe_lettre_emissions_ges"]);
+  const dpeGesValue  = readField(wpProperty, ["dpe_emissions_ges"]);
+  const dpeDate      = readField(wpProperty, ["dpe_date"]);
 
-  // Construction / année
-  const constructionYear = acf.annee_constr ? String(acf.annee_constr) : "";
+  // Construction
+  const constructionYear = readField(wpProperty, ["annee_constr"]);
 
   // Négociateur
-  const negotiatorName  = acf.nego_nom   || "";
-  const negotiatorPhone = acf.nego_tel   || "";
-  const negotiatorEmail = acf.nego_email || "";
-  const negotiatorCity  = acf.nego_ville || "";
-  const negotiatorPhoto = acf.photo_agent|| "";
+  const negotiatorName      = readField(wpProperty, ["nego_nom"]);
+  const negotiatorPhone     = readField(wpProperty, ["nego_tel"]);
+  const negotiatorEmail     = readField(wpProperty, ["nego_email"]);
+  const negotiatorCity      = readField(wpProperty, ["nego_ville"]);
+  const negotiatorPostalCode= readField(wpProperty, ["nego_cp"]);
+  const negotiatorPhoto     = readField(wpProperty, ["photo_agent"]);
 
-  return {
+  // Build final object
+  const transformed: TransformedProperty = {
     id:               wpProperty.id,
     title,
     location,
@@ -77,7 +110,7 @@ export const transformPropertyData = (
     date:             wpProperty.date || new Date().toISOString(),
     description:      wpProperty.excerpt?.rendered || "",
     fullContent:      wpProperty.content?.rendered || "",
-    propertyType:     acf.type      || "",
+    propertyType:     readField(wpProperty, ["type", "famille", "idtype"]),
     address,
     postalCode,
     country,
@@ -92,20 +125,31 @@ export const transformPropertyData = (
     dpeGes,
     dpeGesValue,
     dpeDate,
-    toilets:          acf.nb_wc ? String(acf.nb_wc) : "",
-    heatingType:      acf.chauffage || "",
-    isNewConstruction: toBool(acf.neuf),
-    isPrestigious:     toBool(acf.prestige) || priceNumber > 1_000_000,
-    isFurnished:       toBool(acf.meuble),
-    isViager:          toBool(acf.viager),
+    toilets:          readField(wpProperty, ["nb_wc"]),
+    heatingType:      readField(wpProperty, ["chauffage", "nature_chauffage"]),
+    isNewConstruction: toBool(readField(wpProperty, ["neuf"])),
+    isPrestigious:     toBool(readField(wpProperty, ["prestige"])) || priceNumber > 1_000_000,
+    isFurnished:       toBool(readField(wpProperty, ["meuble"])),
+    isViager:          toBool(readField(wpProperty, ["viager"])),
     negotiatorName,
     negotiatorPhone,
     negotiatorEmail,
     negotiatorPhoto,
     negotiatorCity,
-    negotiatorPostalCode: acf.nego_cp || "",
-    landArea:         acf.surf_terrain ? String(acf.surf_terrain) : "",
-    floorNumber:      acf.num_etage ? String(acf.num_etage) : "",
-    totalFloors:      acf.nb_etage ? String(acf.nb_etage) : "",
+    negotiatorPostalCode,
+    landArea:         readField(wpProperty, ["surf_terrain"]),
+    floorNumber:      readField(wpProperty, ["num_etage"]),
+    totalFloors:      readField(wpProperty, ["nb_etage"]),
   };
+
+  console.log("[WP TRANSFORM]", {
+    id: wpProperty.id,
+    area,
+    rooms,
+    bedrooms,
+    bathrooms,
+    price
+  });
+
+  return transformed;
 };
