@@ -1,4 +1,3 @@
-
 import { WordPressProperty, TransformedProperty } from "./types";
 
 // Helper function to transform WordPress property data
@@ -151,6 +150,14 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
   const isViager = convertToBoolean(getFieldValue(['viager']));
   const isFurnished = convertToBoolean(getFieldValue(['meuble']));
   
+  // Get negotiator information
+  const negotiatorName = getFieldValue(['nego_nom']);
+  const negotiatorPhone = getFieldValue(['nego_tel']);
+  const negotiatorEmail = getFieldValue(['nego_email']);
+  const negotiatorPhoto = getFieldValue(['photo_agent']);
+  const negotiatorCity = getFieldValue(['nego_ville']);
+  const negotiatorPostalCode = getFieldValue(['nego_cp']);
+  
   // Create the transformed property
   const transformedProperty: TransformedProperty = {
     id: wpProperty.id,
@@ -191,7 +198,15 @@ export const transformPropertyData = (wpProperty: WordPressProperty): Transforme
     dpeValue: dpeValue,
     dpeGesValue: dpeGesValue,
     dpeDate: dpeDate,
-    country: country
+    country: country,
+    
+    // Ajout des informations du négociateur
+    negotiatorName: negotiatorName,
+    negotiatorPhone: negotiatorPhone,
+    negotiatorEmail: negotiatorEmail,
+    negotiatorPhoto: negotiatorPhoto,
+    negotiatorCity: negotiatorCity,
+    negotiatorPostalCode: negotiatorPostalCode
   };
   
   console.log("Transformed property:", transformedProperty);

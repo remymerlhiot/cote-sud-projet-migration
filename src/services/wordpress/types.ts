@@ -188,7 +188,7 @@ export interface CustomWordPressPage {
   media_list: string[];
 }
 
-// Definition for the transformed property
+// Definition for the transformed property - ajout des champs manquants
 export interface TransformedProperty {
   id: number;
   title: string;
@@ -229,4 +229,12 @@ export interface TransformedProperty {
   dpeValue?: string;
   dpeGesValue?: string;
   dpeDate?: string;
+  
+  // Ajout des champs négociateur manquants
+  negotiatorName?: string;
+  negotiatorPhone?: string;
+  negotiatorEmail?: string;
+  negotiatorPhoto?: string;
+  negotiatorCity?: string;
+  negotiatorPostalCode?: string;
 }
