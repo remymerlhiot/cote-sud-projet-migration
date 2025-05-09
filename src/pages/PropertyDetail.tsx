@@ -1,24 +1,22 @@
 
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { usePropertyById, getValidImageUrl } from "@/hooks/useProperties";
+import { usePropertyById } from "@/hooks/useProperties";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Badge } from "@/components/ui/badge";
 
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const propertyId = id ? id : "0";
 
-  // State for tracking current photo in gallery
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-
-  // Fetch property details using our new hook
+  // Fetch property details using our hook
   const { data: displayData, isLoading, error } = usePropertyById(propertyId);
 
   // Helper function to determine the color class based on DPE rating
@@ -35,6 +33,17 @@ const PropertyDetail = () => {
       case "G": return "bg-red-700 text-white";
       default: return "bg-gray-200 text-gray-800";
     }
+  };
+
+  // Format date to French format
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('fr-FR', { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    }).format(date);
   };
 
   if (isLoading) {
@@ -64,7 +73,7 @@ const PropertyDetail = () => {
         <Header />
         <main className="container mx-auto py-12 px-4 flex-grow">
           <div className="text-center py-12">
-            <h2 className="text-2xl font-playfair text-[#CD9B59] mb-4">
+            <h2 className="text-2xl font-serif text-[#CD9B59] mb-4">
               Bien non trouvé
             </h2>
             <p className="mb-6">Impossible de charger les informations de ce bien immobilier.</p>
@@ -83,15 +92,18 @@ const PropertyDetail = () => {
   // Get all property images - fallback to an array with just the main image if allImages doesn't exist
   const propertyImages = displayData.allImages?.length ? displayData.allImages : [displayData.image];
 
+  // Check if the property has an agent/negotiator information
+  const hasAgentInfo = displayData.negotiatorName || displayData.negotiatorPhone || displayData.negotiatorEmail;
+
   return (
-    <div className="flex flex-col min-h-screen bg-cream font-raleway">
+    <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
       <Header />
       
       <main className="container mx-auto py-12 px-4 flex-grow">
         <div className="max-w-4xl mx-auto">
           {/* Back button */}
           <div className="mb-6">
-            <Button variant="outline" asChild className="border-[#CD9B59] text-[#CD9B59] hover:bg-[#CD9B59] hover:text-white">
+            <Button variant="outline" asChild className="border-[#C8A977] text-[#C8A977] hover:bg-[#C8A977] hover:text-white">
               <Link to="/nos-biens" className="inline-flex items-center">
                 <ChevronLeft size={16} className="mr-2" /> Retour aux biens
               </Link>
@@ -99,9 +111,34 @@ const PropertyDetail = () => {
           </div>
           
           {/* Property title */}
-          <h1 className="text-3xl md:text-4xl font-playfair text-[#CD9B59] mb-6">
+          <h1 className="text-3xl md:text-4xl font-['FreightBig Pro', serif] text-[#B17226] mb-6">
             {displayData.title}
           </h1>
+          
+          {/* Location and reference */}
+          <div className="flex flex-wrap justify-between items-center mb-4">
+            <div className="flex items-center">
+              <span className="text-lg font-medium">{displayData.location}</span>
+              {displayData.postalCode && <span className="text-sm ml-2 text-gray-500">({displayData.postalCode})</span>}
+            </div>
+            <span className="text-sm text-gray-500">Ref. {displayData.ref}</span>
+          </div>
+          
+          {/* Property tags */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {displayData.propertyType && (
+              <Badge className="bg-[#C8A977] hover:bg-[#C8A977]/80">{displayData.propertyType}</Badge>
+            )}
+            {displayData.isNewConstruction && (
+              <Badge className="bg-green-500 hover:bg-green-600">Neuf</Badge>
+            )}
+            {displayData.isPrestigious && (
+              <Badge className="bg-[#B17226] hover:bg-[#B17226]/80">Prestige</Badge>
+            )}
+            {displayData.isViager && (
+              <Badge className="bg-purple-500 hover:bg-purple-600">Viager</Badge>
+            )}
+          </div>
           
           {/* Property image gallery */}
           <div className="mb-8 relative">
@@ -124,8 +161,8 @@ const PropertyDetail = () => {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white text-[#CD9B59] border-[#CD9B59]" />
-                <CarouselNext className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white text-[#CD9B59] border-[#CD9B59]" />
+                <CarouselPrevious className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
+                <CarouselNext className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
               </Carousel>
             ) : (
               <img 
@@ -174,13 +211,13 @@ const PropertyDetail = () => {
             <Card className="border-none shadow-sm">
               <CardContent className="p-4 text-center">
                 <p className="text-sm text-gray-600">Pièces</p>
-                <p className="font-bold text-xl">{displayData.rooms}</p>
+                <p className="font-bold text-xl">{displayData.rooms || "Non spécifié"}</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-sm">
               <CardContent className="p-4 text-center">
                 <p className="text-sm text-gray-600">Chambres</p>
-                <p className="font-bold text-xl">{displayData.bedrooms}</p>
+                <p className="font-bold text-xl">{displayData.bedrooms || "Non spécifié"}</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-sm">
@@ -193,9 +230,9 @@ const PropertyDetail = () => {
           
           {/* Additional features */}
           {(displayData.hasBalcony || displayData.hasTerrasse || displayData.hasPool || displayData.hasElevator || 
-            displayData.garageCount !== "0" || displayData.constructionYear) && (
+            displayData.garageCount !== "0" || displayData.constructionYear || displayData.isFurnished) && (
             <div className="mb-8">
-              <h2 className="text-2xl font-playfair text-[#CD9B59] mb-4">Caractéristiques</h2>
+              <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#B17226] mb-4">Caractéristiques</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {displayData.hasBalcony && (
                   <div className="flex items-center">
@@ -233,6 +270,24 @@ const PropertyDetail = () => {
                     <span>Construction: {displayData.constructionYear}</span>
                   </div>
                 )}
+                {displayData.isFurnished && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>Meublé</span>
+                  </div>
+                )}
+                {displayData.floorNumber && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>Étage: {displayData.floorNumber}</span>
+                  </div>
+                )}
+                {displayData.heatingType && (
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[#C8A977] mr-2"></div>
+                    <span>Chauffage: {displayData.heatingType}</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -240,21 +295,40 @@ const PropertyDetail = () => {
           {/* DPE Rating if available */}
           {displayData.dpe && (
             <div className="mb-8">
-              <h2 className="text-2xl font-playfair text-[#CD9B59] mb-4">Performance Énergétique</h2>
-              <div className="flex items-center">
+              <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#B17226] mb-4">Performance Énergétique</h2>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4">
                 <span className={`${getDpeColorClass(displayData.dpe)} px-4 py-2 rounded-md font-bold text-lg`}>
                   {displayData.dpe.toUpperCase()}
                 </span>
-                <span className="ml-3 text-sm text-gray-600">
-                  Diagnostic de Performance Énergétique
+                <span className="ml-0 sm:ml-3 mt-2 sm:mt-0 text-sm text-gray-600">
+                  Diagnostic de Performance Énergétique 
+                  {displayData.dpeValue && ` - ${displayData.dpeValue} kWh/m²/an`}
                 </span>
               </div>
+              
+              {displayData.dpeGes && (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                  <span className={`${getDpeColorClass(displayData.dpeGes)} px-4 py-2 rounded-md font-bold text-lg`}>
+                    {displayData.dpeGes.toUpperCase()}
+                  </span>
+                  <span className="ml-0 sm:ml-3 mt-2 sm:mt-0 text-sm text-gray-600">
+                    Émissions de Gaz à Effet de Serre
+                    {displayData.dpeGesValue && ` - ${displayData.dpeGesValue} kgCO₂/m²/an`}
+                  </span>
+                </div>
+              )}
+              
+              {displayData.dpeDate && (
+                <p className="text-xs text-gray-500 mt-4">
+                  Date du diagnostic: {formatDate(displayData.dpeDate)}
+                </p>
+              )}
             </div>
           )}
           
           {/* Property full description */}
           <div className="mb-8">
-            <h2 className="text-2xl font-playfair text-[#CD9B59] mb-4">Description</h2>
+            <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#B17226] mb-4">Description</h2>
             <div className="prose max-w-none">
               {displayData.fullContent ? (
                 <div dangerouslySetInnerHTML={{ __html: displayData.fullContent }} />
@@ -266,13 +340,67 @@ const PropertyDetail = () => {
             </div>
           </div>
           
+          {/* Agent/Negotiator info if available */}
+          {hasAgentInfo && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#B17226] mb-4">Votre contact</h2>
+              <Card className="border-none shadow-md">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                    {displayData.negotiatorPhoto && (
+                      <div className="w-24 h-24 rounded-full overflow-hidden">
+                        <img 
+                          src={displayData.negotiatorPhoto} 
+                          alt={displayData.negotiatorName || "Agent"} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => { 
+                            e.currentTarget.src = "/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png";
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      {displayData.negotiatorName && (
+                        <h3 className="font-medium text-lg">{displayData.negotiatorName}</h3>
+                      )}
+                      <div className="mt-2 space-y-1">
+                        {displayData.negotiatorPhone && (
+                          <p className="flex items-center">
+                            <span className="font-medium mr-2">Téléphone:</span>
+                            <a href={`tel:${displayData.negotiatorPhone}`} className="text-[#B17226] hover:underline">
+                              {displayData.negotiatorPhone}
+                            </a>
+                          </p>
+                        )}
+                        {displayData.negotiatorEmail && (
+                          <p className="flex items-center">
+                            <span className="font-medium mr-2">Email:</span>
+                            <a href={`mailto:${displayData.negotiatorEmail}`} className="text-[#B17226] hover:underline">
+                              {displayData.negotiatorEmail}
+                            </a>
+                          </p>
+                        )}
+                        {(displayData.negotiatorCity || displayData.negotiatorPostalCode) && (
+                          <p className="flex items-center">
+                            <span className="font-medium mr-2">Localisation:</span>
+                            {displayData.negotiatorPostalCode} {displayData.negotiatorCity}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
           {/* Contact info */}
-          <div className="bg-[#f8f5f0] p-6 rounded-md">
-            <h3 className="text-xl font-playfair text-[#CD9B59] mb-3">
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <h3 className="text-xl font-['FreightBig Pro', serif] text-[#B17226] mb-3">
               Intéressé par ce bien ?
             </h3>
             <p className="mb-4">Contactez-nous pour plus d'informations ou pour organiser une visite.</p>
-            <Button className="bg-[#CD9B59] hover:bg-[#BA8A48] text-white">
+            <Button className="bg-[#C8A977] hover:bg-[#B17226] text-white">
               <Link to="/contact">Nous contacter</Link>
             </Button>
           </div>

@@ -14,39 +14,62 @@ export interface WordPressProperty {
   featured_media: number;
   
   // Direct property fields to match API response structure
+  // Ajout de tous les champs métier spécifiés
   mandat?: string;
-  ville?: string;
-  localisation?: string;
-  prix?: string;
-  prix_affiche?: string;
-  surf_hab?: string;
-  piece?: string;
-  nb_chambre?: string;
-  dpe_lettre_consom_energ?: string;
   type_mandat?: string;
   operation?: string;
+  viager?: string;
   famille?: string;
   type?: string;
+  idtype?: string;
+  nom_residence?: string;
   adresse?: string;
   code_postal?: string;
+  ville?: string;
+  localisation?: string;
+  numero_voie?: string;
   pays?: string;
+  prix?: string;
+  prix_affiche?: string;
+  date_dispo?: string;
+  taxe_fonciere?: string;
+  charges_mensuelles?: string;
   prestige?: string;
   neuf?: string;
+  surf_hab?: string;
+  surf_sejour?: string;
   surf_terrain?: string;
+  piece?: string;
   nb_etage?: string;
   num_etage?: string;
+  nb_chambre?: string;
   nb_sdb?: string;
   nb_salle_deau?: string;
   nb_wc?: string;
   chauffage?: string;
+  nature_chauffage?: string;
   balcon?: string;
+  meuble?: string;
   ascenseur?: string;
   nb_garage?: string;
   terrasse?: string;
   piscine?: string;
   annee_constr?: string;
-  texte_fr?: string;
-  reference?: string; // Unique reference field
+  dpe_non_soumis?: string;
+  dpe_consom_energ?: string;
+  dpe_lettre_consom_energ?: string;
+  dpe_emissions_ges?: string;
+  dpe_lettre_emissions_ges?: string;
+  dpe_date?: string;
+  reference?: string;
+  
+  // Négociateur/Agent fields
+  nego_nom?: string;
+  nego_tel?: string;
+  nego_email?: string;
+  nego_cp?: string;
+  nego_ville?: string;
+  photo_agent?: string;
   
   // Keep the ACF object for backward compatibility
   acf?: {
@@ -58,42 +81,62 @@ export interface WordPressProperty {
     bedrooms?: string;
     dpe?: string;
     
-    // WordPress ACF field names
+    // WordPress ACF field names - tous les champs métier
     mandat?: string;
-    ville?: string;
-    localisation?: string;
-    prix?: string;
-    prix_affiche?: string;
-    surf_hab?: string;
-    piece?: string;
-    nb_chambre?: string;
-    dpe_lettre_consom_energ?: string;
-    
-    // Additional fields from the WordPress ACF list
     type_mandat?: string;
     operation?: string;
+    viager?: string;
     famille?: string;
     type?: string;
+    idtype?: string;
+    nom_residence?: string;
     adresse?: string;
     code_postal?: string;
+    ville?: string;
+    localisation?: string;
+    numero_voie?: string;
     pays?: string;
+    prix?: string;
+    prix_affiche?: string;
+    date_dispo?: string;
+    taxe_fonciere?: string;
+    charges_mensuelles?: string;
     prestige?: string;
     neuf?: string;
+    surf_hab?: string;
+    surf_sejour?: string;
     surf_terrain?: string;
+    piece?: string;
     nb_etage?: string;
     num_etage?: string;
+    nb_chambre?: string;
     nb_sdb?: string;
     nb_salle_deau?: string;
     nb_wc?: string;
     chauffage?: string;
+    nature_chauffage?: string;
     balcon?: string;
+    meuble?: string;
     ascenseur?: string;
     nb_garage?: string;
     terrasse?: string;
     piscine?: string;
     annee_constr?: string;
-    texte_fr?: string;
+    dpe_non_soumis?: string;
+    dpe_consom_energ?: string;
+    dpe_lettre_consom_energ?: string;
+    dpe_emissions_ges?: string;
+    dpe_lettre_emissions_ges?: string;
+    dpe_date?: string;
     reference?: string;
+    
+    // Négociateur/Agent fields
+    nego_nom?: string;
+    nego_tel?: string;
+    nego_email?: string;
+    nego_cp?: string;
+    nego_ville?: string;
+    photo_agent?: string;
   };
   
   _embedded?: {
@@ -157,7 +200,7 @@ export interface TransformedProperty {
   rooms: string;
   bedrooms: string;
   image: string;
-  allImages?: string[];  // All property images for gallery
+  allImages: string[];  // All property images for gallery
   date: string;
   description: string;
   fullContent: string;
@@ -180,4 +223,10 @@ export interface TransformedProperty {
   heatingType?: string;
   isNewConstruction?: boolean;
   isPrestigious?: boolean;
+  isFurnished?: boolean;
+  isViager?: boolean;
+  dpeGes?: string;
+  dpeValue?: string;
+  dpeGesValue?: string;
+  dpeDate?: string;
 }

@@ -9,7 +9,7 @@ import { TransformedProperty } from "./types";
 export const fetchProperties = async (): Promise<TransformedProperty[]> => {
   try {
     // Using _embed to include featured media in the response and increase per_page to get more properties
-    const response = await fetch(`${API_BASE_URL}/annonce?_embed&per_page=20`);
+    const response = await fetch(`${API_BASE_URL}/annonce?_embed&per_page=40`);
     
     if (!response.ok) {
       throw new Error(`Error fetching properties: ${response.statusText}`);
@@ -20,24 +20,22 @@ export const fetchProperties = async (): Promise<TransformedProperty[]> => {
     // Debug log to see the actual structure of the data
     if (data && data.length > 0) {
       console.log("WordPress API Response Total Properties:", data.length);
-      console.log("WordPress API Complete First Property:", data[0]);
-      
-      // Add additional logging to see all available fields
+      console.log("WordPress API First Property ID:", data[0].id);
       console.log("Available fields at root level:", Object.keys(data[0]));
       
-      // Try to find non-null values for important fields by checking all properties
-      const allProperties = [...data];
-      
-      // Find a property with non-null values for key fields
-      const propertyWithPrice = allProperties.find(p => p.prix !== null || p.prix_affiche !== null);
-      const propertyWithSurface = allProperties.find(p => p.surf_hab !== null);
-      const propertyWithRooms = allProperties.find(p => p.piece !== null);
-      const propertyWithBedrooms = allProperties.find(p => p.nb_chambre !== null);
-      
-      console.log("Example property with price:", propertyWithPrice?.id, propertyWithPrice?.prix || propertyWithPrice?.prix_affiche);
-      console.log("Example property with surface:", propertyWithSurface?.id, propertyWithSurface?.surf_hab);
-      console.log("Example property with rooms:", propertyWithRooms?.id, propertyWithRooms?.piece);
-      console.log("Example property with bedrooms:", propertyWithBedrooms?.id, propertyWithBedrooms?.nb_chambre);
+      // Find a sample property with complete data for analysis
+      const sampleProperties = data.slice(0, 3);
+      sampleProperties.forEach((prop, index) => {
+        console.log(`Sample property ${index+1} ID:`, prop.id);
+        console.log(`Sample property ${index+1} fields:`, 
+          Object.keys(prop).filter(key => 
+            prop[key] !== null && 
+            prop[key] !== undefined && 
+            prop[key] !== "" && 
+            typeof prop[key] !== 'object'
+          ).map(key => `${key}: ${prop[key]}`).join(", ")
+        );
+      });
     }
     
     // Transform properties before returning
@@ -62,6 +60,12 @@ export const fetchPropertyById = async (id: number): Promise<TransformedProperty
     
     const data = await response.json();
     console.log(`Full property data for ID ${id}:`, data);
+    
+    // Log all available fields and their values
+    console.log(`Property ${id} available fields:`, Object.keys(data));
+    console.log(`Property ${id} meta fields:`, data.meta || "No meta fields");
+    
+    // Transform property before returning
     return transformPropertyData(data);
   } catch (error) {
     console.error(`Failed to fetch property #${id}:`, error);
@@ -70,5 +74,5 @@ export const fetchPropertyById = async (id: number): Promise<TransformedProperty
   }
 };
 
-// Re-exporter explicitement la fonction transformPropertyData
+// Exporter explicitement la fonction transformPropertyData
 export { transformPropertyData } from "./transformers";

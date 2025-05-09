@@ -1,9 +1,12 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { TransformedProperty } from "@/hooks/useProperties";
 import { Link } from "react-router-dom";
+
 type PropertyProps = {
   property: TransformedProperty;
 };
+
 const PropertyCard = ({
   property
 }: PropertyProps) => {
@@ -25,6 +28,11 @@ const PropertyCard = ({
           PRESTIGE
         </span>);
     }
+    if (property.isViager) {
+      badges.push(<span key="viager" className="absolute top-3 left-24 bg-purple-500 text-white px-2 py-1 text-xs font-medium rounded-sm z-10">
+          VIAGER
+        </span>);
+    }
     return badges;
   };
 
@@ -33,6 +41,7 @@ const PropertyCard = ({
 
   // Extract property type from title if not explicitly defined
   const displayType = property.propertyType || property.title?.split(' ')[0] || "PROPRIÉTÉ";
+  
   return <Link to={`/property/${property.id}`} className="block h-full">
       <Card className="overflow-hidden border-none shadow-md h-full bg-white hover:shadow-lg transition-all duration-300">
         <CardContent className="p-0 relative">
@@ -81,6 +90,7 @@ const PropertyCard = ({
                 {property.bathrooms && <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">
                     {parseInt(property.bathrooms) > 1 ? `${property.bathrooms} SDB` : "1 SDB"}
                   </span>}
+                {property.isFurnished && <span className="px-2 py-1 bg-gray-100 text-[10px] rounded">Meublé</span>}
               </div>}
             
             <div className="mt-4 flex justify-center">
@@ -93,4 +103,5 @@ const PropertyCard = ({
       </Card>
     </Link>;
 };
+
 export default PropertyCard;
