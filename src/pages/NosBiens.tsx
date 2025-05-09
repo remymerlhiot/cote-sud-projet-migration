@@ -46,12 +46,12 @@ const NosBiens = () => {
       // Extraire les localisations uniques
       const uniqueLocations = Array.from(
         new Set(properties.map(prop => prop.location))
-      ).filter(loc => loc && loc !== "Non spécifié");
+      ).filter(loc => loc && loc !== "Non spécifié" && loc !== "");
       
       // Extraire les types de propriété uniques
       const uniqueTypes = Array.from(
         new Set(properties.map(prop => prop.propertyType))
-      ).filter(type => type && type !== "Non spécifié");
+      ).filter(type => type && type !== "Non spécifié" && type !== "");
       
       setLocations(uniqueLocations as string[]);
       setPropertyTypes(uniqueTypes as string[]);
@@ -221,9 +221,9 @@ const NosBiens = () => {
                   <SelectValue placeholder="Tous les types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tous les types</SelectItem>
+                  <SelectItem value="_all">Tous les types</SelectItem>
                   {propertyTypes.map((type) => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                    <SelectItem key={type} value={type || "_default"}>{type}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -237,9 +237,9 @@ const NosBiens = () => {
                   <SelectValue placeholder="Toutes les localisations" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes les localisations</SelectItem>
+                  <SelectItem value="_all">Toutes les localisations</SelectItem>
                   {locations.map((loc) => (
-                    <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                    <SelectItem key={loc} value={loc || "_default"}>{loc}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -358,9 +358,9 @@ const NosBiens = () => {
                       <SelectValue placeholder="Tous les types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Tous les types</SelectItem>
+                      <SelectItem value="_all">Tous les types</SelectItem>
                       {propertyTypes.map((type) => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                        <SelectItem key={type} value={type || "_default"}>{type}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -374,9 +374,9 @@ const NosBiens = () => {
                       <SelectValue placeholder="Toutes les localisations" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Toutes les localisations</SelectItem>
+                      <SelectItem value="_all">Toutes les localisations</SelectItem>
                       {locations.map((loc) => (
-                        <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                        <SelectItem key={loc} value={loc || "_default"}>{loc}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
