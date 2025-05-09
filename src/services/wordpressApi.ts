@@ -1,11 +1,11 @@
+// src/services/wordpressApi.ts
 
-// This file re-exports everything from the WordPress service modules
-// for backward compatibility
-
+// Re-export de tous les exports du dossier WordPress
 export * from "./wordpress";
-export {
-  fetchProperties as fetchProperties,
-  fetchPropertyById as fetchPropertyById,
-  transformPropertyData as transformFTPPropertyData
-} from "./wordpress";
 
+// Export des fonctions FTP (fetch + transform) depuis ftpPropertyApi.ts
+export {
+  fetchProperties     as fetchFTPProperties,
+  fetchPropertyById   as fetchFTPPropertyById,
+  transformFTPPropertyData
+} from "./ftpPropertyApi";
