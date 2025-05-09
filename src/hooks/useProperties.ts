@@ -1,48 +1,52 @@
+// src/hooks/useProperties.ts
 
 import { useQuery } from "@tanstack/react-query";
-import { 
-  fetchWordPressProperties, 
-  fetchWordPressPropertyById,
-  transformPropertyData,
-  TransformedProperty
-} from "@/services/wordpress";
+import { fetchWordPressProperties } from "@/services/wordpress/propertyApi";
+import { fetchProperties as fetchFTPProperties } from "@/services/ftpPropertyApi";
+import { transformFTPPropertyData } from "@/services/ftpPropertyApi";
+import type { TransformedProperty } from "@/services/wordpress/types";
 
-// Fetch all properties using WordPress API instead of FTP
+/**
+ * Récupère et transforme l'ensemble des propriétés
+ * - WordPress : déjà transformées par fetchWordPressProperties()
+ * - FTP       : on applique transformFTPPropertyData()
+ */
+const fetchAllProperties = async (): Promise<TransformedProperty[]> => {
+  const [wpProps, ftpRaw] = await Promise.all([
+    fetchWordPressProperties(),
+    fetchFTPProperties(),
+  ]);
+
+  const ftpProps = ftpRaw.map(transformFTPPropertyData);
+
+  // Fusion + tri décroissant par prix
+  return [...wpProps, ...ftpProps].sort((a, b) => b.priceNumber - a.priceNumber);
+};
+
+/**
+ * Hook pour la liste de toutes les propriétés
+ */
 export const useProperties = () => {
-  return useQuery({
+  return useQuery<TransformedProperty[]>({
     queryKey: ["properties"],
-    queryFn: async () => {
-      const wpProperties = await fetchWordPressProperties();
-      // Les propriétés sont déjà transformées par fetchWordPressProperties
-      return wpProperties.sort((a, b) => b.priceNumber - a.priceNumber);
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryFn: fetchAllProperties,
+    staleTime: 5 * 60 * 1000, // 5 min
   });
 };
 
-// Fetch a single property by ID from WordPress
+/**
+ * Hook pour une propriété unique par ID,
+ * qu'elle vienne de WP ou du FTP
+ */
 export const usePropertyById = (id: string | number) => {
-  return useQuery({
+  return useQuery<TransformedProperty | null>({
     queryKey: ["property", id],
     queryFn: async () => {
-      const stringId = id.toString();
-      const numericId = parseInt(stringId);
-      if (isNaN(numericId)) return null;
-
-      return await fetchWordPressPropertyById(numericId);
+      const numericId = typeof id === "string" ? parseInt(id, 10) : id;
+      const all = await fetchAllProperties();
+      return all.find(p => p.id === numericId) ?? null;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     enabled: !!id,
   });
 };
-
-// Re-export the transform function and helper functions from WordPress services
-export { transformPropertyData };
-
-// Re-export the image validation helper to maintain compatibility
-export const getValidImageUrl = (url: string | undefined): string => {
-  if (!url) return "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
-  return url;
-};
-
-export type { TransformedProperty };
