@@ -3,77 +3,173 @@ import React, { useEffect, useState, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
 
-const Estimation: React.FC = () => {
+const WIDGET_ID = "11bS96785252f655f6Xy524293v7P112";
+const WIDGET_CONTAINER_ID = `jst__est_${WIDGET_ID}`;
+const SCRIPT_URL = `https://expert.jestimo.com/widget-jwt/${WIDGET_ID}`;
+const MAX_LOAD_ATTEMPTS = 5;
+const LOAD_TIMEOUT = 3000; // 3 secondes avant de tenter à nouveau
+const INIT_CHECK_TIMEOUT = 1000; // Verifications périodiques
+
+interface WindowWithWidgetStatus extends Window {
+  _jestimoWidgetLoaded?: boolean;
+  _jestimoWidgetInitialized?: boolean;
+}
+
+declare const window: WindowWithWidgetStatus;
+
+const EstimationWidget: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [scriptError, setScriptError] = useState<string | null>(null);
+  const [widgetStatus, setWidgetStatus] = useState<'loading' | 'loaded' | 'error' | 'fallback'>('loading');
   const scriptRef = useRef<HTMLScriptElement | null>(null);
   const loadAttempts = useRef(0);
-  const maxAttempts = 3;
+  const checkInterval = useRef<number | null>(null);
+  const { toast } = useToast();
+  
+  // Fonction pour nettoyer les listeners et intervalles
+  const cleanup = () => {
+    if (checkInterval.current) {
+      window.clearInterval(checkInterval.current);
+      checkInterval.current = null;
+    }
+    
+    // Reset global tracking variables
+    window._jestimoWidgetLoaded = false;
+    window._jestimoWidgetInitialized = false;
+    
+    // Supprimer le script s'il existe
+    if (scriptRef.current && document.body.contains(scriptRef.current)) {
+      document.body.removeChild(scriptRef.current);
+      scriptRef.current = null;
+    }
+  };
+  
+  // Vérifier périodiquement si le widget est initialisé
+  const startWidgetCheck = () => {
+    // Nettoyer les checks précédents
+    if (checkInterval.current) {
+      window.clearInterval(checkInterval.current);
+    }
+    
+    // Variable pour compter les vérifications
+    let checks = 0;
+    const MAX_CHECKS = 10; // Max 10 vérifications (10 secondes au total)
+    
+    checkInterval.current = window.setInterval(() => {
+      checks++;
+      
+      const container = document.getElementById(WIDGET_CONTAINER_ID);
+      const isInitialized = window._jestimoWidgetInitialized === true || 
+                         (container && container.children.length > 2);
+      
+      console.log(`Widget check #${checks}: Container exists: ${!!container}, Children: ${container?.children.length || 0}`);
+      
+      if (isInitialized) {
+        // Widget est chargé avec succès
+        window.clearInterval(checkInterval.current!);
+        setIsLoading(false);
+        setWidgetStatus('loaded');
+        window._jestimoWidgetInitialized = true;
+        console.log("Widget initialized successfully");
+      } else if (checks >= MAX_CHECKS) {
+        // Timeout après 10 vérifications
+        window.clearInterval(checkInterval.current!);
+        
+        if (loadAttempts.current < MAX_LOAD_ATTEMPTS) {
+          console.log(`Widget initialization timeout. Retrying (${loadAttempts.current + 1}/${MAX_LOAD_ATTEMPTS})...`);
+          loadEstimationWidget();
+        } else {
+          setIsLoading(false);
+          setScriptError("Le widget d'estimation n'a pas pu s'initialiser correctement. Veuillez utiliser notre formulaire de contact ci-dessous.");
+          setWidgetStatus('fallback');
+          console.error("Widget initialization failed after multiple attempts");
+          toast({
+            title: "Problème avec l'outil d'estimation",
+            description: "Nous avons rencontré un problème technique. N'hésitez pas à nous contacter directement.",
+            variant: "destructive"
+          });
+        }
+      }
+    }, INIT_CHECK_TIMEOUT);
+  };
   
   const loadEstimationWidget = () => {
     // Réinitialiser l'état
     setIsLoading(true);
     setScriptError(null);
+    setWidgetStatus('loading');
+    
+    // Nettoyage préalable
+    cleanup();
     
     // Incrémente le compteur de tentatives
     loadAttempts.current += 1;
+    console.log(`Loading widget attempt ${loadAttempts.current}/${MAX_LOAD_ATTEMPTS}`);
     
-    // Si le script existe déjà, le supprimer
-    if (scriptRef.current && document.body.contains(scriptRef.current)) {
-      document.body.removeChild(scriptRef.current);
-      scriptRef.current = null;
+    // S'assurer que le conteneur existe
+    let container = document.getElementById(WIDGET_CONTAINER_ID);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = WIDGET_CONTAINER_ID;
+      container.className = "w-full min-h-[600px]";
+      
+      const widgetArea = document.getElementById('widget-container-area');
+      if (widgetArea) {
+        widgetArea.innerHTML = '';
+        widgetArea.appendChild(container);
+      } else {
+        console.error("Widget container area not found");
+        setScriptError("Zone de conteneur introuvable");
+        setIsLoading(false);
+        setWidgetStatus('error');
+        return;
+      }
     }
     
-    // Création de l'élément script
+    // Création de l'élément script dans le head pour un meilleur chargement
     const script = document.createElement("script");
-    script.src = "https://expert.jestimo.com/widget-jwt/11bS96785252f655f6Xy524293v7P112";
+    script.src = SCRIPT_URL;
     script.async = true;
+    script.defer = true;
     scriptRef.current = script;
+    
+    // Marquage global pour suivi de l'état
+    window._jestimoWidgetLoaded = false;
     
     // Gérer le chargement réussi
     script.onload = () => {
       console.log("Widget script loaded successfully");
-      // Attendre un peu que le widget s'initialise
-      setTimeout(() => {
-        const container = document.getElementById("jst__est_11bS96785252f655f6Xy524293v7P112");
-        if (container) {
-          // Vérifier si le widget a bien été initialisé (contient des éléments enfants)
-          if (container.children.length > 0) {
-            setIsLoading(false);
-          } else {
-            console.error("Widget container exists but has no children. Retrying...");
-            // Si le conteneur existe mais est vide, réessayer après un court délai
-            if (loadAttempts.current < maxAttempts) {
-              setTimeout(loadEstimationWidget, 2000);
-            } else {
-              setIsLoading(false);
-              setScriptError("Le widget d'estimation n'a pas pu être chargé correctement. Veuillez rafraîchir la page.");
-            }
-          }
-        } else {
-          console.error("Widget container not found");
-          setScriptError("Le conteneur du widget n'a pas été trouvé.");
-          setIsLoading(false);
-        }
-      }, 1500);
+      window._jestimoWidgetLoaded = true;
+      
+      // Commencer la vérification périodique de l'initialisation
+      startWidgetCheck();
     };
     
     // Gérer les erreurs de chargement
     script.onerror = () => {
       console.error("Failed to load estimation widget script");
-      if (loadAttempts.current < maxAttempts) {
-        console.log(`Retrying (${loadAttempts.current}/${maxAttempts})...`);
-        setTimeout(loadEstimationWidget, 2000);
+      if (loadAttempts.current < MAX_LOAD_ATTEMPTS) {
+        console.log(`Retrying in ${LOAD_TIMEOUT/1000}s (${loadAttempts.current}/${MAX_LOAD_ATTEMPTS})...`);
+        setTimeout(loadEstimationWidget, LOAD_TIMEOUT);
       } else {
-        setScriptError("Impossible de charger le widget d'estimation. Veuillez vérifier votre connexion internet.");
+        setScriptError("Impossible de charger le widget d'estimation. Veuillez utiliser notre formulaire de contact ci-dessous.");
         setIsLoading(false);
+        setWidgetStatus('fallback');
+        toast({
+          title: "Erreur de chargement",
+          description: "Nous n'avons pas pu charger l'outil d'estimation. Vous pouvez nous contacter directement.",
+          variant: "destructive"
+        });
       }
     };
     
-    // Ajout du script au document
-    document.body.appendChild(script);
+    // Ajout du script au head du document
+    document.head.appendChild(script);
   };
   
   useEffect(() => {
@@ -82,10 +178,7 @@ const Estimation: React.FC = () => {
     
     // Nettoyage lors du démontage du composant
     return () => {
-      // Suppression du script lors du démontage du composant
-      if (scriptRef.current && document.body.contains(scriptRef.current)) {
-        document.body.removeChild(scriptRef.current);
-      }
+      cleanup();
     };
   }, []);
   
@@ -94,6 +187,64 @@ const Estimation: React.FC = () => {
     loadEstimationWidget();
   };
   
+  // Formulaire de secours en cas d'échec du widget
+  const renderFallbackForm = () => {
+    return (
+      <Card className="mt-8 bg-sable-30 border-sable-50">
+        <CardContent className="pt-6">
+          <h3 className="font-playfair text-2xl text-cuivre mb-4">Contactez-nous pour une estimation</h3>
+          <p className="mb-6 text-anthracite">
+            Notre équipe d'experts immobiliers est à votre disposition pour estimer votre bien. 
+            Contactez-nous directement:
+          </p>
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <Button className="bg-cuivre hover:bg-sable text-white flex gap-2 items-center">
+              <Phone size={18} />
+              <span>04 94 XX XX XX</span>
+            </Button>
+            <Button className="bg-anthracite hover:bg-sable-80 text-white flex gap-2 items-center">
+              <Mail size={18} />
+              <span>contact@cote-sud.immo</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+  
+  return (
+    <div className="relative w-full">
+      {isLoading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-sable-30/30 rounded-lg z-10">
+          <Loader2 className="h-8 w-8 text-cuivre animate-spin mb-2" />
+          <p className="text-anthracite font-medium">Chargement de l'outil d'estimation...</p>
+        </div>
+      )}
+      
+      {scriptError && (
+        <div className="text-center py-8">
+          <p className="text-red-500 mb-4">{scriptError}</p>
+          <Button 
+            onClick={handleRefresh}
+            className="bg-cuivre hover:bg-sable-80 text-white font-medium"
+          >
+            Réessayer
+          </Button>
+        </div>
+      )}
+      
+      {/* Zone de conteneur pour le widget */}
+      <div id="widget-container-area" className="w-full min-h-[600px]">
+        <div id={WIDGET_CONTAINER_ID} className="w-full min-h-[600px]"></div>
+      </div>
+      
+      {/* Formulaire de secours */}
+      {widgetStatus === 'fallback' && renderFallbackForm()}
+    </div>
+  );
+};
+
+const Estimation: React.FC = () => {
   return (
     <>
       <Helmet>
@@ -120,30 +271,8 @@ const Estimation: React.FC = () => {
             </div>
             
             <div className="bg-white shadow-lg rounded-lg p-4 md:p-8">
-              {/* Conteneur du widget avec état de chargement */}
-              <div className="relative w-full">
-                {isLoading && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-sable-30/30 rounded-lg z-10">
-                    <Loader2 className="h-8 w-8 text-cuivre animate-spin mb-2" />
-                    <p className="text-anthracite font-medium">Chargement de l'outil d'estimation...</p>
-                  </div>
-                )}
-                
-                {scriptError && (
-                  <div className="text-center py-16">
-                    <p className="text-red-500 mb-4">{scriptError}</p>
-                    <button 
-                      onClick={handleRefresh}
-                      className="bg-cuivre hover:bg-sable text-white font-medium py-2 px-4 rounded transition-colors"
-                    >
-                      Réessayer
-                    </button>
-                  </div>
-                )}
-                
-                {/* Conteneur du widget */}
-                <div id="jst__est_11bS96785252f655f6Xy524293v7P112" className="w-full min-h-[600px]"></div>
-              </div>
+              {/* Widget encapsulé dans un composant dédié */}
+              <EstimationWidget />
             </div>
             
             <div className="mt-8 md:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
