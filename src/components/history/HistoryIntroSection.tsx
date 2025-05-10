@@ -23,18 +23,16 @@ const HistoryIntroSection: React.FC<HistoryIntroSectionProps> = ({
         
         <div className="flex flex-col md:flex-row items-center gap-8 max-w-5xl mx-auto">
           <div className="md:w-1/2">
-            <div className="rounded-lg overflow-hidden w-full h-auto border border-sable/10 shadow-md">
-              {imageUrl ? (
-                <img 
-                  src={imageUrl} 
-                  alt="Maison Cezanne" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-64 bg-sable/10 flex items-center justify-center text-sable">
-                  Notre Agence
-                </div>
-              )}
+            <div className="rounded-lg overflow-hidden border border-sable/10 shadow-md" style={{ maxHeight: "400px" }}>
+              <img 
+                src={imageUrl} 
+                alt="Maison Cezanne" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.error("Image failed to load:", imageUrl);
+                  e.currentTarget.src = "/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png";
+                }}
+              />
             </div>
           </div>
           
