@@ -64,3 +64,6 @@ export const usePropertyById = (id: string | number) => {
     enabled: !!id,
   });
 };
+
+// Exporter le type TransformedProperty pour les composants qui l'utilisent
+export type { TransformedProperty } from "@/services/wordpress/types";

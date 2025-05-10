@@ -67,7 +67,7 @@ export const transformPropertyData = (
 
   // Caractéristiques
   const hasBalcony  = toBool(readField(property, ["balcon"]));
-  const hasTerrace = toBool(readField(property, ["terrasse"]));
+  const hasTerrasse = toBool(readField(property, ["terrasse"]));
   const hasPool     = toBool(readField(property, ["piscine"]));
   const hasElevator = toBool(readField(property, ["ascenseur"]));
   const garageCount = readField(property, ["nb_garage"]);
@@ -112,7 +112,7 @@ export const transformPropertyData = (
     country,
     constructionYear,
     hasBalcony,
-    hasTerrace: hasTerrace,
+    hasTerrasse, // Correction de l'orthographe ici (au lieu de hasTerrace)
     hasPool,
     hasElevator,
     garageCount,
