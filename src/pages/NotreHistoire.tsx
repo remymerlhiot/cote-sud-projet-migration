@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import CustomWordPressPage from "@/components/CustomWordPressPage";
 import { useNotreHistoire } from "@/hooks/useNotreHistoire";
 import { Skeleton } from "@/components/ui/skeleton";
-import TeamSection from "@/components/team/TeamSection";
+import TeamSectionStatic from "@/components/team/TeamSectionStatic";
 import HistoryIntroSection from "@/components/history/HistoryIntroSection";
 
 interface NotreHistoireProps {
@@ -51,8 +51,8 @@ const NotreHistoire: React.FC<NotreHistoireProps> = ({
                 description="Côté Sud Immobilier vous accompagne dans tous vos projets immobiliers depuis plus de 15 ans. Notre expertise du marché local et notre connaissance approfondie de la région nous permettent de vous offrir un service personnalisé et de qualité. Notre équipe de professionnels est à votre écoute pour vous guider dans votre recherche et vous accompagner jusqu'à la concrétisation de votre projet." 
               />
               
-              {/* Add our custom TeamSection component */}
-              <TeamSection />
+              {/* Remplacer TeamSection par TeamSectionStatic */}
+              <TeamSectionStatic />
               
               {/* Hidden WordPress content */}
               <div className="hidden">
