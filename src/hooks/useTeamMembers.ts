@@ -27,12 +27,12 @@ export const useTeamMembers = () => {
       const membersFromPage = extractTeamMembersFromHTML(page.content);
       
       if (membersFromPage.length > 0) {
-        console.log("Successfully extracted team members from WordPress content");
+        console.log("Successfully extracted team members from WordPress content:", membersFromPage.length);
         return { teamMembers: membersFromPage, isFromWordPress: true };
       }
       
       // If we couldn't extract members, return fallback data
-      console.log("Could not extract team members from WordPress content");
+      console.log("Could not extract team members from WordPress content, using defaults");
       return { teamMembers: defaultTeamMembers, isFromWordPress: false };
       
     } catch (error) {
