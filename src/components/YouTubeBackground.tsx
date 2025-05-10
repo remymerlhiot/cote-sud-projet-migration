@@ -128,8 +128,8 @@ const YouTubeBackground = ({
       const containerHeight = containerRef.current.offsetHeight;
       
       // Calculate proper scaling factor for the video
-      // Use a larger scale for mobile to ensure full coverage
-      const scaleFactor = isMobile ? 3.5 : 3;
+      // Use a larger scale factor to ensure full coverage
+      const scaleFactor = isMobile ? 4.0 : 3.5;
       
       try {
         playerRef.current.setSize(containerWidth * scaleFactor, containerHeight * scaleFactor);
@@ -167,7 +167,7 @@ const YouTubeBackground = ({
       <div className="absolute inset-0 flex items-center justify-center">
         <div 
           id="youtube-background" 
-          className="absolute w-[300%] h-[300%] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+          className="absolute w-full h-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-[3.5]"
         ></div>
       </div>
       {/* Overlay avec la couleur et l'opacité personnalisées */}

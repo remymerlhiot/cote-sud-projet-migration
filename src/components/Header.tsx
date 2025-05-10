@@ -1,3 +1,4 @@
+
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { useLocation } from "react-router-dom";
 import { Home, Phone, Menu, X } from "lucide-react";
@@ -82,7 +83,7 @@ const Header = () => {
       </SheetContent>
     </Sheet>;
   return <header className="relative">
-      <div className="relative h-[180px] md:h-[220px] overflow-hidden">
+      <div className="relative h-[210px] md:h-[250px] overflow-hidden">
         {/* YouTube Video Background avec les nouveaux paramètres */}
         <YouTubeBackground videoId={youtubeVideoId} startTime={startTime} endTime={endTime} overlayColor="#B17226" overlayOpacity={0.36} />
         
