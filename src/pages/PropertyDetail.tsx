@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePropertyById } from "@/hooks/useProperties";
@@ -10,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
+import TeamCardStatic from "@/components/team/TeamCardStatic";
+import { teamMembers } from "@/data/teamMembers";
 
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -65,6 +68,24 @@ const PropertyDetail = () => {
     return value;
   };
 
+  // Fonction pour trouver un membre de l'équipe correspondant au négociateur de la propriété
+  const findTeamMember = (negotiatorName?: string) => {
+    if (!negotiatorName || negotiatorName === "Non spécifié") return null;
+    
+    // On cherche par prénom (assumant que le prénom est la première partie du nom complet)
+    const firstName = negotiatorName.split(' ')[0];
+    
+    // Recherche dans la liste des membres de l'équipe
+    const matchingMember = teamMembers.find(member => 
+      member.name.toLowerCase() === firstName.toLowerCase() || 
+      member.name.toLowerCase().includes(firstName.toLowerCase())
+    );
+    
+    console.log(`Recherche d'agent: ${firstName}, Correspondance trouvée:`, matchingMember?.name || "Aucune");
+    
+    return matchingMember;
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-cream font-raleway">
@@ -115,6 +136,9 @@ const PropertyDetail = () => {
       ? [displayData.image] 
       : ["/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"];
 
+  // Trouver le membre de l'équipe correspondant au négociateur
+  const teamMember = displayData.negotiatorName ? findTeamMember(displayData.negotiatorName) : null;
+
   // Check if the property has an agent/negotiator information
   const hasAgentInfo = displayData.negotiatorName && 
                       displayData.negotiatorName !== "Non spécifié" && 
@@ -126,46 +150,50 @@ const PropertyDetail = () => {
       <Header />
       
       <main className="flex-grow">
-        {/* Property image gallery - Full width */}
-        <div className="relative w-full mb-8">
+        {/* Property image gallery - Carousel container avec taille maximale */}
+        <div className="relative w-full mb-8 bg-anthracite">
           {propertyImages.length > 1 ? (
-            <Carousel className="w-full">
-              <CarouselContent>
-                {propertyImages.map((image, index) => (
-                  <CarouselItem key={index} className="w-full">
-                    <div className="aspect-[16/9] w-full">
-                      <img 
-                        src={image} 
-                        alt={`${displayData.title} - Vue ${index + 1}`} 
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.log("Image error, using fallback");
-                          e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
-                        }}
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="absolute left-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
-              <CarouselNext className="absolute right-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
-              
-              {/* Price badge */}
-              <div className="absolute top-4 right-4 z-10 bg-[#B17226] text-white px-4 py-2 rounded-md text-lg font-semibold">
-                {displayData.price}
-              </div>
-            </Carousel>
+            <div className="container mx-auto max-w-5xl">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {propertyImages.map((image, index) => (
+                    <CarouselItem key={index} className="w-full">
+                      <div className="aspect-[4/3] w-full max-h-[600px] flex items-center justify-center p-4">
+                        <img 
+                          src={image} 
+                          alt={`${displayData.title} - Vue ${index + 1}`} 
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => {
+                            console.log("Image error, using fallback");
+                            e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                          }}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="absolute left-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
+                <CarouselNext className="absolute right-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
+                
+                {/* Price badge */}
+                <div className="absolute top-4 right-4 z-10 bg-[#B17226] text-white px-4 py-2 rounded-md text-lg font-semibold">
+                  {displayData.price}
+                </div>
+              </Carousel>
+            </div>
           ) : (
-            <div className="relative aspect-[16/9] w-full">
-              <img 
-                src={propertyImages[0]} 
-                alt={displayData.title || "Propriété"} 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  console.log("Image error, using fallback");
-                  e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
-                }}
-              />
+            <div className="relative container mx-auto max-w-5xl">
+              <div className="aspect-[4/3] w-full max-h-[600px] flex items-center justify-center p-4">
+                <img 
+                  src={propertyImages[0]} 
+                  alt={displayData.title || "Propriété"} 
+                  className="max-w-full max-h-full object-contain"
+                  onError={(e) => {
+                    console.log("Image error, using fallback");
+                    e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                  }}
+                />
+              </div>
               
               {/* Price badge */}
               <div className="absolute top-4 right-4 z-10 bg-[#B17226] text-white px-4 py-2 rounded-md text-lg font-semibold">
@@ -375,70 +403,65 @@ const PropertyDetail = () => {
               </div>
             </div>
             
-            {/* Agent/Negotiator info if available */}
-            {hasAgentInfo && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#B17226] mb-4">Votre contact</h2>
-                <Card className="border-none shadow-md">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                      {displayData.negotiatorPhoto && displayData.negotiatorPhoto !== "Non spécifié" && (
-                        <div className="w-24 h-24 rounded-full overflow-hidden">
-                          <img 
-                            src={displayData.negotiatorPhoto} 
-                            alt={displayData.negotiatorName || "Agent"} 
-                            className="w-full h-full object-cover"
-                            onError={(e) => { 
-                              e.currentTarget.src = "/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png";
-                            }}
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        {displayData.negotiatorName && displayData.negotiatorName !== "Non spécifié" && (
-                          <h3 className="font-medium text-lg">{displayData.negotiatorName}</h3>
-                        )}
-                        <div className="mt-2 space-y-1">
+            {/* Agent/Negotiator info fusionné avec "Intéressé par ce bien" */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#B17226] mb-4">
+                Intéressé par ce bien ?
+              </h2>
+              
+              <Card className="border-none shadow-md bg-white">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                    {/* Utilisation du TeamCardStatic si un membre d'équipe correspondant est trouvé */}
+                    {teamMember ? (
+                      <div className="md:w-1/3">
+                        <TeamCardStatic 
+                          name={teamMember.name}
+                          phone={teamMember.phone}
+                          imageUrl={teamMember.imageUrl}
+                          imagePosition={teamMember.imagePosition || "center"}
+                          imageSize={teamMember.imageSize || "medium"}
+                        />
+                      </div>
+                    ) : (
+                      /* Affichage de secours si aucun membre d'équipe correspondant n'est trouvé */
+                      hasAgentInfo && (
+                        <div className="md:w-1/3 flex flex-col items-center">
+                          <div className="w-36 h-36 rounded-full overflow-hidden mb-3 border-2 border-sable">
+                            <img 
+                              src={displayData.negotiatorPhoto && displayData.negotiatorPhoto !== "Non spécifié" 
+                                ? displayData.negotiatorPhoto 
+                                : "/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
+                              } 
+                              alt={displayData.negotiatorName || "Agent"} 
+                              className="w-full h-full object-cover"
+                              onError={(e) => { 
+                                e.currentTarget.src = "/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png";
+                              }}
+                            />
+                          </div>
+                          {displayData.negotiatorName && displayData.negotiatorName !== "Non spécifié" && (
+                            <h3 className="font-playfair text-xl text-cuivre mb-2">{displayData.negotiatorName}</h3>
+                          )}
                           {displayData.negotiatorPhone && displayData.negotiatorPhone !== "Non spécifié" && (
-                            <p className="flex items-center">
-                              <span className="font-medium mr-2">Téléphone:</span>
-                              <a href={`tel:${displayData.negotiatorPhone}`} className="text-[#B17226] hover:underline">
-                                {displayData.negotiatorPhone}
-                              </a>
-                            </p>
+                            <p className="text-sm font-medium">{displayData.negotiatorPhone}</p>
                           )}
                           {displayData.negotiatorEmail && displayData.negotiatorEmail !== "Non spécifié" && (
-                            <p className="flex items-center">
-                              <span className="font-medium mr-2">Email:</span>
-                              <a href={`mailto:${displayData.negotiatorEmail}`} className="text-[#B17226] hover:underline">
-                                {displayData.negotiatorEmail}
-                              </a>
-                            </p>
-                          )}
-                          {(displayData.negotiatorCity || displayData.negotiatorPostalCode) && 
-                            (displayData.negotiatorCity !== "Non spécifié" || displayData.negotiatorPostalCode !== "Non spécifié") && (
-                            <p className="flex items-center">
-                              <span className="font-medium mr-2">Localisation:</span>
-                              {displayData.negotiatorPostalCode} {displayData.negotiatorCity}
-                            </p>
+                            <p className="text-sm">{displayData.negotiatorEmail}</p>
                           )}
                         </div>
-                      </div>
+                      )
+                    )}
+                    
+                    <div className="flex-1 flex flex-col justify-center">
+                      <p className="mb-4">Contactez notre agent pour organiser une visite ou obtenir plus d'informations sur ce bien exceptionnel.</p>
+                      <Button className="bg-[#C8A977] hover:bg-[#B17226] text-white w-full md:w-auto">
+                        <Link to="/contact">Contacter l'agent</Link>
+                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-            
-            {/* Contact info */}
-            <div className="bg-white p-6 rounded-md shadow-md mb-8">
-              <h3 className="text-xl font-['FreightBig Pro', serif] text-[#B17226] mb-3">
-                Intéressé par ce bien ?
-              </h3>
-              <p className="mb-4">Contactez-nous pour plus d'informations ou pour organiser une visite.</p>
-              <Button className="bg-[#C8A977] hover:bg-[#B17226] text-white">
-                <Link to="/contact">Nous contacter</Link>
-              </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
