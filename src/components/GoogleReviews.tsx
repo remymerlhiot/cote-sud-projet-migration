@@ -41,7 +41,7 @@ const staticReviews: GoogleReview[] = [
     id: '2',
     name: 'Maguy Choune',
     rating: 5,
-    comment: 'Personne charmante et à l'écoute, qui a su ajuster ses recommandations au gré de mes besoins !',
+    comment: "Personne charmante et à l'écoute, qui a su ajuster ses recommandations au gré de mes besoins !",
     review_date: '2023-02-15',
     review_place: 'Google'
   },
@@ -73,7 +73,7 @@ const staticReviews: GoogleReview[] = [
     id: '6',
     name: 'Elisabeth Bicheron-R',
     rating: 5,
-    comment: 'Nous cherchions un studio à acheter sur Aix et nous l\'avons trouvé le jour même. Rencontre avec Florence à l\'agence d\'Aix en Pce, jeune femme très sympathique, très attentive, dynamique et sans ambiguïté, bonne connaissance de ses produits. Je la recommande vivement.',
+    comment: "Nous cherchions un studio à acheter sur Aix et nous l'avons trouvé le jour même. Rencontre avec Florence à l'agence d'Aix en Pce, jeune femme très sympathique, très attentive, dynamique et sans ambiguïté, bonne connaissance de ses produits. Je la recommande vivement.",
     review_date: '2023-04-15',
     review_place: 'Google'
   },
@@ -81,7 +81,7 @@ const staticReviews: GoogleReview[] = [
     id: '7',
     name: 'DOMINIQUE G',
     rating: 5,
-    comment: 'Sur notre projet d\'expatriation, Florence nous a aidé à vendre nos biens immobiliers. Elle est très à l\'écoute, elle ne sur-estime pas les biens. Elle n\'a fait que des visites qualifiées, elle est d\'un grand professionnalisme. Je la recommande absolument.',
+    comment: "Sur notre projet d'expatriation, Florence nous a aidé à vendre nos biens immobiliers. Elle est très à l'écoute, elle ne sur-estime pas les biens. Elle n'a fait que des visites qualifiées, elle est d'un grand professionnalisme. Je la recommande absolument.",
     review_date: '2024-06-15',
     review_place: 'Google'
   },
@@ -89,7 +89,7 @@ const staticReviews: GoogleReview[] = [
     id: '8',
     name: 'Alain Popeye',
     rating: 5, 
-    comment: 'Très bonne expérience avec Florence de l\'agence d\'Aix en Provence. Avec sa grande connaissance du marché local, sa réactivité et sa bonne humeur permanente, Florence a été de bon conseil pour l\'estimation et la vente de notre bien qui est parti au juste prix malgré cette période difficile pour l\'immobilier. Je recommande !',
+    comment: "Très bonne expérience avec Florence de l'agence d'Aix en Provence. Avec sa grande connaissance du marché local, sa réactivité et sa bonne humeur permanente, Florence a été de bon conseil pour l'estimation et la vente de notre bien qui est parti au juste prix malgré cette période difficile pour l'immobilier. Je recommande !",
     review_date: '2024-06-15',
     review_place: 'Google'
   },
@@ -97,7 +97,7 @@ const staticReviews: GoogleReview[] = [
     id: '9',
     name: 'Sidonie Fenerol',
     rating: 5,
-    comment: 'Florence a vendu mon appartement en un mois. Elle est très réactive, active, professionnelle. Je recommande Florence ainsi que l\'Agence terrasse en ville Aix en Provence !',
+    comment: "Florence a vendu mon appartement en un mois. Elle est très réactive, active, professionnelle. Je recommande Florence ainsi que l'Agence terrasse en ville Aix en Provence !",
     review_date: '2024-10-15',
     review_place: 'Google'
   }
