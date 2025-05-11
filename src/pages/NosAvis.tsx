@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -474,7 +473,7 @@ const NosAvis = () => {
           </p>
           <Button 
             className="bg-cuivre hover:bg-anthracite text-white px-8 py-2" 
-            onClick={() => window.open('https://g.page/r/YOURREVIEWLINK/review', '_blank')}
+            onClick={() => window.open('https://maps.app.goo.gl/jzgzfA6HtmrkCPVKA', '_blank')}
           >
             Laisser un avis sur Google
           </Button>
