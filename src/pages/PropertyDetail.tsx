@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePropertyById } from "@/hooks/useProperties";
@@ -13,6 +12,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Badge } from "@/components/ui/badge";
 import { teamMembers } from "@/data/teamMembers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import AutoplayPlugin from "embla-carousel-autoplay";
 
 const PropertyDetail = () => {
   const {
@@ -28,6 +28,14 @@ const PropertyDetail = () => {
     isLoading,
     error
   } = usePropertyById(propertyId);
+
+  // Configurer le plugin d'autoplay pour le carousel
+  const autoplayOptions = {
+    delay: 5000, // 5 secondes entre chaque slide
+    stopOnInteraction: true,
+    stopOnMouseEnter: true,
+    rootNode: (emblaRoot: any) => emblaRoot.parentElement,
+  };
 
   // Helper function to determine the color class based on DPE rating
   const getDpeColorClass = (dpe?: string) => {
@@ -181,7 +189,14 @@ const PropertyDetail = () => {
         {/* Property image gallery - Carousel container avec taille maximale */}
         <div className="relative w-full mb-8 bg-anthracite">
           {propertyImages.length > 1 ? <div className="container mx-auto max-w-5xl">
-              <Carousel className="w-full">
+              <Carousel 
+                className="w-full" 
+                plugins={[AutoplayPlugin(autoplayOptions)]}
+                opts={{
+                  align: "center",
+                  loop: true
+                }}
+              >
                 <CarouselContent>
                   {propertyImages.map((image, index) => <CarouselItem key={index} className="w-full">
                       <div className="aspect-[4/3] w-full max-h-[600px] flex items-center justify-center p-4">

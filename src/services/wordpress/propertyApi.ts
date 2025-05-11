@@ -78,3 +78,6 @@ export const fetchPropertyById = async (id: number): Promise<TransformedProperty
     return null;
   }
 };
+
+// Exporter transformPropertyData pour résoudre l'erreur d'importation
+export { transformPropertyData } from "./transformers";

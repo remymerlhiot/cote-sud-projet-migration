@@ -1,5 +1,8 @@
+
 import React from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import AutoplayPlugin from "embla-carousel-autoplay";
+
 const AgenceSection = () => {
   // Images de l'agence avec leur description et URLs mises à jour
   const agenceImages = [{
@@ -15,6 +18,15 @@ const AgenceSection = () => {
     url: "https://cote-sud.immo/wp-content/uploads/2025/05/agence-3-min-scaled.jpg",
     alt: "Agence AXO Côté Sud - Façade"
   }];
+
+  // Configuration du plugin d'autoplay pour le carousel de l'agence
+  const autoplayOptions = {
+    delay: 4000, // 4 secondes entre chaque slide
+    stopOnInteraction: true,
+    stopOnMouseEnter: true,
+    rootNode: (emblaRoot: any) => emblaRoot.parentElement,
+  };
+
   return <section className="py-16 bg-sable-30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
@@ -28,9 +40,16 @@ const AgenceSection = () => {
           </p>
         </div>
 
-        {/* Carousel des images de l'agence avec bordure dorée */}
+        {/* Carousel des images de l'agence avec bordure dorée et défilement automatique */}
         <div className="max-w-5xl mx-auto">
-          <Carousel className="w-full">
+          <Carousel 
+            className="w-full"
+            opts={{
+              align: "center",
+              loop: true
+            }}
+            plugins={[AutoplayPlugin(autoplayOptions)]}
+          >
             <CarouselContent>
               {agenceImages.map((image, index) => <CarouselItem key={index} className="md:basis-2/3 lg:basis-3/4">
                   <div className="p-2">
