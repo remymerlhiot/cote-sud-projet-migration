@@ -12,6 +12,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Badge } from "@/components/ui/badge";
 import { teamMembers } from "@/data/teamMembers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 const PropertyDetail = () => {
   const {
     id
@@ -100,6 +101,7 @@ const PropertyDetail = () => {
     const body = displayData?.ref ? `Bonjour,\n\nJe souhaite obtenir plus d'informations concernant le bien référence ${displayData.ref}.\n\nCordialement,` : "Bonjour,\n\nJe souhaite obtenir plus d'informations concernant un de vos biens.\n\nCordialement,";
     window.location.href = `mailto:cote-sud@axo.immo?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
+
   if (isLoading) {
     return <div className="flex flex-col min-h-screen bg-cream font-raleway">
         <Header />
@@ -144,8 +146,11 @@ const PropertyDetail = () => {
   // Trouver le membre de l'équipe correspondant au négociateur
   const teamMember = displayData.negotiatorName ? findTeamMember(displayData.negotiatorName) : null;
 
-  // Simplifier le nom du négociateur pour afficher seulement le prénom et nom
-  const agentDisplayName = displayData.negotiatorName && displayData.negotiatorName !== "Non spécifié" ? displayData.negotiatorName.replace("L'Agence", "").trim() : "Agence Côté Sud";
+  // Simplifier le nom du négociateur pour n'afficher que son prénom et nom, sans mention de l'agence
+  const agentDisplayName = displayData.negotiatorName && displayData.negotiatorName !== "Non spécifié" 
+    ? displayData.negotiatorName.replace(/L['']Agence.*?\s+/i, "").trim() // Retire "L'Agence" et tout texte jusqu'au prochain espace
+    : "Agence Côté Sud";
+
   return <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
       <Header />
       
@@ -362,9 +367,10 @@ const PropertyDetail = () => {
                     {/* Logo de l'agence au lieu de la photo d'agent */}
                     <div className="md:w-1/3 flex flex-col items-center">
                       
-
-                      {/* Nom simplifié de l'agent */}
-                      {agentDisplayName !== "Agence Côté Sud" && <h3 className="font-['FreightBig Pro', serif] text-xl text-cuivre mb-2">{agentDisplayName}</h3>}
+                      {/* Nom simplifié de l'agent - uniquement prénom et nom */}
+                      <h3 className="font-['FreightBig Pro', serif] text-xl text-cuivre mb-2">
+                        {agentDisplayName}
+                      </h3>
                       
                       {/* Email de l'agence */}
                       <p className="text-sm">cote-sud@axo.immo</p>
