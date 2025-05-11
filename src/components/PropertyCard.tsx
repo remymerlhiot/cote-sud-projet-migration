@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { TransformedProperty } from "@/hooks/useProperties";
 import { Link } from "react-router-dom";
@@ -9,8 +10,43 @@ type PropertyProps = {
 // Affiche "NC" si la valeur est vide
 const displayValue = (v?: string) => (v && v !== "" ? v : "NC");
 
+/**
+ * Extrait le nom du négociateur en supprimant "L'Agence immobilière de prestige Côté Sud" 
+ * et autres variations similaires
+ */
+const extractNegotiatorName = (fullName?: string): string => {
+  if (!fullName) return "";
+  
+  // Remplacer différentes formes d'apostrophes encodées
+  const cleanName = fullName
+    .replace(/&apos;/g, "'")
+    .replace(/&#039;/g, "'")
+    .replace(/&#39;/g, "'");
+  
+  // Supprimer l'agence et autres textes non pertinents
+  const agencyVariants = [
+    /L['']Agence immobilière de prestige Côté Sud/i,
+    /L['']Agence Côté Sud/i,
+    /Agence Côté Sud/i,
+    /Côté Sud/i
+  ];
+  
+  let result = cleanName;
+  for (const variant of agencyVariants) {
+    result = result.replace(variant, "").trim();
+  }
+  
+  // Supprimer les tirets ou traits d'union en début/fin
+  result = result.replace(/^[-–—]+|[-–—]+$/g, "").trim();
+  
+  return result;
+};
+
 const PropertyCard = ({ property }: PropertyProps) => {
   const displayImage = property.image;
+  
+  // Extraire le nom du négociateur
+  const negotiatorName = extractNegotiatorName(property.negotiatorName);
 
   // Type affiché
   const displayType =
@@ -103,6 +139,13 @@ const PropertyCard = ({ property }: PropertyProps) => {
                 </p>
               </div>
             </div>
+
+            {/* Affichage du nom du négociateur s'il existe */}
+            {negotiatorName && (
+              <div className="text-xs text-[#37373A] italic mb-3">
+                {negotiatorName}
+              </div>
+            )}
 
             {(property.hasBalcony ||
               property.hasTerrasse ||
