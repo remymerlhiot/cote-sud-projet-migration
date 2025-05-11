@@ -143,6 +143,13 @@ export interface WordPressProperty {
     "wp:featuredmedia"?: Array<{
       source_url: string;
     }>;
+    "wp:attachment"?: Array<{
+      id: number;
+      source_url: string;
+      alt_text?: string;
+      media_type?: string;
+      mime_type?: string;
+    }>;
   };
 }
 

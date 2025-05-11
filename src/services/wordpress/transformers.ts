@@ -1,3 +1,4 @@
+
 import { WordPressProperty, TransformedProperty } from "./types";
 
 // Map de synonymes pour lire dans wpProperty ou dans wpProperty.acf
@@ -54,16 +55,20 @@ export const transformPropertyData = (
     property._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
     fallbackImage;
 
-  // 2) Tous les attachements (Elementor carousel, etc.)
+  // 2) Tous les attachements (médias WordPress)
   const attachmentImages: string[] =
-    property._embedded?.["wp:attachment"]?.map((m: any) => m.source_url) ||
+    property._embedded?.["wp:attachment"]?.map((m: any) => m.source_url).filter(Boolean) ||
     [];
 
   // 3) On fusionne et on enlève les doublons
   const allImages = Array.from(new Set([
     featuredImage,
     ...attachmentImages
-  ]));
+  ])).filter(url => url !== fallbackImage || allImages.length === 0);
+
+  console.log(`transformPropertyData: property #${property.id} has ${
+    allImages.length} images total (${
+    attachmentImages.length} attachments + featured)`);
 
   // --- Booléens helpers ---
   const toBool = (v: string) =>
