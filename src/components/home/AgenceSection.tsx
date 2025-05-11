@@ -3,22 +3,22 @@ import React from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const AgenceSection = () => {
-  // Images de l'agence avec leur description et URLs corrigées
+  // Images de l'agence avec leur description et URLs mises à jour
   const agenceImages = [
     {
-      url: "https://cote-sud.immo/wp-content/uploads/2024/10/DEVANT-AGENCE.jpg",
+      url: "https://cote-sud.immo/wp-content/uploads/2025/05/agence-0-min-scaled.jpg",
       alt: "Agence AXO Côté Sud - Extérieur",
     },
     {
-      url: "https://cote-sud.immo/wp-content/uploads/2024/10/IMG_0882-scaled.jpg",
+      url: "https://cote-sud.immo/wp-content/uploads/2025/05/agence-2-min-scaled.jpg",
       alt: "Agence AXO Côté Sud - Intérieur lumineux",
     },
     {
-      url: "https://cote-sud.immo/wp-content/uploads/2024/10/IMG_0136-scaled.jpg",
+      url: "https://cote-sud.immo/wp-content/uploads/2025/05/agence-4-min-scaled.jpg",
       alt: "Agence AXO Côté Sud - Bureau d'accueil",
     },
     {
-      url: "https://cote-sud.immo/wp-content/uploads/2024/10/IMG_1789-scaled.jpg",
+      url: "https://cote-sud.immo/wp-content/uploads/2025/05/agence-3-min-scaled.jpg",
       alt: "Agence AXO Côté Sud - Façade",
     }
   ];

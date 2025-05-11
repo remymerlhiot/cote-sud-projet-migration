@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { cleanElementorHtml } from "@/utils/elementorCleaner";
 import { Skeleton } from "@/components/ui/skeleton";
+
 type DifferenceContent = {
   title: string;
   image: string;
@@ -11,12 +13,14 @@ type DifferenceContent = {
   accompagnementTitle: string;
   accompagnementText: string[];
 };
+
 const DifferenceSection = () => {
   // Fetch homepage content
   const {
     data: homePage,
     isLoading
   } = useCustomPage("new-home");
+  
   const [content, setContent] = useState<DifferenceContent>({
     title: "LA DIFFÉRENCE",
     image: "https://cote-sud.immo/wp-content/uploads/2025/01/kahn-louis.png",
@@ -24,11 +28,13 @@ const DifferenceSection = () => {
     accompagnementTitle: "L'ACCOMPAGNEMENT",
     accompagnementText: ["Notaires, courtiers, architectes, maîtres d'œuvre, entreprises générales et spécialisées, décorateurs d'intérieur, home-stagers, concierges, paysagistes… Nos experts sont sélectionnés pour leur savoir-faire et leur engagement à valoriser chaque détail de votre bien."]
   });
+
   useEffect(() => {
     if (homePage?.content) {
       extractDifferenceContent(homePage.content);
     }
   }, [homePage]);
+
   const extractDifferenceContent = (htmlContent: string) => {
     // Parse the content
     const parser = new DOMParser();
@@ -118,12 +124,11 @@ const DifferenceSection = () => {
     }
     return null;
   }
-  return <section className="container mx-auto mb-20 px-4">
-      <h2 className="text-3xl md:text-4xl font-playfair font-normal text-sable text-center mb-16 lg:text-4xl">
-        {content.title}
-      </h2>
-      
-      {isLoading ? <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+
+  return (
+    <section className="container mx-auto mb-20 px-4">
+      {isLoading ? (
+        <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
           <div className="md:w-1/3">
             <Skeleton className="w-full h-[300px] rounded-full" />
           </div>
@@ -136,26 +141,43 @@ const DifferenceSection = () => {
             <Skeleton className="h-6 w-full mb-2" />
             <Skeleton className="h-12 w-48 mt-4" />
           </div>
-        </div> : <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+        </div>
+      ) : (
+        <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
           <div className="md:w-1/3">
             <div className="overflow-hidden rounded-full aspect-square border-4 border-sable shadow-lg">
               <img src={content.image} alt="AXO Côté Sud - La différence" className="w-full h-full object-cover" />
             </div>
           </div>
           <div className="md:w-2/3">
-            {content.mainText.map((paragraph, index) => <p key={`main-${index}`} className="text-anthracite mb-4">
-                {paragraph}
-              </p>)}
+            <div className="mb-8">
+              <h2 className="text-3xl md:text-4xl font-playfair font-normal text-sable mb-4 lg:text-4xl">
+                {content.title}
+              </h2>
+              
+              {content.mainText.map((paragraph, index) => (
+                <p key={`main-${index}`} className="text-anthracite mb-4">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
             
-            <h2 className="text-3xl md:text-4xl font-playfair font-normal text-sable mb-16 lg:text-4xl">
-              {content.accompagnementTitle}
-            </h2>
-            
-            {content.accompagnementText.map((paragraph, index) => <p key={`accomp-${index}`} className="text-anthracite mb-6">
-                {paragraph}
-              </p>)}
+            <div>
+              <h2 className="text-3xl md:text-4xl font-playfair font-normal text-sable mb-4 lg:text-4xl">
+                {content.accompagnementTitle}
+              </h2>
+              
+              {content.accompagnementText.map((paragraph, index) => (
+                <p key={`accomp-${index}`} className="text-anthracite mb-4">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
           </div>
-        </div>}
-    </section>;
+        </div>
+      )}
+    </section>
+  );
 };
+
 export default DifferenceSection;

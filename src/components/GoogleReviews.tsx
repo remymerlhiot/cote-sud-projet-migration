@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -26,6 +27,82 @@ type GoogleReview = {
   review_place: string;
 };
 
+// Nouvelles données d'avis basées sur les captures d'écran
+const staticReviews: GoogleReview[] = [
+  {
+    id: '1',
+    name: 'Hélène Codagnan',
+    rating: 5,
+    comment: 'Carole est une personne bienveillante et très professionnelle. Toujours prête à vous écouter et prendre en compte vos besoins, très compétente, je recommande vivement.',
+    review_date: '2024-04-15',
+    review_place: 'Google'
+  },
+  {
+    id: '2',
+    name: 'Maguy Choune',
+    rating: 5,
+    comment: 'Personne charmante et à l'écoute, qui a su ajuster ses recommandations au gré de mes besoins !',
+    review_date: '2023-02-15',
+    review_place: 'Google'
+  },
+  {
+    id: '3',
+    name: 'Carl Marthom',
+    rating: 5,
+    comment: 'Personne très compétente, qui a le souci de rendre service à ses clients. Je recommande sans hésiter.',
+    review_date: '2023-02-15',
+    review_place: 'Google'
+  },
+  {
+    id: '4',
+    name: 'Valérie Guerinoni',
+    rating: 5,
+    comment: 'Charmante personne et travail professionnel, je la recommande pour son professionnalisme.',
+    review_date: '2023-02-15', 
+    review_place: 'Google'
+  },
+  {
+    id: '5',
+    name: 'Fri Bri',
+    rating: 5,
+    comment: 'Très satisfait du travail effectué par cette dame pour la vente de notre maison.',
+    review_date: '2023-02-15',
+    review_place: 'Google'
+  },
+  {
+    id: '6',
+    name: 'Elisabeth Bicheron-R',
+    rating: 5,
+    comment: 'Nous cherchions un studio à acheter sur Aix et nous l\'avons trouvé le jour même. Rencontre avec Florence à l\'agence d\'Aix en Pce, jeune femme très sympathique, très attentive, dynamique et sans ambiguïté, bonne connaissance de ses produits. Je la recommande vivement.',
+    review_date: '2023-04-15',
+    review_place: 'Google'
+  },
+  {
+    id: '7',
+    name: 'DOMINIQUE G',
+    rating: 5,
+    comment: 'Sur notre projet d\'expatriation, Florence nous a aidé à vendre nos biens immobiliers. Elle est très à l\'écoute, elle ne sur-estime pas les biens. Elle n\'a fait que des visites qualifiées, elle est d\'un grand professionnalisme. Je la recommande absolument.',
+    review_date: '2024-06-15',
+    review_place: 'Google'
+  },
+  {
+    id: '8',
+    name: 'Alain Popeye',
+    rating: 5, 
+    comment: 'Très bonne expérience avec Florence de l\'agence d\'Aix en Provence. Avec sa grande connaissance du marché local, sa réactivité et sa bonne humeur permanente, Florence a été de bon conseil pour l\'estimation et la vente de notre bien qui est parti au juste prix malgré cette période difficile pour l\'immobilier. Je recommande !',
+    review_date: '2024-06-15',
+    review_place: 'Google'
+  },
+  {
+    id: '9',
+    name: 'Sidonie Fenerol',
+    rating: 5,
+    comment: 'Florence a vendu mon appartement en un mois. Elle est très réactive, active, professionnelle. Je recommande Florence ainsi que l\'Agence terrasse en ville Aix en Provence !',
+    review_date: '2024-10-15',
+    review_place: 'Google'
+  }
+];
+
 // Composant pour afficher la notation avec des étoiles
 const StarRating = ({ rating }: { rating: number }) => {
   return (
@@ -41,8 +118,8 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 export default function GoogleReviews() {
-  const [reviews, setReviews] = useState<GoogleReview[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<GoogleReview[]>(staticReviews);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { toast } = useToast();
 
@@ -57,14 +134,19 @@ export default function GoogleReviews() {
         .eq('enabled', true);
 
       if (error) throw error;
-      setReviews(data || []);
+      if (data && data.length > 0) {
+        setReviews(data);
+      } else {
+        // Si pas de données, utiliser les avis statiques
+        setReviews(staticReviews);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des avis:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les avis Google.",
-        variant: "destructive",
+        title: "Information",
+        description: "Affichage des avis en mode statique.",
       });
+      setReviews(staticReviews);
     } finally {
       setLoading(false);
     }
@@ -102,7 +184,7 @@ export default function GoogleReviews() {
       console.error('Erreur lors de la mise à jour des avis:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de mettre à jour les avis Google.",
+        description: "Impossible de mettre à jour les avis Google. Avis statiques utilisés.",
         variant: "destructive",
       });
     } finally {
@@ -112,7 +194,9 @@ export default function GoogleReviews() {
 
   // Charger les avis au chargement du composant
   useEffect(() => {
-    loadReviews();
+    // Pour cette version, nous utilisons directement les avis statiques
+    // Vous pouvez décommenter la ligne suivante pour essayer de charger depuis Supabase
+    // loadReviews();
   }, []);
 
   // Formatage de la date au format français
