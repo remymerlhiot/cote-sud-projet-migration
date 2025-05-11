@@ -1,4 +1,3 @@
-
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { useLocation } from "react-router-dom";
 import { Home, Phone, Menu, X } from "lucide-react";
@@ -6,7 +5,6 @@ import YouTubeBackground from "./YouTubeBackground";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
 const Header = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -83,7 +81,6 @@ const Header = () => {
         </div>
       </SheetContent>
     </Sheet>;
-
   return <header className="relative">
       <div className="relative h-[240px] md:h-[280px] overflow-hidden">
         {/* YouTube Video Background avec les nouveaux paramètres */}
@@ -101,7 +98,7 @@ const Header = () => {
           {/* Desktop Navigation Menu - Centered and uniform */}
           <div className="absolute bottom-8 left-0 right-0 w-full hidden md:block">
             <div className="container mx-auto">
-              <div className="flex justify-center">
+              <div className="flex justify-center my-[15px]">
                 <div className="bg-[#CD9B59]/30 backdrop-blur-sm">
                   <NavigationMenu className="w-full">
                     <NavigationMenuList className="flex justify-center w-full space-x-0 mx-auto">
@@ -135,5 +132,4 @@ const Header = () => {
       </div>
     </header>;
 };
-
 export default Header;
