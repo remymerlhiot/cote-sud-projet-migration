@@ -3,10 +3,19 @@ import React, { useEffect, useState, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
-import { Loader2, Mail, Phone } from "lucide-react";
+import { Loader2, Mail, Phone, BarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
 
 const WIDGET_ID = "11bS96785252f655f6Xy524293v7P112";
 const WIDGET_CONTAINER_ID = `jst__est_${WIDGET_ID}`;
@@ -22,7 +31,7 @@ interface WindowWithWidgetStatus extends Window {
 
 declare const window: WindowWithWidgetStatus;
 
-const EstimationWidget: React.FC = () => {
+const EstimationWidget: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [scriptError, setScriptError] = useState<string | null>(null);
   const [widgetStatus, setWidgetStatus] = useState<'loading' | 'loaded' | 'error' | 'fallback'>('loading');
@@ -172,15 +181,18 @@ const EstimationWidget: React.FC = () => {
     document.head.appendChild(script);
   };
   
+  // Charger le widget uniquement lorsque la modal est ouverte
   useEffect(() => {
-    // Charger le widget lors du montage du composant
-    loadEstimationWidget();
+    if (isOpen) {
+      loadEstimationWidget();
+    } else {
+      cleanup();
+    }
     
-    // Nettoyage lors du démontage du composant
     return () => {
       cleanup();
     };
-  }, []);
+  }, [isOpen]);
   
   const handleRefresh = () => {
     loadAttempts.current = 0;
@@ -213,7 +225,7 @@ const EstimationWidget: React.FC = () => {
   };
   
   return (
-    <div className="relative w-full">
+    <div className="relative w-full h-[600px] min-h-[600px] overflow-hidden">
       {isLoading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-sable-30/30 rounded-lg z-10">
           <Loader2 className="h-8 w-8 text-cuivre animate-spin mb-2" />
@@ -234,8 +246,8 @@ const EstimationWidget: React.FC = () => {
       )}
       
       {/* Zone de conteneur pour le widget */}
-      <div id="widget-container-area" className="w-full min-h-[600px]">
-        <div id={WIDGET_CONTAINER_ID} className="w-full min-h-[600px]"></div>
+      <div id="widget-container-area" className="w-full h-full min-h-[600px]">
+        <div id={WIDGET_CONTAINER_ID} className="w-full h-full min-h-[600px]"></div>
       </div>
       
       {/* Formulaire de secours */}
@@ -245,10 +257,12 @@ const EstimationWidget: React.FC = () => {
 };
 
 const Estimation: React.FC = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   return (
     <>
       <Helmet>
-        <title>Estimation immobilière | Côte Sud Immobilier</title>
+        <title>Estimation immobilière | Côté Sud Immobilier</title>
         <meta name="description" content="Estimez la valeur de votre bien immobilier sur la Côte d'Azur avec notre outil d'estimation en ligne gratuit." />
       </Helmet>
       
@@ -270,9 +284,46 @@ const Estimation: React.FC = () => {
               <div className="w-24 md:w-32 h-0.5 bg-sable-50 mx-auto"></div>
             </div>
             
-            <div className="bg-white shadow-lg rounded-lg p-4 md:p-8">
-              {/* Widget encapsulé dans un composant dédié */}
-              <EstimationWidget />
+            <div className="bg-white shadow-lg rounded-lg p-4 md:p-8 text-center">
+              <div className="max-w-3xl mx-auto">
+                <div className="mb-8">
+                  <h2 className="font-playfair text-2xl md:text-3xl text-cuivre mb-4">
+                    Lancez votre estimation gratuitement
+                  </h2>
+                  <p className="text-anthracite mb-6">
+                    Notre outil d'estimation vous permet d'obtenir une première évaluation de votre bien immobilier en quelques minutes.
+                  </p>
+                  
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        size="lg"
+                        className="bg-cuivre hover:bg-sable-80 text-white font-medium gap-2"
+                      >
+                        <BarChart className="h-5 w-5" />
+                        Estimer mon bien
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-hidden p-0">
+                      <DialogHeader className="px-6 pt-6 pb-2">
+                        <DialogTitle className="text-2xl font-playfair text-cuivre">
+                          Estimation de votre bien immobilier
+                        </DialogTitle>
+                        <DialogDescription>
+                          Remplissez le formulaire pour obtenir une estimation précise.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="px-0 py-0 overflow-hidden">
+                        <EstimationWidget isOpen={dialogOpen} />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                
+                <div className="text-sm text-anthracite/80 italic mb-6">
+                  Cette estimation en ligne est indicative. Pour une évaluation précise, nos experts peuvent vous accompagner sur place.
+                </div>
+              </div>
             </div>
             
             <div className="mt-8 md:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -298,6 +349,25 @@ const Estimation: React.FC = () => {
                 <p className="text-anthracite text-sm md:text-base">
                   Nos consultants sont disponibles pour affiner cette estimation et vous proposer une stratégie de vente adaptée à vos objectifs.
                 </p>
+              </div>
+              
+              <div className="md:col-span-2 bg-white p-4 md:p-6 rounded-lg border border-sable-30 text-center">
+                <h3 className="font-playfair text-xl md:text-2xl text-cuivre mb-4">
+                  Besoin d'une expertise immédiate ?
+                </h3>
+                <p className="text-anthracite text-sm md:text-base mb-6">
+                  Nos conseillers immobiliers sont à votre disposition pour réaliser une estimation personnalisée de votre bien.
+                </p>
+                <div className="flex flex-col md:flex-row gap-4 justify-center">
+                  <Button className="bg-cuivre hover:bg-sable text-white flex gap-2 items-center">
+                    <Phone size={18} />
+                    <span>04 94 XX XX XX</span>
+                  </Button>
+                  <Button className="bg-anthracite hover:bg-sable-80 text-white flex gap-2 items-center">
+                    <Mail size={18} />
+                    <span>contact@cote-sud.immo</span>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

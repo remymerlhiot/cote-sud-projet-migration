@@ -1,10 +1,12 @@
+
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { useLocation } from "react-router-dom";
-import { Home, Phone, Menu, X } from "lucide-react";
+import { Home, Phone, Menu, X, ExternalLink } from "lucide-react";
 import YouTubeBackground from "./YouTubeBackground";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
 const Header = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -68,10 +70,15 @@ const Header = () => {
           </nav>
           <div className="mt-auto pt-6 border-t border-sable-30/20">
             <div className="flex flex-col items-center gap-4 text-sm text-white">
-              <div className="flex items-center gap-2">
-                <Home size={14} className="text-sable-30" />
+              <a 
+                href="https://etreactif.com/contact/"
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-sable"
+              >
+                <ExternalLink size={14} className="text-sable-30" />
                 <span>REJOIGNEZ-NOUS</span>
-              </div>
+              </a>
               <div className="flex items-center gap-2">
                 <Phone size={14} className="text-sable-30" />
                 <span>06 09 08 04 98</span>
@@ -103,8 +110,11 @@ const Header = () => {
                   <NavigationMenu className="w-full">
                     <NavigationMenuList className="flex justify-center w-full space-x-0 mx-auto">
                       {navigationLinks.map(link => <NavigationMenuItem key={link.path}>
-                          <NavigationMenuLink href={link.path} className={`text-white hover:bg-[#CD9B59] uppercase text-xs font-medium px-4 md:px-6 py-3 transition-colors
-                            ${isActive(link.path) ? 'bg-[#CD9B59]' : ''}`}>
+                          <NavigationMenuLink 
+                            href={link.path} 
+                            className={`text-white hover:bg-[#CD9B59] hover:text-white uppercase text-xs font-medium px-4 md:px-6 py-3 transition-colors
+                            ${isActive(link.path) ? 'bg-[#CD9B59]' : ''}`}
+                          >
                             {link.label}
                           </NavigationMenuLink>
                         </NavigationMenuItem>)}
@@ -118,10 +128,15 @@ const Header = () => {
           {/* Contact Bar - Hidden on mobile */}
           <div className="absolute bottom-1 left-0 right-0 py-1 hidden md:block">
             <div className="container mx-auto flex justify-center items-center gap-8 md:gap-12 text-xs">
-              <div className="flex items-center gap-2 text-white">
-                <Home size={14} className="text-white" />
+              <a 
+                href="https://etreactif.com/contact/"
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-white hover:text-sable transition-colors"
+              >
+                <ExternalLink size={14} className="text-white" />
                 <span>REJOIGNEZ-NOUS</span>
-              </div>
+              </a>
               <div className="flex items-center gap-2 text-white">
                 <Phone size={14} className="text-white" />
                 <span>06 09 08 04 98</span>
@@ -132,4 +147,5 @@ const Header = () => {
       </div>
     </header>;
 };
+
 export default Header;
