@@ -50,9 +50,7 @@ const AgenceSection = () => {
         </div>
 
         <div className="max-w-xl mx-auto mt-10 text-center text-anthracite">
-          <p className="mb-5">
-            Située au cœur de la région Sud, notre agence AXO Côté Sud allie expertise immobilière et connaissance approfondie du marché local pour vous offrir un service immobilier d'exception.
-          </p>
+          
           
         </div>
       </div>
