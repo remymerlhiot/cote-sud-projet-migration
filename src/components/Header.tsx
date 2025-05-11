@@ -1,4 +1,3 @@
-
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { useLocation } from "react-router-dom";
 import { Home, Phone, Menu, X, ExternalLink } from "lucide-react";
@@ -26,25 +25,32 @@ const Header = () => {
   }, [location.pathname]);
 
   // Navigation links used in both desktop and mobile menus
-  const navigationLinks = [{
-    path: "/",
-    label: "Accueil"
-  }, {
-    path: "/notre-histoire",
-    label: "Notre Histoire"
-  }, {
-    path: "/nos-biens",
-    label: "Nos Biens"
-  }, {
-    path: "/estimation",
-    label: "Estimation"
-  }, {
-    path: "/partenaires",
-    label: "Partenaires"
-  }, {
-    path: "/nos-avis",
-    label: "Nos Avis"
-  }];
+  const navigationLinks = [
+    {
+      path: "/",
+      label: "Accueil"
+    },
+    {
+      path: "/notre-histoire",
+      label: "Notre Histoire"
+    },
+    {
+      path: "/nos-biens",
+      label: "Nos Biens"
+    },
+    {
+      path: "/estimation",
+      label: "Estimation"
+    },
+    {
+      path: "/partenaires",
+      label: "Partenaires"
+    },
+    {
+      path: "/nos-avis",
+      label: "Nos Avis"
+    }
+  ];
 
   // Mobile Menu Component
   const MobileMenu = () => <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -79,10 +85,10 @@ const Header = () => {
                 <ExternalLink size={14} className="text-sable-30" />
                 <span>REJOIGNEZ-NOUS</span>
               </a>
-              <div className="flex items-center gap-2">
+              <a href="tel:0609080498" className="flex items-center gap-2">
                 <Phone size={14} className="text-sable-30" />
                 <span>06 09 08 04 98</span>
-              </div>
+              </a>
             </div>
           </div>
         </div>
@@ -137,10 +143,10 @@ const Header = () => {
                 <ExternalLink size={14} className="text-white" />
                 <span>REJOIGNEZ-NOUS</span>
               </a>
-              <div className="flex items-center gap-2 text-white">
+              <a href="tel:0609080498" className="flex items-center gap-2 text-white hover:text-sable transition-colors">
                 <Phone size={14} className="text-white" />
                 <span>06 09 08 04 98</span>
-              </div>
+              </a>
             </div>
           </div>
         </div>

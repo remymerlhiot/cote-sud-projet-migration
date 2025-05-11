@@ -29,11 +29,11 @@ const PropertyDetail = () => {
     error
   } = usePropertyById(propertyId);
 
-  // Configurer le plugin d'autoplay pour le carousel
+  // Configurer le plugin d'autoplay pour le carousel - 3 secondes sans arrêt sur interaction
   const autoplayOptions = {
-    delay: 5000, // 5 secondes entre chaque slide
-    stopOnInteraction: true,
-    stopOnMouseEnter: true,
+    delay: 3000, // 3 secondes entre chaque slide
+    stopOnInteraction: false, // Ne pas arrêter sur interaction
+    stopOnMouseEnter: false, // Ne pas arrêter quand la souris passe dessus
     rootNode: (emblaRoot: any) => emblaRoot.parentElement,
   };
 

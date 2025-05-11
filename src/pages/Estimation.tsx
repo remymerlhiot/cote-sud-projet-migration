@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -19,6 +18,7 @@ import {
 // ID du widget Jestimo pour l'estimation
 const WIDGET_ID = "11bS96785252f655f6Xy524293v7P112";
 const WIDGET_CONTAINER_ID = `jst__est_${WIDGET_ID}`;
+const JESTIMO_URL = "https://www.jestimonline.com/?uid=11bS96785252f655f6Xy524293v7P112";
 
 // Composant pour l'outil d'estimation Jestimo
 const EstimationWidget: React.FC = () => {
@@ -92,6 +92,11 @@ const Estimation: React.FC = () => {
       setWidgetLoaded(true);
     }
   }, [dialogOpen, widgetLoaded]);
+
+  // Fonction pour ouvrir le lien Jestimo dans un nouvel onglet
+  const openJestimoLink = () => {
+    window.open(JESTIMO_URL, "_blank");
+  };
   
   return (
     <>
@@ -133,6 +138,7 @@ const Estimation: React.FC = () => {
                       <Button 
                         size="lg"
                         className="bg-cuivre hover:bg-sable-80 text-white font-medium gap-2"
+                        onClick={openJestimoLink}
                       >
                         <BarChart className="h-5 w-5" />
                         Estimer mon bien
