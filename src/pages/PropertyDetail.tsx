@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePropertyById } from "@/hooks/useProperties";
@@ -109,8 +108,12 @@ const PropertyDetail = () => {
     );
   }
 
-  // Get all property images - fallback to an array with just the main image if allImages doesn't exist
-  const propertyImages = displayData.allImages?.length ? displayData.allImages : [displayData.image];
+  // Get all property images - ensure we handle the case where allImages might be empty or undefined
+  const propertyImages = displayData.allImages?.length 
+    ? displayData.allImages 
+    : displayData.image 
+      ? [displayData.image] 
+      : ["/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"];
 
   // Check if the property has an agent/negotiator information
   const hasAgentInfo = displayData.negotiatorName && 
@@ -129,13 +132,14 @@ const PropertyDetail = () => {
             <Carousel className="w-full">
               <CarouselContent>
                 {propertyImages.map((image, index) => (
-                  <CarouselItem key={index}>
+                  <CarouselItem key={index} className="w-full">
                     <div className="aspect-[16/9] w-full">
                       <img 
                         src={image} 
                         alt={`${displayData.title} - Vue ${index + 1}`} 
                         className="w-full h-full object-cover"
                         onError={(e) => {
+                          console.log("Image error, using fallback");
                           e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
                         }}
                       />
@@ -143,8 +147,8 @@ const PropertyDetail = () => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
-              <CarouselNext className="bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
+              <CarouselPrevious className="absolute left-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
+              <CarouselNext className="absolute right-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
               
               {/* Price badge */}
               <div className="absolute top-4 right-4 z-10 bg-[#B17226] text-white px-4 py-2 rounded-md text-lg font-semibold">
@@ -154,10 +158,11 @@ const PropertyDetail = () => {
           ) : (
             <div className="relative aspect-[16/9] w-full">
               <img 
-                src={displayData.image} 
-                alt={displayData.title} 
+                src={propertyImages[0]} 
+                alt={displayData.title || "Propriété"} 
                 className="w-full h-full object-cover"
                 onError={(e) => {
+                  console.log("Image error, using fallback");
                   e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
                 }}
               />

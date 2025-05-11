@@ -6,6 +6,7 @@ import YouTubeBackground from "./YouTubeBackground";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
 const Header = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -82,8 +83,9 @@ const Header = () => {
         </div>
       </SheetContent>
     </Sheet>;
+
   return <header className="relative">
-      <div className="relative h-[210px] md:h-[250px] overflow-hidden">
+      <div className="relative h-[240px] md:h-[280px] overflow-hidden">
         {/* YouTube Video Background avec les nouveaux paramètres */}
         <YouTubeBackground videoId={youtubeVideoId} startTime={startTime} endTime={endTime} overlayColor="#B17226" overlayOpacity={0.36} />
         
@@ -133,4 +135,5 @@ const Header = () => {
       </div>
     </header>;
 };
+
 export default Header;

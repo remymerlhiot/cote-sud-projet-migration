@@ -6,6 +6,7 @@ import MainTitleSection from "@/components/home/MainTitleSection";
 import PropertyCarousel from "@/components/home/PropertyCarousel";
 import ServicesSection from "@/components/home/ServicesSection";
 import DifferenceSection from "@/components/home/DifferenceSection";
+import AgenceSection from "@/components/home/AgenceSection";
 
 const Index = () => {
   return (
@@ -28,6 +29,9 @@ const Index = () => {
 
         {/* Différence & Accompagnement Section */}
         <DifferenceSection />
+
+        {/* Notre Agence Section */}
+        <AgenceSection />
       </main>
 
       {/* Footer */}
