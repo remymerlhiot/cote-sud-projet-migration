@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
@@ -20,19 +20,39 @@ import {
 const WIDGET_ID = "11bS96785252f655f6Xy524293v7P112";
 const WIDGET_CONTAINER_ID = `jst__est_${WIDGET_ID}`;
 
+// Composant pour l'outil d'estimation Jestimo
 const EstimationWidget: React.FC = () => {
-  return (
-    <div className="w-full h-[600px] overflow-hidden">
-      {/* Utilisation directe d'un iframe au lieu du chargement dynamique de script */}
-      <iframe 
-        src={`https://expert.jestimo.com/widget-jwt/${WIDGET_ID}`}
-        className="w-full h-[600px] border-0"
-        title="Outil d'estimation immobilière"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-      ></iframe>
+  const scriptRef = useRef<HTMLScriptElement | null>(null);
+  
+  // Charger le script Jestimo de manière sécurisée après le rendu du composant
+  useEffect(() => {
+    // Ne pas recharger si le script est déjà présent
+    if (!scriptRef.current) {
+      const script = document.createElement('script');
+      script.src = `https://expert.jestimo.com/widget-jwt/${WIDGET_ID}/script.js`;
+      script.async = true;
+      script.defer = true;
       
-      {/* Conserver également le div requis par Jestimo (mais qui sera utilisé uniquement en fallback) */}
-      <div id={WIDGET_CONTAINER_ID} className="hidden"></div>
+      // Stocker la référence pour éviter les rechargements
+      scriptRef.current = script;
+      
+      // Ajouter le script au document
+      document.body.appendChild(script);
+      
+      // Nettoyer le script quand le composant est démonté
+      return () => {
+        if (script && script.parentNode) {
+          script.parentNode.removeChild(script);
+          scriptRef.current = null;
+        }
+      };
+    }
+  }, []);
+  
+  return (
+    <div className="w-full min-h-[600px]">
+      {/* Div conteneur pour le widget Jestimo qui sera ciblé par le script */}
+      <div id={WIDGET_CONTAINER_ID} className="w-full min-h-[600px] bg-white"></div>
     </div>
   );
 };
@@ -64,6 +84,14 @@ const FallbackForm: React.FC = () => {
 
 const Estimation: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [widgetLoaded, setWidgetLoaded] = useState(false);
+  
+  // Forcer le chargement du widget quand la dialog est ouverte
+  useEffect(() => {
+    if (dialogOpen && !widgetLoaded) {
+      setWidgetLoaded(true);
+    }
+  }, [dialogOpen, widgetLoaded]);
   
   return (
     <>
@@ -120,7 +148,7 @@ const Estimation: React.FC = () => {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="px-0 py-0 overflow-hidden">
-                        <EstimationWidget />
+                        {widgetLoaded && <EstimationWidget />}
                       </div>
                     </DialogContent>
                   </Dialog>
