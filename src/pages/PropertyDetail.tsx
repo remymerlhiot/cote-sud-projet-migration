@@ -13,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { teamMembers } from "@/data/teamMembers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AutoplayPlugin from "embla-carousel-autoplay";
-
 const PropertyDetail = () => {
   const {
     id
@@ -31,10 +30,13 @@ const PropertyDetail = () => {
 
   // Configurer le plugin d'autoplay pour le carousel - 3 secondes sans arrêt sur interaction
   const autoplayOptions = {
-    delay: 3000, // 3 secondes entre chaque slide
-    stopOnInteraction: false, // Ne pas arrêter sur interaction
-    stopOnMouseEnter: false, // Ne pas arrêter quand la souris passe dessus
-    rootNode: (emblaRoot: any) => emblaRoot.parentElement,
+    delay: 3000,
+    // 3 secondes entre chaque slide
+    stopOnInteraction: false,
+    // Ne pas arrêter sur interaction
+    stopOnMouseEnter: false,
+    // Ne pas arrêter quand la souris passe dessus
+    rootNode: (emblaRoot: any) => emblaRoot.parentElement
   };
 
   // Helper function to determine the color class based on DPE rating
@@ -116,10 +118,8 @@ const PropertyDetail = () => {
     if (!negotiatorName || negotiatorName === "Non spécifié") {
       return "Votre agent";
     }
-    
     return `Votre agent - ${negotiatorName}`;
   };
-
   if (isLoading) {
     return <div className="flex flex-col min-h-screen bg-cream font-raleway">
         <Header />
@@ -166,7 +166,6 @@ const PropertyDetail = () => {
 
   // Obtenir le nom de l'agent proprement formaté
   const agentDisplayName = formatNegotiatorName(displayData.negotiatorName);
-
   return <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
       <Header />
       
@@ -174,14 +173,10 @@ const PropertyDetail = () => {
         {/* Property image gallery - Carousel container avec taille maximale */}
         <div className="relative w-full mb-8 bg-anthracite">
           {propertyImages.length > 1 ? <div className="container mx-auto max-w-5xl">
-              <Carousel 
-                className="w-full" 
-                plugins={[AutoplayPlugin(autoplayOptions)]}
-                opts={{
-                  align: "center",
-                  loop: true
-                }}
-              >
+              <Carousel className="w-full" plugins={[AutoplayPlugin(autoplayOptions)]} opts={{
+            align: "center",
+            loop: true
+          }}>
                 <CarouselContent>
                   {propertyImages.map((image, index) => <CarouselItem key={index} className="w-full">
                       <div className="aspect-[4/3] w-full max-h-[600px] flex items-center justify-center p-4">
@@ -391,12 +386,11 @@ const PropertyDetail = () => {
                     <div className="md:w-1/3 flex flex-col items-center">
                       
                       {/* Updated agent display name */}
-                      <h3 className="font-['FreightBig Pro', serif] text-xl text-cuivre mb-2">
-                        {agentDisplayName}
-                      </h3>
+                      
                       
                       {/* Email de l'agence */}
-                      <p className="text-sm">cote-sud@axo.immo</p>
+                      <p className="text-sm text-center">Coordonnées: 
+cote-sud@axo.immo</p>
                       
                       {/* Téléphone du négociateur ou de l'agence */}
                       {(teamMember?.phone || displayData.negotiatorPhone) && <p className="text-sm font-medium">
