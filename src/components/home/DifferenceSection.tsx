@@ -24,9 +24,14 @@ const DifferenceSection = () => {
   const [content, setContent] = useState<DifferenceContent>({
     title: "LA DIFFÉRENCE",
     image: "https://cote-sud.immo/wp-content/uploads/2025/01/kahn-louis.png",
-    mainText: ["AXO Côté Sud, réseau d'agences spécialisées en commercialisation de biens immobiliers d'exception, s'adresse aux clients à la recherche de leur lieu de vie idéal au cœur du Sud de la France.", "Notre équipe composée d'experts du secteur immobilier, vous accompagne tout au long de votre projet, des premières étapes de recherche jusqu'à la concrétisation de votre projet immobilier que vous souhaitiez devenir locataire ou bien propriétaire."],
+    mainText: [
+      "Aujourd'hui, notre priorité est d'offrir un accompagnement sur-mesure et une expertise complète, tant sur le plan immobilier que sur le plan patrimonial, fiscal ou juridique.",
+      "Nous nous engageons à fournir un service personnalisé, en collaboration avec des partenaires de confiance, pour chaque étape de votre projet immobilier, qu'il s'agisse d'achat ou de vente."
+    ],
     accompagnementTitle: "L'ACCOMPAGNEMENT",
-    accompagnementText: ["Anticipation, des actions, des prestations, maîtrise des dossiers, professionnalisme, des connaissances, disponibilité et réactivité. Autant d'adjectifs qui vous permettront de vous rassurer dans votre projet, d'avoir une écoute face à vos questionnements, de recevoir des conseils avisés et d'être soutenu dans vos démarches."]
+    accompagnementText: [
+      "Notaires, courtiers, architectes, maîtres d'œuvre, entreprises générales et spécialisées, décorateurs d'intérieur, home-stagers, concierges, paysagistes… Nos experts sont sélectionnés pour leur savoir-faire et leur engagement à valoriser chaque détail de votre bien."
+    ]
   });
 
   useEffect(() => {
@@ -160,9 +165,9 @@ const DifferenceSection = () => {
               </p>
             ))}
             
-            <h3 className="text-2xl md:text-3xl font-playfair font-normal text-sable mb-8">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-sable mb-16">
               {content.accompagnementTitle}
-            </h3>
+            </h2>
             
             {content.accompagnementText.map((paragraph, index) => (
               <p key={`accomp-${index}`} className="text-anthracite mb-6">
