@@ -53,6 +53,7 @@ const AgenceSection = () => {
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                         onError={(e) => {
                           console.error(`Erreur de chargement d'image: ${image.url}`);
+                          // Utilisation du placeholder comme fallback
                           e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
                         }}
                       />

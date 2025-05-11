@@ -1,18 +1,17 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePropertyById } from "@/hooks/useProperties";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
-import TeamCardStatic from "@/components/team/TeamCardStatic";
 import { teamMembers } from "@/data/teamMembers";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -86,6 +85,14 @@ const PropertyDetail = () => {
     return matchingMember;
   };
 
+  // Fonction pour ouvrir un mail vers l'agence
+  const handleContactAgent = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const subject = displayData?.title ? `Demande d'information - ${displayData.title}` : "Demande d'information";
+    const body = displayData?.ref ? `Bonjour,\n\nJe souhaite obtenir plus d'informations concernant le bien référence ${displayData.ref}.\n\nCordialement,` : "Bonjour,\n\nJe souhaite obtenir plus d'informations concernant un de vos biens.\n\nCordialement,";
+    window.location.href = `mailto:cote-sud@axo.immo?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-cream font-raleway">
@@ -139,11 +146,10 @@ const PropertyDetail = () => {
   // Trouver le membre de l'équipe correspondant au négociateur
   const teamMember = displayData.negotiatorName ? findTeamMember(displayData.negotiatorName) : null;
 
-  // Check if the property has an agent/negotiator information
-  const hasAgentInfo = displayData.negotiatorName && 
-                      displayData.negotiatorName !== "Non spécifié" && 
-                      (displayData.negotiatorPhone !== "Non spécifié" || 
-                       displayData.negotiatorEmail !== "Non spécifié");
+  // Simplifier le nom du négociateur pour afficher seulement le prénom et nom
+  const agentDisplayName = displayData.negotiatorName && displayData.negotiatorName !== "Non spécifié" 
+    ? displayData.negotiatorName.replace("L'Agence", "").trim() 
+    : "Agence Côté Sud";
 
   return (
     <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
@@ -412,51 +418,40 @@ const PropertyDetail = () => {
               <Card className="border-none shadow-md bg-white">
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                    {/* Utilisation du TeamCardStatic si un membre d'équipe correspondant est trouvé */}
-                    {teamMember ? (
-                      <div className="md:w-1/3">
-                        <TeamCardStatic 
-                          name={teamMember.name}
-                          phone={teamMember.phone}
-                          imageUrl={teamMember.imageUrl}
-                          imagePosition={teamMember.imagePosition || "center"}
-                          imageSize={teamMember.imageSize || "medium"}
+                    {/* Logo de l'agence au lieu de la photo d'agent */}
+                    <div className="md:w-1/3 flex flex-col items-center">
+                      <div className="w-36 h-36 rounded-full overflow-hidden mb-3 border-2 border-sable flex items-center justify-center bg-white p-2">
+                        <img 
+                          src="/lovable-uploads/7eaefbd9-2a14-4bcd-959b-139a0bac5c99.png" 
+                          alt="Logo AXO Côté Sud" 
+                          className="w-full object-contain"
+                          onError={(e) => { 
+                            e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                          }}
                         />
                       </div>
-                    ) : (
-                      /* Affichage de secours si aucun membre d'équipe correspondant n'est trouvé */
-                      hasAgentInfo && (
-                        <div className="md:w-1/3 flex flex-col items-center">
-                          <div className="w-36 h-36 rounded-full overflow-hidden mb-3 border-2 border-sable">
-                            <img 
-                              src={displayData.negotiatorPhoto && displayData.negotiatorPhoto !== "Non spécifié" 
-                                ? displayData.negotiatorPhoto 
-                                : "/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png"
-                              } 
-                              alt={displayData.negotiatorName || "Agent"} 
-                              className="w-full h-full object-cover"
-                              onError={(e) => { 
-                                e.currentTarget.src = "/lovable-uploads/da965f9f-a5aa-421e-adf5-296c06a90881.png";
-                              }}
-                            />
-                          </div>
-                          {displayData.negotiatorName && displayData.negotiatorName !== "Non spécifié" && (
-                            <h3 className="font-playfair text-xl text-cuivre mb-2">{displayData.negotiatorName}</h3>
-                          )}
-                          {displayData.negotiatorPhone && displayData.negotiatorPhone !== "Non spécifié" && (
-                            <p className="text-sm font-medium">{displayData.negotiatorPhone}</p>
-                          )}
-                          {displayData.negotiatorEmail && displayData.negotiatorEmail !== "Non spécifié" && (
-                            <p className="text-sm">{displayData.negotiatorEmail}</p>
-                          )}
-                        </div>
-                      )
-                    )}
+
+                      {/* Nom simplifié de l'agent */}
+                      {agentDisplayName !== "Agence Côté Sud" && (
+                        <h3 className="font-['FreightBig Pro', serif] text-xl text-cuivre mb-2">{agentDisplayName}</h3>
+                      )}
+                      
+                      {/* Email de l'agence */}
+                      <p className="text-sm">cote-sud@axo.immo</p>
+                      
+                      {/* Téléphone du négociateur ou de l'agence */}
+                      {(teamMember?.phone || displayData.negotiatorPhone) && (
+                        <p className="text-sm font-medium">
+                          {teamMember?.phone || displayData.negotiatorPhone !== "Non spécifié" ? displayData.negotiatorPhone : "06 09 08 04 98"}
+                        </p>
+                      )}
+                    </div>
                     
                     <div className="flex-1 flex flex-col justify-center">
-                      <p className="mb-4">Contactez notre agent pour organiser une visite ou obtenir plus d'informations sur ce bien exceptionnel.</p>
-                      <Button className="bg-[#C8A977] hover:bg-[#B17226] text-white w-full md:w-auto">
-                        <Link to="/contact">Contacter l'agent</Link>
+                      <p className="mb-4">Contactez notre agence pour organiser une visite ou obtenir plus d'informations sur ce bien exceptionnel.</p>
+                      <Button className="bg-[#C8A977] hover:bg-[#B17226] text-white w-full md:w-auto" onClick={handleContactAgent}>
+                        <Mail className="mr-2" size={18} />
+                        Contacter l'agent
                       </Button>
                     </div>
                   </div>
