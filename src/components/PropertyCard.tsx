@@ -45,9 +45,6 @@ const extractNegotiatorName = (fullName?: string): string => {
 const PropertyCard = ({ property }: PropertyProps) => {
   const displayImage = property.image;
   
-  // Extraire le nom du négociateur
-  const negotiatorName = extractNegotiatorName(property.negotiatorName);
-
   // Type affiché
   const displayType =
     property.propertyType ||
@@ -140,12 +137,7 @@ const PropertyCard = ({ property }: PropertyProps) => {
               </div>
             </div>
 
-            {/* Affichage du nom du négociateur s'il existe */}
-            {negotiatorName && (
-              <div className="text-xs text-[#37373A] italic mb-3">
-                {negotiatorName}
-              </div>
-            )}
+            {/* Agent name display section has been removed as requested */}
 
             {(property.hasBalcony ||
               property.hasTerrasse ||
