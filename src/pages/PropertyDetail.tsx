@@ -5,7 +5,7 @@ import { usePropertyById } from "@/hooks/useProperties";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Mail, Edit2, Check } from "lucide-react";
+import { ChevronLeft, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Badge } from "@/components/ui/badge";
 import { teamMembers } from "@/data/teamMembers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/sonner";
 
 const PropertyDetail = () => {
   const {
@@ -23,10 +21,6 @@ const PropertyDetail = () => {
     id: string;
   }>();
   const propertyId = id ? id : "0";
-
-  // État pour le mode édition et la valeur de l'agent
-  const [isEditingAgentName, setIsEditingAgentName] = useState(false);
-  const [editedAgentName, setEditedAgentName] = useState("");
 
   // Fetch property details using our hook
   const {
@@ -179,21 +173,6 @@ const PropertyDetail = () => {
 
   // Obtenir le nom de l'agent proprement formaté
   const agentDisplayName = extractAgentName(displayData.negotiatorName);
-
-  // Fonction pour gérer le début de l'édition
-  const handleStartEditing = () => {
-    setEditedAgentName(agentDisplayName);
-    setIsEditingAgentName(true);
-  };
-
-  // Fonction pour sauvegarder les modifications du nom
-  const handleSaveAgentName = () => {
-    // Ici on pourrait implémenter un appel API pour mettre à jour le nom dans la base de données
-    // Pour l'instant on se contente d'afficher un toast
-    toast.success("Nom de l'agent mis à jour");
-    setIsEditingAgentName(false);
-    // Note: Idéalement, on mettrait à jour displayData.negotiatorName ici via un appel API
-  };
 
   return <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
       <Header />
@@ -412,37 +391,9 @@ const PropertyDetail = () => {
                     <div className="md:w-1/3 flex flex-col items-center">
                       
                       {/* Nom simplifié de l'agent - uniquement prénom et nom */}
-                      {isEditingAgentName ? (
-                        <div className="flex items-center">
-                          <Input 
-                            type="text" 
-                            value={editedAgentName}
-                            onChange={(e) => setEditedAgentName(e.target.value)}
-                            className="max-w-[200px] mr-2 border-cuivre"
-                            autoFocus
-                          />
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            onClick={handleSaveAgentName}
-                            className="text-cuivre hover:text-cuivre/80"
-                          >
-                            <Check size={16} />
-                          </Button>
-                        </div>
-                      ) : (
-                        <h3 className="font-['FreightBig Pro', serif] text-xl text-cuivre mb-2 flex items-center">
-                          {agentDisplayName}
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            onClick={handleStartEditing}
-                            className="ml-2 text-cuivre hover:text-cuivre/80"
-                          >
-                            <Edit2 size={14} />
-                          </Button>
-                        </h3>
-                      )}
+                      <h3 className="font-['FreightBig Pro', serif] text-xl text-cuivre mb-2">
+                        {agentDisplayName}
+                      </h3>
                       
                       {/* Email de l'agence */}
                       <p className="text-sm">cote-sud@axo.immo</p>
