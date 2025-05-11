@@ -1,4 +1,5 @@
 
+
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { Facebook, Linkedin } from "lucide-react";
 
@@ -45,7 +46,7 @@ const Footer = () => {
           
           <div className="flex flex-col items-center md:items-end text-center md:text-right">
             <h3 className="text-xs uppercase mb-2">PAR TÉLÉPHONE</h3>
-            <p className="text-xs text-white">06 14 84 80 35</p>
+            <a href="tel:0614848035" className="text-xs text-white hover:text-[#CD9B59]">06 14 84 80 35</a>
           </div>
         </div>
         
@@ -63,3 +64,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

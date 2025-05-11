@@ -1,3 +1,4 @@
+
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { useLocation } from "react-router-dom";
 import { Home, Phone, Menu, X, ExternalLink } from "lucide-react";
@@ -85,9 +86,9 @@ const Header = () => {
                 <ExternalLink size={14} className="text-sable-30" />
                 <span>REJOIGNEZ-NOUS</span>
               </a>
-              <a href="tel:0609080498" className="flex items-center gap-2">
+              <a href="tel:0614848035" className="flex items-center gap-2">
                 <Phone size={14} className="text-sable-30" />
-                <span>06 09 08 04 98</span>
+                <span>06 14 84 80 35</span>
               </a>
             </div>
           </div>
@@ -143,9 +144,9 @@ const Header = () => {
                 <ExternalLink size={14} className="text-white" />
                 <span>REJOIGNEZ-NOUS</span>
               </a>
-              <a href="tel:0609080498" className="flex items-center gap-2 text-white hover:text-sable transition-colors">
+              <a href="tel:0614848035" className="flex items-center gap-2 text-white hover:text-sable transition-colors">
                 <Phone size={14} className="text-white" />
-                <span>06 09 08 04 98</span>
+                <span>06 14 84 80 35</span>
               </a>
             </div>
           </div>

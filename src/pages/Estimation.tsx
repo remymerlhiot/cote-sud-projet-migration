@@ -1,98 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+
+import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
 import { Mail, Phone, BarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose
-} from "@/components/ui/dialog";
 
 // ID du widget Jestimo pour l'estimation
-const WIDGET_ID = "11bS96785252f655f6Xy524293v7P112";
-const WIDGET_CONTAINER_ID = `jst__est_${WIDGET_ID}`;
 const JESTIMO_URL = "https://www.jestimonline.com/?uid=11bS96785252f655f6Xy524293v7P112";
 
-// Composant pour l'outil d'estimation Jestimo
-const EstimationWidget: React.FC = () => {
-  const scriptRef = useRef<HTMLScriptElement | null>(null);
-  
-  // Charger le script Jestimo de manière sécurisée après le rendu du composant
-  useEffect(() => {
-    // Ne pas recharger si le script est déjà présent
-    if (!scriptRef.current) {
-      const script = document.createElement('script');
-      script.src = `https://expert.jestimo.com/widget-jwt/${WIDGET_ID}/script.js`;
-      script.async = true;
-      script.defer = true;
-      
-      // Stocker la référence pour éviter les rechargements
-      scriptRef.current = script;
-      
-      // Ajouter le script au document
-      document.body.appendChild(script);
-      
-      // Nettoyer le script quand le composant est démonté
-      return () => {
-        if (script && script.parentNode) {
-          script.parentNode.removeChild(script);
-          scriptRef.current = null;
-        }
-      };
-    }
-  }, []);
-  
-  return (
-    <div className="w-full min-h-[600px]">
-      {/* Div conteneur pour le widget Jestimo qui sera ciblé par le script */}
-      <div id={WIDGET_CONTAINER_ID} className="w-full min-h-[600px] bg-white"></div>
-    </div>
-  );
-};
-
-// Formulaire de secours en cas de problème avec l'iframe
-const FallbackForm: React.FC = () => {
-  return (
-    <Card className="mt-8 bg-sable-30 border-sable-50">
-      <CardContent className="pt-6">
-        <h3 className="font-playfair text-2xl text-cuivre mb-4">Contactez-nous pour une estimation</h3>
-        <p className="mb-6 text-anthracite">
-          Notre équipe d'experts immobiliers est à votre disposition pour estimer votre bien. 
-          Contactez-nous directement:
-        </p>
-        <div className="flex flex-col md:flex-row gap-4 justify-center">
-          <Button className="bg-cuivre hover:bg-sable text-white flex gap-2 items-center">
-            <Phone size={18} />
-            <span>04 94 XX XX XX</span>
-          </Button>
-          <Button className="bg-anthracite hover:bg-sable-80 text-white flex gap-2 items-center">
-            <Mail size={18} />
-            <span>contact@cote-sud.immo</span>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
 const Estimation: React.FC = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [widgetLoaded, setWidgetLoaded] = useState(false);
-  
-  // Forcer le chargement du widget quand la dialog est ouverte
-  useEffect(() => {
-    if (dialogOpen && !widgetLoaded) {
-      setWidgetLoaded(true);
-    }
-  }, [dialogOpen, widgetLoaded]);
-
   // Fonction pour ouvrir le lien Jestimo dans un nouvel onglet
   const openJestimoLink = () => {
     window.open(JESTIMO_URL, "_blank");
@@ -133,31 +51,14 @@ const Estimation: React.FC = () => {
                     Notre outil d'estimation vous permet d'obtenir une première évaluation de votre bien immobilier en quelques minutes.
                   </p>
                   
-                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        size="lg"
-                        className="bg-cuivre hover:bg-sable-80 text-white font-medium gap-2"
-                        onClick={openJestimoLink}
-                      >
-                        <BarChart className="h-5 w-5" />
-                        Estimer mon bien
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-hidden p-0">
-                      <DialogHeader className="px-6 pt-6 pb-2">
-                        <DialogTitle className="text-2xl font-playfair text-cuivre">
-                          Estimation de votre bien immobilier
-                        </DialogTitle>
-                        <DialogDescription>
-                          Remplissez le formulaire pour obtenir une estimation précise.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="px-0 py-0 overflow-hidden">
-                        {widgetLoaded && <EstimationWidget />}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                  <Button 
+                    size="lg"
+                    className="bg-cuivre hover:bg-sable-80 text-white font-medium gap-2"
+                    onClick={openJestimoLink}
+                  >
+                    <BarChart className="h-5 w-5" />
+                    Estimer mon bien
+                  </Button>
                 </div>
                 
                 <div className="text-sm text-anthracite/80 italic mb-6">
@@ -199,13 +100,19 @@ const Estimation: React.FC = () => {
                   Nos conseillers immobiliers sont à votre disposition pour réaliser une estimation personnalisée de votre bien.
                 </p>
                 <div className="flex flex-col md:flex-row gap-4 justify-center">
-                  <Button className="bg-cuivre hover:bg-sable text-white flex gap-2 items-center">
+                  <Button 
+                    className="bg-cuivre hover:bg-sable text-white flex gap-2 items-center"
+                    onClick={() => window.location.href = 'tel:0614848035'}
+                  >
                     <Phone size={18} />
-                    <span>04 94 XX XX XX</span>
+                    <span>06 14 84 80 35</span>
                   </Button>
-                  <Button className="bg-anthracite hover:bg-sable-80 text-white flex gap-2 items-center">
+                  <Button 
+                    className="bg-anthracite hover:bg-sable-80 text-white flex gap-2 items-center"
+                    onClick={() => window.location.href = 'mailto:cote-sud@axo.immo'}
+                  >
                     <Mail size={18} />
-                    <span>contact@cote-sud.immo</span>
+                    <span>cote-sud@axo.immo</span>
                   </Button>
                 </div>
               </div>
