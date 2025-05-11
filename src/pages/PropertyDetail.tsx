@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePropertyById } from "@/hooks/useProperties";
@@ -146,10 +147,32 @@ const PropertyDetail = () => {
   // Trouver le membre de l'équipe correspondant au négociateur
   const teamMember = displayData.negotiatorName ? findTeamMember(displayData.negotiatorName) : null;
 
-  // Simplifier le nom du négociateur pour n'afficher que son prénom et nom, sans mention de l'agence
-  const agentDisplayName = displayData.negotiatorName && displayData.negotiatorName !== "Non spécifié" 
-    ? displayData.negotiatorName.replace(/L['']Agence.*?\s+/i, "").trim() // Retire "L'Agence" et tout texte jusqu'au prochain espace
-    : "Agence Côté Sud";
+  // Fonction qui extrait seulement le prénom et nom de l'agent, en supprimant toute mention de l'agence
+  const extractAgentName = (fullName?: string): string => {
+    if (!fullName || fullName === "Non spécifié") {
+      return "Agence Côté Sud";
+    }
+    
+    // Log pour debug
+    console.log("Nom d'agent original:", fullName);
+    
+    // 1. Supprimer toute mention de l'agence avec différents formats d'apostrophe
+    let cleanName = fullName
+      .replace(/L[\'\'\`\'\"]Agence.*?(immobili[èe]re)?.*?(de\s+)?.*?(Prestige)?.*?Côté\s+Sud\s*/gi, "")
+      .replace(/Agence.*?(immobili[èe]re)?.*?(de\s+)?.*?(Prestige)?.*?Côté\s+Sud\s*/gi, "")
+      .trim();
+      
+    // 2. Nettoyer les espaces multiples et caractères spéciaux restants
+    cleanName = cleanName.replace(/\s+/g, " ").trim();
+    
+    // Log pour vérifier le résultat
+    console.log("Nom d'agent nettoyé:", cleanName);
+    
+    return cleanName || "Agence Côté Sud";
+  };
+
+  // Obtenir le nom de l'agent proprement formaté
+  const agentDisplayName = extractAgentName(displayData.negotiatorName);
 
   return <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
       <Header />
