@@ -111,6 +111,15 @@ const PropertyDetail = () => {
     window.location.href = `mailto:cote-sud@axo.immo?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
+  // Fonction qui extrait le nom de l'agent pour l'affichage
+  const formatNegotiatorName = (negotiatorName?: string): string => {
+    if (!negotiatorName || negotiatorName === "Non spécifié") {
+      return "Votre agent";
+    }
+    
+    return `Votre agent - ${negotiatorName}`;
+  };
+
   if (isLoading) {
     return <div className="flex flex-col min-h-screen bg-cream font-raleway">
         <Header />
@@ -155,32 +164,8 @@ const PropertyDetail = () => {
   // Trouver le membre de l'équipe correspondant au négociateur
   const teamMember = displayData.negotiatorName ? findTeamMember(displayData.negotiatorName) : null;
 
-  // Fonction qui extrait seulement le prénom et nom de l'agent, en supprimant toute mention de l'agence
-  const extractAgentName = (fullName?: string): string => {
-    if (!fullName || fullName === "Non spécifié") {
-      return "Agence Côté Sud";
-    }
-    
-    // Log pour debug
-    console.log("Nom d'agent original:", fullName);
-    
-    // 1. Supprimer toute mention de l'agence avec différents formats d'apostrophe
-    let cleanName = fullName
-      .replace(/L[\'\'\`\'\"]Agence.*?(immobili[èe]re)?.*?(de\s+)?.*?(Prestige)?.*?Côté\s+Sud\s*/gi, "")
-      .replace(/Agence.*?(immobili[èe]re)?.*?(de\s+)?.*?(Prestige)?.*?Côté\s+Sud\s*/gi, "")
-      .trim();
-      
-    // 2. Nettoyer les espaces multiples et caractères spéciaux restants
-    cleanName = cleanName.replace(/\s+/g, " ").trim();
-    
-    // Log pour vérifier le résultat
-    console.log("Nom d'agent nettoyé:", cleanName);
-    
-    return cleanName || "Agence Côté Sud";
-  };
-
   // Obtenir le nom de l'agent proprement formaté
-  const agentDisplayName = extractAgentName(displayData.negotiatorName);
+  const agentDisplayName = formatNegotiatorName(displayData.negotiatorName);
 
   return <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
       <Header />
@@ -402,10 +387,10 @@ const PropertyDetail = () => {
               <Card className="border-none shadow-md bg-white">
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                    {/* Logo de l'agence au lieu de la photo d'agent */}
+                    {/* Agent information */}
                     <div className="md:w-1/3 flex flex-col items-center">
                       
-                      {/* Nom simplifié de l'agent - uniquement prénom et nom */}
+                      {/* Updated agent display name */}
                       <h3 className="font-['FreightBig Pro', serif] text-xl text-cuivre mb-2">
                         {agentDisplayName}
                       </h3>
