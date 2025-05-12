@@ -1,4 +1,3 @@
-
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
 import { DEFAULT_IMAGE } from "./config";
 
@@ -22,7 +21,7 @@ export const normalizePropertyData = (
     return "";
   };
 
-  // Features
+  // Caractéristiques
   const feats = acfData?.acf?.features || {};
   const hasBalcony = feats.balcon === "oui";
   const hasTerrasse = feats.terrasse === "oui";
@@ -31,6 +30,11 @@ export const normalizePropertyData = (
   const garageCount = feats.garage || "0";
   const constructionYear = feats.annee_construction || "";
   const isFurnished = feats.meuble === "oui";
+
+  const isNewConstruction = acfData?.acf?.neuf === "1" || acfData?.acf?.neuf === "oui";
+  const isPrestigious = acfData?.acf?.prestige === "1" || acfData?.acf?.prestige === "oui";
+  const isViager = acfData?.acf?.viager === "1" || acfData?.acf?.viager === "oui";
+  const bathrooms = getField(["nb_sdb", "bathrooms"]);
 
   // Images
   let allImages: string[] = [];
@@ -45,28 +49,23 @@ export const normalizePropertyData = (
   };
 
   if (acfData?.acf.photo) {
-    allImages = tryField(acfData.acf.photo) || [];
-  }
-  if (!allImages.length && acfData?.acf.liste_photos) {
+    allImages = tryField(acfData.acf.photo);
+  } else if (acfData?.acf.liste_photos) {
     allImages = tryField(acfData.acf.liste_photos);
-  }
-  if (!allImages.length && acfData?.acf.photos) {
+  } else if (acfData?.acf.photos) {
     allImages = tryField(acfData.acf.photos);
-  }
-  if (!allImages.length && annonce._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
+  } else if (annonce._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
     allImages = [annonce._embedded["wp:featuredmedia"][0].source_url];
   }
+
   if (!allImages.length) {
     allImages = [DEFAULT_IMAGE];
   }
 
-  // Description
-  let description = "";
-  if (annonce.excerpt?.rendered) {
-    description = stripHtml(annonce.excerpt.rendered);
-  } else if (annonce.content?.rendered) {
-    description = stripHtml(annonce.content.rendered).slice(0, 150) + "...";
-  }
+  // Texte
+  const description = annonce.excerpt?.rendered
+    ? stripHtml(annonce.excerpt.rendered)
+    : stripHtml(annonce.content?.rendered || "").slice(0, 150) + "...";
 
   const prixValue = getField(["prix", "prix_affiche", "price"]) || "Prix sur demande";
   const villeValue = getField(["ville", "localisation", "city"]) || "NC";
@@ -102,14 +101,13 @@ export const normalizePropertyData = (
     garageCount,
     constructionYear,
     isFurnished,
-    // Extended properties for compatibility
-    isNewConstruction: false,
-    isPrestigious: false,
-    isViager: false,
+    isNewConstruction,
+    isPrestigious,
+    isViager,
     propertyType: annonce.title.rendered.split(" ")[0] || "Propriété",
-    bathrooms: "",
+    bathrooms,
   };
 };
 
-// Exporter la fonction renommée pour la compatibilité
+// Export compatible
 export { normalizePropertyData as transformPropertyData };
