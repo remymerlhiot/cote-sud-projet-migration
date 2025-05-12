@@ -40,7 +40,7 @@ const PropertyCarouselACF = () => {
   return (
     <section className="container mx-auto mb-20 px-4 py-[20px]">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-serif text-[#C8A977] mb-4">Nos Biens d'Exception</h2>
+        <h2 className="text-3xl font-['FreightBig Pro', serif] text-[#C8A977] mb-4">Nos Biens d'Exception</h2>
         <p className="text-[#37373A] max-w-2xl mx-auto">Découvrez notre sélection de propriétés exclusives</p>
       </div>
       
@@ -79,7 +79,7 @@ const PropertyCarouselACF = () => {
                       </div>
 
                       <div className="p-4 text-center">
-                        <h3 className="text-lg font-serif mt-2 text-[#C8A977]">
+                        <h3 className="text-lg font-['FreightBig Pro', serif] mt-2 text-[#C8A977]">
                           {property.titre}
                         </h3>
                         <p className="text-sm text-gray-600">{property.ville}</p>

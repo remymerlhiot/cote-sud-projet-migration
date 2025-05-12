@@ -36,6 +36,10 @@ interface AcfData {
       url: string;
       alt?: string;
     }>;
+    photo?: Array<{
+      url: string;
+      alt?: string;
+    }> | string;
     liste_photos?: Array<{
       url: string;
       alt?: string;
@@ -170,8 +174,22 @@ const normalizePropertyData = (
   // Recherche de toutes les images
   let allImages: string[] = [];
   
-  // 1. Essayer d'abord liste_photos (priorité la plus haute)
-  if (acfData?.acf?.liste_photos) {
+  // 1. Chercher d'abord dans le champ 'photo'
+  if (acfData?.acf?.photo) {
+    console.log("Champ photo trouvé dans ACF:", acfData.acf.photo);
+    // Vérifier si photo est un tableau ou une chaîne (URL unique)
+    if (Array.isArray(acfData.acf.photo)) {
+      allImages = acfData.acf.photo
+        .filter(photo => photo && photo.url)
+        .map(photo => photo.url);
+    } else if (typeof acfData.acf.photo === 'string' && acfData.acf.photo.trim() !== '') {
+      allImages = [acfData.acf.photo];
+    }
+  }
+  
+  // 2. Essayer ensuite liste_photos
+  if (allImages.length === 0 && acfData?.acf?.liste_photos) {
+    console.log("Champ liste_photos trouvé dans ACF:", acfData.acf.liste_photos);
     // Vérifier si liste_photos est un tableau ou une chaîne (URL unique)
     if (Array.isArray(acfData.acf.liste_photos)) {
       allImages = acfData.acf.liste_photos
@@ -182,8 +200,9 @@ const normalizePropertyData = (
     }
   }
   
-  // 2. Si liste_photos est vide, essayer le champ photos
+  // 3. Chercher ensuite dans le champ photos
   if (allImages.length === 0 && acfData?.acf?.photos) {
+    console.log("Champ photos trouvé dans ACF:", acfData.acf.photos);
     if (Array.isArray(acfData.acf.photos)) {
       const validPhotos = acfData.acf.photos
         .filter(photo => photo && photo.url)
@@ -195,15 +214,19 @@ const normalizePropertyData = (
     }
   }
   
-  // 3. Sinon, utiliser l'image mise en avant WordPress si disponible
+  // 4. Sinon, utiliser l'image mise en avant WordPress si disponible
   if (allImages.length === 0 && annonce._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
+    console.log("Image mise en avant WordPress utilisée pour l'ID:", annonce.id);
     allImages = [annonce._embedded["wp:featuredmedia"][0].source_url];
   }
   
-  // 4. Si toujours pas d'images, utiliser l'image par défaut
+  // 5. Si toujours pas d'images, utiliser l'image par défaut
   if (allImages.length === 0) {
+    console.log("Utilisation de l'image par défaut pour l'annonce ID:", annonce.id);
     allImages = [DEFAULT_IMAGE];
   }
+  
+  console.log(`Propriété ID=${annonce.id}, ${allImages.length} images trouvées`);
   
   // Extraction de la description depuis l'extrait ou le contenu
   let description = "";
@@ -245,3 +268,4 @@ const stripHtml = (html: string): string => {
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText || "";
 };
+
