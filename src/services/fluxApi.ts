@@ -1,5 +1,3 @@
-
-// src/services/fluxApi.ts
 import { toast } from "@/components/ui/sonner";
 
 // Types pour les données brutes de l'API WordPress
@@ -51,7 +49,7 @@ interface AcfData {
     chambres?: string;
     reference?: string;
     // Pour une meilleure compatibilité avec différents noms de champs
-    prix_vente?: string; 
+    prix_vente?: string;
     surf_hab?: string;
     localisation?: string;
     piece?: string;
@@ -75,7 +73,6 @@ export interface NormalizedProperty {
   description: string;
   date: string;
   allImages: string[];
-  // Champs de features
   hasBalcony?: boolean;
   hasTerrasse?: boolean;
   hasElevator?: boolean;
@@ -111,37 +108,61 @@ export const fetchAnnoncesList = async (): Promise<WordPressAnnonce[]> => {
  */
 export const fetchAcfData = async (id: number): Promise<AcfData | null> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/acf/v3/annonce/${id}`);
+    const response = await fetch(`${API_BASE_URL}/acf/v3/posts/${id}`);
     if (!response.ok) {
       throw new Error(`Erreur lors de la récupération des données ACF: ${response.statusText}`);
     }
     return await response.json();
   } catch (error) {
     console.error(`Échec de la récupération des données ACF pour l'annonce #${id}:`, error);
-    // Pas de toast ici pour éviter de spammer l'utilisateur si plusieurs annonces échouent
     return null;
   }
 };
 
 /**
- * Récupère toutes les annonces avec leurs données ACF
+ * Récupère les médias joints à une annonce via l'endpoint WP Media
+ */
+const fetchAttachments = async (postId: number): Promise<string[]> => {
+  try {
+    const resp = await fetch(`${API_BASE_URL}/wp/v2/media?parent=${postId}&per_page=50`);
+    if (!resp.ok) return [];
+    const medias = await resp.json();
+    return medias.map((m: any) => m.source_url);
+  } catch (error) {
+    console.error(`Échec de la récupération des médias pour l'annonce #${postId}:`, error);
+    return [];
+  }
+};
+
+/**
+ * Récupère toutes les annonces avec leurs données ACF et médias
  */
 export const fetchAllAnnonces = async (): Promise<NormalizedProperty[]> => {
-  // 1. Récupérer la liste des annonces
   const annonces = await fetchAnnoncesList();
-  
-  // 2. Pour chaque annonce, récupérer les données ACF
-  const annoncePromises = annonces.map(async (annonce) => {
-    const acfData = await fetchAcfData(annonce.id);
-    return normalizePropertyData(annonce, acfData);
-  });
-  
-  // 3. Attendre que toutes les requêtes soient terminées
-  const properties = await Promise.all(annoncePromises);
-  
-  // 4. Tri par date décroissante (plus récent d'abord)
-  return properties.sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
+  const properties = await Promise.all(
+    annonces.map(async (annonce) => {
+      const acfData = await fetchAcfData(annonce.id);
+      const normalized = normalizePropertyData(annonce, acfData);
+
+      // Si aucune image ACF ou featured, on récupère tous les médias joints
+      if (
+        normalized.allImages.length === 1 &&
+        normalized.allImages[0] === DEFAULT_IMAGE
+      ) {
+        const attached = await fetchAttachments(annonce.id);
+        if (attached.length) {
+          normalized.allImages = attached;
+          normalized.image = attached[0];
+        }
+      }
+
+      return normalized;
+    })
+  );
+
+  // Tri par date décroissante (plus récent d'abord)
+  return properties.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 };
 
@@ -152,7 +173,6 @@ const normalizePropertyData = (
   annonce: WordPressAnnonce,
   acfData: AcfData | null
 ): NormalizedProperty => {
-  // Fonction helper pour lire un champ dans l'ordre de préférence
   const getField = (fields: string[]): string => {
     if (acfData?.acf) {
       for (const field of fields) {
@@ -162,7 +182,6 @@ const normalizePropertyData = (
     return "";
   };
 
-  // Extraction des features
   const hasBalcony = acfData?.acf?.features?.balcon === "oui" || false;
   const hasTerrasse = acfData?.acf?.features?.terrasse === "oui" || false;
   const hasElevator = acfData?.acf?.features?.ascenseur === "oui" || false;
@@ -171,64 +190,39 @@ const normalizePropertyData = (
   const constructionYear = acfData?.acf?.features?.annee_construction || "";
   const isFurnished = acfData?.acf?.features?.meuble === "oui" || false;
 
-  // Recherche de toutes les images
   let allImages: string[] = [];
-  
-  // 1. Chercher d'abord dans le champ 'photo'
+
   if (acfData?.acf?.photo) {
-    console.log("Champ photo trouvé dans ACF:", acfData.acf.photo);
-    // Vérifier si photo est un tableau ou une chaîne (URL unique)
     if (Array.isArray(acfData.acf.photo)) {
-      allImages = acfData.acf.photo
-        .filter(photo => photo && photo.url)
-        .map(photo => photo.url);
-    } else if (typeof acfData.acf.photo === 'string' && acfData.acf.photo.trim() !== '') {
+      allImages = acfData.acf.photo.filter(p => p && p.url).map(p => p.url);
+    } else if (typeof acfData.acf.photo === "string" && acfData.acf.photo.trim()) {
       allImages = [acfData.acf.photo];
     }
   }
-  
-  // 2. Essayer ensuite liste_photos
-  if (allImages.length === 0 && acfData?.acf?.liste_photos) {
-    console.log("Champ liste_photos trouvé dans ACF:", acfData.acf.liste_photos);
-    // Vérifier si liste_photos est un tableau ou une chaîne (URL unique)
+
+  if (!allImages.length && acfData?.acf?.liste_photos) {
     if (Array.isArray(acfData.acf.liste_photos)) {
-      allImages = acfData.acf.liste_photos
-        .filter(photo => photo && photo.url)
-        .map(photo => photo.url);
-    } else if (typeof acfData.acf.liste_photos === 'string' && acfData.acf.liste_photos.trim() !== '') {
+      allImages = acfData.acf.liste_photos.filter(p => p && p.url).map(p => p.url);
+    } else if (typeof acfData.acf.liste_photos === "string" && acfData.acf.liste_photos.trim()) {
       allImages = [acfData.acf.liste_photos];
     }
   }
-  
-  // 3. Chercher ensuite dans le champ photos
-  if (allImages.length === 0 && acfData?.acf?.photos) {
-    console.log("Champ photos trouvé dans ACF:", acfData.acf.photos);
+
+  if (!allImages.length && acfData?.acf?.photos) {
     if (Array.isArray(acfData.acf.photos)) {
-      const validPhotos = acfData.acf.photos
-        .filter(photo => photo && photo.url)
-        .map(photo => photo.url);
-      
-      if (validPhotos.length > 0) {
-        allImages = [...validPhotos];
-      }
+      const valid = acfData.acf.photos.filter(p => p && p.url).map(p => p.url);
+      if (valid.length) allImages = valid;
     }
   }
-  
-  // 4. Sinon, utiliser l'image mise en avant WordPress si disponible
-  if (allImages.length === 0 && annonce._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
-    console.log("Image mise en avant WordPress utilisée pour l'ID:", annonce.id);
+
+  if (!allImages.length && annonce._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
     allImages = [annonce._embedded["wp:featuredmedia"][0].source_url];
   }
-  
-  // 5. Si toujours pas d'images, utiliser l'image par défaut
-  if (allImages.length === 0) {
-    console.log("Utilisation de l'image par défaut pour l'annonce ID:", annonce.id);
+
+  if (!allImages.length) {
     allImages = [DEFAULT_IMAGE];
   }
-  
-  console.log(`Propriété ID=${annonce.id}, ${allImages.length} images trouvées`);
-  
-  // Extraction de la description depuis l'extrait ou le contenu
+
   let description = "";
   if (annonce.excerpt?.rendered) {
     description = stripHtml(annonce.excerpt.rendered);
@@ -245,11 +239,10 @@ const normalizePropertyData = (
     pieces: getField(["pieces", "piece", "rooms"]) || "NC",
     chambres: getField(["chambres", "nb_chambre", "bedrooms"]) || "NC",
     reference: getField(["reference", "mandat", "ref"]) || `REF-${annonce.id}`,
-    image: allImages[0] || DEFAULT_IMAGE,
-    allImages: allImages,
-    description: description,
+    image: allImages[0],
+    allImages,
+    description,
     date: annonce.date,
-    // Ajout des features
     hasBalcony,
     hasTerrasse,
     hasElevator,
@@ -268,4 +261,3 @@ const stripHtml = (html: string): string => {
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText || "";
 };
-
