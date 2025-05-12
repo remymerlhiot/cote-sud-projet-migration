@@ -12,9 +12,6 @@ const AgenceSection = () => {
     url: "https://cote-sud.immo/wp-content/uploads/2025/05/agence-2-min-scaled.jpg",
     alt: "Agence AXO Côté Sud - Intérieur lumineux"
   }, {
-    url: "https://cote-sud.immo/wp-content/uploads/2025/05/agence-4-min-scaled.jpg",
-    alt: "Agence AXO Côté Sud - Bureau d'accueil"
-  }, {
     url: "https://cote-sud.immo/wp-content/uploads/2025/05/agence-3-min-scaled.jpg",
     alt: "Agence AXO Côté Sud - Façade"
   }];

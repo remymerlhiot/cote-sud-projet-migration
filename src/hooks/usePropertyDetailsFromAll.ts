@@ -94,5 +94,6 @@ function adaptACFToTransformed(acfProp: NormalizedProperty): TransformedProperty
     isPrestigious: false,
     isFurnished: false,
     isViager: false,
+    negotiatorName: ""
   };
 }

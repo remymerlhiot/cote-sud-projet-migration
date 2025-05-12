@@ -9,11 +9,15 @@ interface PropertyGridProps {
   limit?: number;
   className?: string;
   showFilter?: boolean;
+  filter?: string;
 }
 
-const PropertyGridFromACF = ({ limit, className = "", showFilter = false }: PropertyGridProps) => {
+const PropertyGridFromACF = ({ limit, className = "", showFilter = false, filter = "" }: PropertyGridProps) => {
   const { data: properties, isLoading, error } = useAcfProperties();
-  const [filter, setFilter] = useState<string>("");
+  const [localFilter, setLocalFilter] = useState<string>(filter);
+  
+  // Utiliser soit le filtre externe, soit le filtre local
+  const activeFilter = filter || localFilter;
   
   // Données de secours si l'API échoue
   const [fallbackProperties] = useState<NormalizedProperty[]>([{
@@ -68,10 +72,10 @@ const PropertyGridFromACF = ({ limit, className = "", showFilter = false }: Prop
     : displayProperties;
   
   // Filtrer les propriétés si le filtre est actif
-  const filteredProperties = filter 
+  const filteredProperties = activeFilter 
     ? limitedProperties.filter(prop => 
-        prop.ville.toLowerCase().includes(filter.toLowerCase()) || 
-        prop.titre.toLowerCase().includes(filter.toLowerCase())
+        prop.ville.toLowerCase().includes(activeFilter.toLowerCase()) || 
+        prop.titre.toLowerCase().includes(activeFilter.toLowerCase())
       )
     : limitedProperties;
 
@@ -176,8 +180,8 @@ const PropertyGridFromACF = ({ limit, className = "", showFilter = false }: Prop
             type="text"
             placeholder="Filtrer par ville ou type de bien..."
             className="w-full p-2 border border-gray-300 rounded-md"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={localFilter}
+            onChange={(e) => setLocalFilter(e.target.value)}
           />
         </div>
       )}

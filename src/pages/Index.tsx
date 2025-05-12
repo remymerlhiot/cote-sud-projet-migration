@@ -3,7 +3,7 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MainTitleSection from "@/components/home/MainTitleSection";
-import PropertyCarousel from "@/components/home/PropertyCarousel";
+import PropertyCarouselACF from "@/components/home/PropertyCarouselACF";
 import ServicesSection from "@/components/home/ServicesSection";
 import DifferenceSection from "@/components/home/DifferenceSection";
 import AgenceSection from "@/components/home/AgenceSection";
@@ -22,7 +22,7 @@ const Index = () => {
         <MainTitleSection />
 
         {/* Properties Carousel */}
-        <PropertyCarousel />
+        <PropertyCarouselACF />
 
         {/* Services de l'Agence Section */}
         <ServicesSection />
