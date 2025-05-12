@@ -4,18 +4,21 @@ import { Plus, Minus } from "lucide-react";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cleanElementorHtml } from "@/utils/elementorCleaner";
+
 type ServiceItem = {
   id: string;
   title: string;
   content: string;
 };
+
 const ServicesSection = () => {
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [backgroundImage, setBackgroundImage] = useState<string>("https://cote-sud.immo/wp-content/uploads/2024/11/champs-de-lavandes-sur-sainte-victoire.jpg");
   const {
     data: pageData,
     isLoading
-  } = useCustomPage("new-home");
+  } = useCustomPage("new-home", { skipCustomApi: true }); // Skip the custom API for new-home
+
   useEffect(() => {
     if (pageData?.content) {
       // Extract services and background image from WordPress content
@@ -201,7 +204,9 @@ const ServicesSection = () => {
     }
     return null;
   }
-  return <section className="relative mb-20">
+
+  return (
+    <section className="relative mb-20">
       <div className="w-full h-[700px] bg-cover bg-center" style={{
       backgroundImage: `url('${backgroundImage}')`
     }}>
@@ -222,7 +227,7 @@ const ServicesSection = () => {
                       <AccordionTrigger className="text-sable hover:no-underline py-6 text-lg md:text-xl flex justify-between">
                         <span>{service.title}</span>
                         <div className="flex items-center">
-                          
+                          <Plus className="h-5 w-5 shrink-0 text-sable transition-all group-data-[state=open]:hidden" />
                           <Minus className="h-5 w-5 shrink-0 text-sable transition-all hidden group-data-[state=open]:block" />
                         </div>
                       </AccordionTrigger>
@@ -237,6 +242,8 @@ const ServicesSection = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default ServicesSection;

@@ -15,11 +15,11 @@ type DifferenceContent = {
 };
 
 const DifferenceSection = () => {
-  // Fetch homepage content
+  // Fetch homepage content with skipCustomApi option
   const {
     data: homePage,
     isLoading
-  } = useCustomPage("new-home");
+  } = useCustomPage("new-home", { skipCustomApi: true });
   
   const [content, setContent] = useState<DifferenceContent>({
     title: "LA DIFFÉRENCE",

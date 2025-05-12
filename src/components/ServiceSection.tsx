@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { 
   Accordion, 
@@ -24,7 +23,7 @@ type ServiceSectionProps = {
 const ServiceSection = ({ className }: ServiceSectionProps) => {
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [backgroundImage, setBackgroundImage] = useState<string>("https://cote-sud.immo/wp-content/uploads/2024/11/champs-de-lavandes-sur-sainte-victoire.jpg");
-  const { data: pageData, isLoading } = useCustomPage("new-home");
+  const { data: pageData, isLoading } = useCustomPage("new-home", { skipCustomApi: true });
 
   useEffect(() => {
     if (pageData?.content) {

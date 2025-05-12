@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState, useEffect } from "react";
 import { useCustomPage } from "@/hooks/useCustomPage";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,8 +18,9 @@ interface CustomWordPressPageProps {
   hideTeamSection?: boolean;
   styleTeamSection?: boolean;
   debugMode?: boolean;
-  hideContent?: boolean; // New prop to control content visibility
-  fallbackContent?: React.ReactNode; // Add fallback content prop
+  hideContent?: boolean;
+  fallbackContent?: React.ReactNode;
+  skipCustomApi?: boolean; // New option to skip custom API
 }
 
 const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
@@ -30,15 +32,19 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
   hideTeamSection = false,
   styleTeamSection = false,
   debugMode = false,
-  hideContent = false, // Default to showing content
-  fallbackContent = null // Default fallback content
+  hideContent = false,
+  fallbackContent = null,
+  skipCustomApi // Pass this to useCustomPage
 }) => {
   const {
     data: page,
     isLoading,
     isError,
     error
-  } = useCustomPage(slug, { showErrors: false });
+  } = useCustomPage(slug, { 
+    showErrors: false,
+    skipCustomApi: skipCustomApi 
+  });
   
   const [showOriginalHtml, setShowOriginalHtml] = useState<boolean>(false);
   const [originalContent, setOriginalContent] = useState<string>("");
