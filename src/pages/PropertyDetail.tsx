@@ -410,4 +410,5 @@ cote-sud@axo.immo</p>
       <Footer />
     </div>;
 };
+
 export default PropertyDetail;

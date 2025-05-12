@@ -19,12 +19,12 @@ export const usePropertyDetailsFromAll = (id: string | number) => {
   
   // Récupérer toutes les propriétés ACF pour trouver celle qui correspond
   const acfQuery = useAcfProperties({
-    // N'activer cette requête que si la requête WordPress a échoué ou ne retourne rien
-    enabled: wpQuery.isSuccess && !wpQuery.data ? true : false
+    // Activer cette requête dans tous les cas
+    enabled: true
   });
   
   // Requête combinée qui unifie les résultats
-  return useQuery<UnifiedPropertyDetails | null, Error>({
+  return useQuery<TransformedProperty | null, Error>({
     queryKey: ["property-all-sources", numericId],
     queryFn: async () => {
       // 1. Essayer avec WordPress d'abord
@@ -58,16 +58,20 @@ export const usePropertyDetailsFromAll = (id: string | number) => {
  * pour compatibilité avec le composant PropertyDetail
  */
 function adaptACFToTransformed(acfProp: NormalizedProperty): TransformedProperty {
+  // Convertir le prix en nombre pour le tri
+  const priceNumber = parseInt(acfProp.prix.replace(/[^0-9]/g, ""), 10) || 0;
+  
   return {
     id: acfProp.id,
     title: acfProp.titre,
     location: acfProp.ville,
     ref: acfProp.reference,
     price: acfProp.prix,
-    priceNumber: parseInt(acfProp.prix.replace(/[^0-9]/g, ""), 10) || 0,
+    priceNumber: priceNumber,
     area: acfProp.surface,
     rooms: acfProp.pieces,
     bedrooms: acfProp.chambres,
+    bathrooms: "",
     image: acfProp.image,
     allImages: acfProp.allImages,
     date: acfProp.date,
@@ -85,15 +89,24 @@ function adaptACFToTransformed(acfProp: NormalizedProperty): TransformedProperty
     postalCode: "",
     address: "",
     country: "France",
-    bathrooms: "",
     dpeValue: "",
     dpeGes: "",
     dpeGesValue: "",
     dpeDate: "",
     isNewConstruction: false,
-    isPrestigious: false,
+    isPrestigious: priceNumber > 1_000_000,
     isFurnished: false,
     isViager: false,
-    negotiatorName: ""
+    negotiatorName: "",
+    negotiatorPhone: "",
+    negotiatorEmail: "",
+    negotiatorPhoto: "",
+    negotiatorCity: "",
+    negotiatorPostalCode: "",
+    landArea: "",
+    floorNumber: "",
+    totalFloors: "",
+    toilets: "",
+    heatingType: ""
   };
 }
