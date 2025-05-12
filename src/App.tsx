@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/sonner";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,7 +14,7 @@ import Partenaires from "./pages/Partenaires";
 import Estimation from "./pages/Estimation";
 import PageTest from "./pages/PageTest";
 import DynamicPage from "./pages/DynamicPage";
-import PropertyListACF from "./pages/PropertyListACF"; // Import de la nouvelle page ACF
+import PropertyListACF from "./pages/PropertyListACF";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,9 @@ const App = () => (
           <Route path="/services" element={<DynamicPage slug="services" />} />
           <Route path="/new-home" element={<DynamicPage slug="new-home" />} />
           <Route path="/notre-histoire" element={<NotreHistoire />} />
+          
+          {/* Route pour les propriétés ACF */}
+          <Route path="/acf-properties" element={<PropertyListACF />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

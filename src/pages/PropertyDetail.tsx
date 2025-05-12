@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { usePropertyById } from "@/hooks/useProperties";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,22 +10,15 @@ import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { teamMembers } from "@/data/teamMembers";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AutoplayPlugin from "embla-carousel-autoplay";
+import { usePropertyDetailsFromAll } from "@/hooks/usePropertyDetailsFromAll";
+
 const PropertyDetail = () => {
-  const {
-    id
-  } = useParams<{
-    id: string;
-  }>();
+  const { id } = useParams<{ id: string }>();
   const propertyId = id ? id : "0";
 
-  // Fetch property details using our hook
-  const {
-    data: displayData,
-    isLoading,
-    error
-  } = usePropertyById(propertyId);
+  // Utiliser notre hook unifié qui cherche dans toutes les sources
+  const { data: displayData, isLoading, error } = usePropertyDetailsFromAll(propertyId);
 
   // Configurer le plugin d'autoplay pour le carousel - 3 secondes sans arrêt sur interaction
   const autoplayOptions = {
@@ -120,6 +112,7 @@ const PropertyDetail = () => {
     }
     return `Votre agent - ${negotiatorName}`;
   };
+
   if (isLoading) {
     return <div className="flex flex-col min-h-screen bg-cream font-raleway">
         <Header />
@@ -166,6 +159,7 @@ const PropertyDetail = () => {
 
   // Obtenir le nom de l'agent proprement formaté
   const agentDisplayName = formatNegotiatorName(displayData.negotiatorName);
+  
   return <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif] text-[#37373A]">
       <Header />
       
@@ -389,7 +383,7 @@ const PropertyDetail = () => {
                       
                       
                       {/* Email de l'agence */}
-                      <p className="text-sm text-center">Coordonnées: 
+                      <p className="text-sm text-center">Coordonnées: 
 cote-sud@axo.immo</p>
                       
                       {/* Téléphone du négociateur ou de l'agence */}
