@@ -15,7 +15,7 @@ const PropertyCarouselACF = () => {
   // Si aucun bien n'est trouvé ou en cours de chargement, afficher un message
   if (isLoading) {
     return <section className="container mx-auto mb-20 px-4 py-[20px] text-center">
-        <h2 className="text-2xl font-serif text-[#C8A977] mb-4">Nos Biens Immobiliers</h2>
+        <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#C8A977] mb-4">Nos Biens Immobiliers</h2>
         <p className="text-[#37373A]">Chargement des biens immobiliers en cours...</p>
       </section>;
   }
@@ -23,7 +23,7 @@ const PropertyCarouselACF = () => {
   // Si une erreur s'est produite ou si aucun bien n'est trouvé
   if (error || !properties || properties.length === 0) {
     return <section className="container mx-auto mb-20 px-4 py-[20px] text-center">
-        <h2 className="text-2xl font-serif text-[#C8A977] mb-4">Nos Biens Immobiliers</h2>
+        <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#C8A977] mb-4">Nos Biens Immobiliers</h2>
         <p className="text-[#37373A]">Biens immobiliers en cours de publication...</p>
       </section>;
   }

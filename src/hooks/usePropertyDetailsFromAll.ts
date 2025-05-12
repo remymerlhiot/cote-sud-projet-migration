@@ -1,4 +1,3 @@
-
 import { usePropertyById } from "@/hooks/useProperties";
 import { useAcfProperties, NormalizedProperty } from "@/hooks/useAcfProperties";
 import { useQuery } from "@tanstack/react-query";
@@ -9,17 +8,15 @@ export type UnifiedPropertyDetails = TransformedProperty;
 
 /**
  * Hook qui tente de récupérer les détails d'une propriété depuis toutes les sources disponibles
- * @param id Identifiant de la propriété
  */
 export const usePropertyDetailsFromAll = (id: string | number) => {
   const numericId = typeof id === "string" ? parseInt(id, 10) : id;
   
-  // Récupérer depuis WordPress
+  // Récupérer depuis WordPress (prioritaire)
   const wpQuery = usePropertyById(numericId);
   
-  // Récupérer toutes les propriétés ACF pour trouver celle qui correspond
+  // Récupérer toutes les propriétés ACF comme fallback
   const acfQuery = useAcfProperties({
-    // Activer cette requête dans tous les cas
     enabled: true
   });
   
@@ -27,17 +24,17 @@ export const usePropertyDetailsFromAll = (id: string | number) => {
   return useQuery<TransformedProperty | null, Error>({
     queryKey: ["property-all-sources", numericId],
     queryFn: async () => {
-      // 1. Essayer avec WordPress d'abord
+      // 1. Essayer avec WordPress d'abord (prioritaire)
       if (wpQuery.isSuccess && wpQuery.data) {
-        console.log(`Propriété #${numericId} trouvée dans WordPress`);
+        console.log(`Propriété #${numericId} trouvée dans WordPress (agence-axo.immo)`);
         return wpQuery.data;
       }
       
-      // 2. Essayer avec ACF ensuite
+      // 2. Essayer avec ACF ensuite (fallback)
       if (acfQuery.isSuccess && acfQuery.data) {
         const acfProperty = acfQuery.data.find(p => p.id === numericId);
         if (acfProperty) {
-          console.log(`Propriété #${numericId} trouvée dans ACF`);
+          console.log(`Propriété #${numericId} trouvée dans ACF (fallback)`);
           return adaptACFToTransformed(acfProperty);
         }
       }
