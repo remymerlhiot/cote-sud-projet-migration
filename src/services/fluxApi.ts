@@ -1,7 +1,8 @@
+
 import { toast } from "@/components/ui/sonner";
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "../types";
-import { normalizePropertyData } from "../transformers";
-import { API_BASE_URL, DEFAULT_IMAGE } from "../config";
+import { normalizePropertyData } from "../services/wordpress/transformers";
+import { API_BASE_URL, DEFAULT_IMAGE } from "./wordpress/config";
 
 // 1. Liste WP REST
 export const fetchAnnoncesList = async (): Promise<WordPressAnnonce[]> => {

@@ -1,6 +1,7 @@
+
 import { Spinner } from "@/components/ui/spinner";
-import PropertyCarousel from "@/components/PropertyCarousel";
 import { usePropertyDetailsFromAll } from "@/hooks/usePropertyDetailsFromAll";
+import PropertyCarousel from "@/components/home/PropertyCarousel";
 
 export default function PropertyDetail() {
   const { property, isLoading } = usePropertyDetailsFromAll();
@@ -9,24 +10,24 @@ export default function PropertyDetail() {
 
   return (
     <main className="max-w-4xl mx-auto py-8">
-      <h1 className="text-2xl font-serif mb-4">{property.titre}</h1>
+      <h1 className="text-2xl font-['FreightBig Pro', serif] text-[#C8A977] mb-4">{property.titre}</h1>
       <PropertyCarousel images={property.allImages} title={property.titre} />
       <section className="mt-6 space-y-4">
         <p className="text-lg text-[#B17226] font-semibold">{property.prix} €</p>
-        <p>{property.description}</p>
-        <ul className="grid grid-cols-2 gap-2">
-          <li>Ville : {property.ville}</li>
-          <li>Surface : {property.surface} m²</li>
-          <li>Pièces : {property.pieces}</li>
-          <li>Chambres : {property.chambres}</li>
-          <li>Référence : {property.reference}</li>
-          {property.hasBalcony && <li>Balcon</li>}
-          {property.hasTerrasse && <li>Terrasse</li>}
-          {property.hasPool && <li>Piscine</li>}
+        <p className="text-[#37373A]">{property.description}</p>
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <li className="text-[#37373A]"><span className="font-medium">Ville :</span> {property.ville}</li>
+          <li className="text-[#37373A]"><span className="font-medium">Surface :</span> {property.surface} m²</li>
+          <li className="text-[#37373A]"><span className="font-medium">Pièces :</span> {property.pieces}</li>
+          <li className="text-[#37373A]"><span className="font-medium">Chambres :</span> {property.chambres}</li>
+          <li className="text-[#37373A]"><span className="font-medium">Référence :</span> {property.reference}</li>
+          {property.hasBalcony && <li className="text-[#37373A]"><span className="font-medium">Balcon</span></li>}
+          {property.hasTerrasse && <li className="text-[#37373A]"><span className="font-medium">Terrasse</span></li>}
+          {property.hasPool && <li className="text-[#37373A]"><span className="font-medium">Piscine</span></li>}
           {parseInt(property.garageCount || "0") > 0 && (
-            <li>Garage : {property.garageCount}</li>
+            <li className="text-[#37373A]"><span className="font-medium">Garage :</span> {property.garageCount}</li>
           )}
-          {property.isFurnished && <li>Meublé</li>}
+          {property.isFurnished && <li className="text-[#37373A]"><span className="font-medium">Meublé</span></li>}
         </ul>
       </section>
     </main>
