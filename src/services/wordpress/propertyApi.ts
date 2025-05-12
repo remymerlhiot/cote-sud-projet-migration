@@ -35,23 +35,21 @@ export const fetchPropertyById = async (id: number): Promise<TransformedProperty
     if (!res.ok) throw new Error(res.statusText);
     const data: any = await res.json();
 
-    console.log(`Property ${id} initial data:`, {
-      has_featured: !!data._embedded?.["wp:featuredmedia"],
-      has_attachments: !!data._embedded?.["wp:attachment"],
-    });
+    console.log(`Property ${id}: Récupération des données principales réussie`);
 
-    // 2) On récupère toutes les images attachées (parent = post ID)
-    const mediaRes = await fetch(`${API_BASE_URL}/media?parent=${id}&per_page=50`);
+    // 2) On récupère séparément toutes les images attachées (parent = post ID)
+    // Le paramètre media_type=image assure qu'on ne récupère que des images
+    const mediaRes = await fetch(`${API_BASE_URL}/media?parent=${id}&per_page=50&media_type=image`);
     const attsCount = mediaRes.headers.get('x-wp-total') || 'unknown';
 
-    console.log(`Property ${id} found ${attsCount} attached media items`);
+    console.log(`Property ${id}: ${attsCount} médias attachés trouvés`);
 
     if (mediaRes.ok) {
       const atts: any[] = await mediaRes.json();
-      console.log(`Property ${id} attached media:`, 
+      console.log(`Property ${id}: Médias attachés récupérés avec succès`, 
         atts.map(a => ({ id: a.id, url: a.source_url })));
 
-      // Initialiser le tableau wp:attachment s'il n'existe pas encore
+      // Initialiser ou remplacer le tableau wp:attachment
       if (!data._embedded) {
         data._embedded = {};
       }
@@ -59,17 +57,17 @@ export const fetchPropertyById = async (id: number): Promise<TransformedProperty
       data._embedded["wp:attachment"] = atts;
 
       // Vérifier si les médias ont été correctement ajoutés
-      console.log(`Property ${id} now has ${data._embedded["wp:attachment"]?.length || 0} attachments`);
+      console.log(`Property ${id}: ${data._embedded["wp:attachment"]?.length || 0} attachments intégrés dans l'objet`);
     } else {
-      console.warn(`No attachments fetched for property ${id}:`, mediaRes.status);
+      console.warn(`Property ${id}: Échec de récupération des attachements:`, mediaRes.status);
     }
 
     // 3) On transforme l'objet complet
     const transformed = transformPropertyData(data);
-    console.log(`Property ${id} transformed, images count:`, transformed.allImages.length);
+    console.log(`Property ${id}: Transformation terminée, ${transformed.allImages.length} images disponibles`);
     
-    // Log pour débogage des images
-    console.log(`Property ${id} image URLs:`, transformed.allImages);
+    // Log des URLs d'images pour débogage
+    console.log(`Property ${id}: URLs des images:`, transformed.allImages);
 
     return transformed;
   } catch (error) {

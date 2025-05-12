@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -17,6 +16,7 @@ import { usePropertyDetailsFromAll } from "@/hooks/usePropertyDetailsFromAll";
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const propertyId = id ? id : "0";
+  const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
 
   // Utiliser notre hook unifié qui cherche dans toutes les sources
   const { data: displayData, isLoading, error } = usePropertyDetailsFromAll(propertyId);
@@ -114,8 +114,14 @@ const PropertyDetail = () => {
     return `Votre agent - ${negotiatorName}`;
   };
 
+  // Fonction pour gérer les erreurs de chargement d'image
+  const handleImageError = (imageUrl: string) => {
+    console.log(`Erreur de chargement d'image: ${imageUrl}`);
+    setImageLoadErrors(prev => ({...prev, [imageUrl]: true}));
+  };
+
   if (isLoading) {
-    return <div className="flex flex-col min-h-screen bg-cream font-raleway">
+    return <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif]">
         <Header />
         <main className="container mx-auto py-12 px-4 flex-grow">
           <div className="max-w-4xl mx-auto">
@@ -134,11 +140,11 @@ const PropertyDetail = () => {
   }
   
   if (error || !displayData) {
-    return <div className="flex flex-col min-h-screen bg-cream font-raleway">
+    return <div className="flex flex-col min-h-screen bg-[#EEE4D6] font-['Avenir Book', sans-serif]">
         <Header />
         <main className="container mx-auto py-12 px-4 flex-grow">
           <div className="text-center py-12">
-            <h2 className="text-2xl font-serif text-[#CD9B59] mb-4">
+            <h2 className="text-2xl font-['FreightBig Pro', serif] text-[#B17226] mb-4">
               Bien non trouvé
             </h2>
             <p className="mb-6">Impossible de charger les informations de ce bien immobilier.</p>
@@ -153,12 +159,25 @@ const PropertyDetail = () => {
       </div>;
   }
 
-  // Get all property images and ensure we handle arrays properly
-  const propertyImages = Array.isArray(displayData.allImages) && displayData.allImages.length > 0
-    ? displayData.allImages
-    : displayData.image 
-      ? [displayData.image] 
-      : ["/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"];
+  // Log des informations sur les images pour débogage
+  console.log(`PropertyDetail #${propertyId}: Images disponibles`, { 
+    allImages: displayData.allImages?.length || 0,
+    featuredImage: displayData.image,
+    hasMainImage: !!displayData.image
+  });
+
+  // Filtrer les images valides - enlever celles qui ont eu des erreurs de chargement
+  const validPropertyImages = displayData.allImages
+    ? displayData.allImages.filter(url => !imageLoadErrors[url] && url !== "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png")
+    : [];
+
+  // Si aucune image valide, utiliser l'image par défaut
+  const propertyImages = validPropertyImages.length > 0
+    ? validPropertyImages
+    : ["/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"];
+
+  // Log pour le débogage des images
+  console.log(`PropertyDetail #${propertyId}: ${propertyImages.length} images valides à afficher`);
 
   // Trouver le membre de l'équipe correspondant au négociateur
   const teamMember = displayData.negotiatorName ? findTeamMember(displayData.negotiatorName) : null;
@@ -179,14 +198,15 @@ const PropertyDetail = () => {
             }}>
               <CarouselContent>
                 {propertyImages.map((image, index) => (
-                  <CarouselItem key={index} className="w-full">
+                  <CarouselItem key={`${image}-${index}`} className="w-full">
                     <div className="aspect-[4/3] w-full max-h-[600px] flex items-center justify-center p-4">
                       <img 
                         src={image} 
                         alt={`${displayData.title} - Vue ${index + 1}`} 
                         className="max-w-full max-h-full object-contain" 
-                        onError={e => {
-                          console.log("Image error, using fallback");
+                        onError={(e) => {
+                          console.log(`Erreur de chargement pour l'image: ${image}`);
+                          handleImageError(image);
                           e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
                         }} 
                       />

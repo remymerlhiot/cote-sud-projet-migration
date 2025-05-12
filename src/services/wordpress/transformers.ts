@@ -24,11 +24,16 @@ function readField(property: WordPressProperty, keys: string[]): string {
   return "";
 }
 
+/**
+ * Transforme les données brutes d'une propriété WordPress en format unifié
+ * avec traitement des images : l'image principale (featured) en premier,
+ * suivie des images attachées
+ */
 export const transformPropertyData = (
   property: WordPressProperty
 ): TransformedProperty => {
   // Fallback sur image
-  const fallbackImage = "/lovable-uploads/fallback.png";
+  const fallbackImage = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
 
   // --- Champs principaux ---
   const priceRaw    = readField(property, SYNONYMS.price);
@@ -49,26 +54,49 @@ export const transformPropertyData = (
   const postalCode = readField(property, ["code_postal"]);
   const country    = readField(property, ["pays"]) || "France";
 
-  // --- Images ---
-  // 1) Featured media
-  const featuredImage =
-    property._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-    fallbackImage;
+  // --- TRAITEMENT DES IMAGES ---
+  
+  // 1) Image principale (mise en avant / featured media)
+  let featuredImage = "";
+  if (property._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
+    featuredImage = property._embedded["wp:featuredmedia"][0].source_url;
+    console.log(`Image mise en avant WordPress utilisée pour l'ID: ${property.id}`);
+  }
+  
+  // Si pas d'image principale, utiliser le fallback
+  if (!featuredImage) featuredImage = fallbackImage;
 
-  // 2) Tous les attachements (médias WordPress)
-  const attachmentImages: string[] =
-    property._embedded?.["wp:attachment"]?.map((m: any) => m.source_url).filter(Boolean) ||
-    [];
+  // 2) Images attachées (tous les attachements WordPress)
+  let attachmentImages: string[] = [];
+  if (property._embedded?.["wp:attachment"]) {
+    // Filtrer pour ne garder que les URLs valides 
+    attachmentImages = property._embedded["wp:attachment"]
+      .filter((m: any) => m && m.source_url && typeof m.source_url === 'string')
+      .map((m: any) => m.source_url);
+  }
 
-  // 3) On fusionne et on enlève les doublons
-  const allImages = Array.from(new Set([
-    featuredImage,
-    ...attachmentImages
-  ])).filter(url => url !== fallbackImage || allImages.length === 0);
+  // 3) Construction du tableau final d'images:
+  // - Image principale en premier
+  // - Puis toutes les images attachées
+  // - Enlever les doublons (si l'image principale est aussi dans les attachements)
+  // - Ne garder que les URLs valides
+  const allImagesSet = new Set<string>();
+  
+  // Ajouter l'image principale d'abord (si elle n'est pas le fallback)
+  if (featuredImage !== fallbackImage) {
+    allImagesSet.add(featuredImage);
+  }
+  
+  // Ajouter toutes les images attachées ensuite
+  attachmentImages.forEach(url => allImagesSet.add(url));
+  
+  // Convertir en tableau et ajouter le fallback si aucune image n'est disponible
+  const allImages = Array.from(allImagesSet);
+  if (allImages.length === 0) {
+    allImages.push(fallbackImage);
+  }
 
-  console.log(`transformPropertyData: property #${property.id} has ${
-    allImages.length} images total (${
-    attachmentImages.length} attachments + featured)`);
+  console.log(`Propriété ID=${property.id}, ${allImages.length} images trouvées`);
 
   // --- Booléens helpers ---
   const toBool = (v: string) =>
