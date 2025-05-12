@@ -1,109 +1,14 @@
-import { usePropertyById } from "@/hooks/useProperties";
-import { useAcfProperties, NormalizedProperty } from "@/hooks/useAcfProperties";
-import { useQuery } from "@tanstack/react-query";
-import { TransformedProperty } from "@/services/wordpress/types";
+import { useParams } from "react-router-dom";
+import { useProperties } from "./useProperties";
+import { NormalizedProperty } from "../types";
 
-// Type unifié qui correspond uniquement au format TransformedProperty
-export type UnifiedPropertyDetails = TransformedProperty;
+export const usePropertyDetailsFromAll = (): {
+  property?: NormalizedProperty;
+  isLoading: boolean;
+} => {
+  const { id } = useParams<{ id: string }>();
+  const { data, isLoading } = useProperties();
 
-/**
- * Hook qui tente de récupérer les détails d'une propriété depuis toutes les sources disponibles
- */
-export const usePropertyDetailsFromAll = (id: string | number) => {
-  const numericId = typeof id === "string" ? parseInt(id, 10) : id;
-  
-  // Récupérer depuis WordPress (prioritaire)
-  const wpQuery = usePropertyById(numericId);
-  
-  // Récupérer toutes les propriétés ACF comme fallback
-  const acfQuery = useAcfProperties({
-    enabled: true
-  });
-  
-  // Requête combinée qui unifie les résultats
-  return useQuery<TransformedProperty | null, Error>({
-    queryKey: ["property-all-sources", numericId],
-    queryFn: async () => {
-      // 1. Essayer avec WordPress d'abord (prioritaire)
-      if (wpQuery.isSuccess && wpQuery.data) {
-        console.log(`Propriété #${numericId} trouvée dans WordPress (agence-axo.immo)`);
-        return wpQuery.data;
-      }
-      
-      // 2. Essayer avec ACF ensuite (fallback)
-      if (acfQuery.isSuccess && acfQuery.data) {
-        const acfProperty = acfQuery.data.find(p => p.id === numericId);
-        if (acfProperty) {
-          console.log(`Propriété #${numericId} trouvée dans ACF (fallback)`);
-          return adaptACFToTransformed(acfProperty);
-        }
-      }
-      
-      // 3. Si pas trouvé, retourner null
-      console.log(`Propriété #${numericId} non trouvée dans aucune source`);
-      return null;
-    },
-    // Ne pas exécuter la requête combinée tant que les sous-requêtes ne sont pas prêtes
-    enabled: wpQuery.isSuccess || acfQuery.isSuccess,
-    // Garder en cache 5 minutes
-    staleTime: 5 * 60 * 1000,
-  });
+  const property = data?.find(p => p.id === Number(id));
+  return { property, isLoading };
 };
-
-/**
- * Adapter une propriété ACF normalisée au format TransformedProperty
- * pour compatibilité avec le composant PropertyDetail
- */
-function adaptACFToTransformed(acfProp: NormalizedProperty): TransformedProperty {
-  // Convertir le prix en nombre pour le tri
-  const priceNumber = parseInt(acfProp.prix.replace(/[^0-9]/g, ""), 10) || 0;
-  
-  return {
-    id: acfProp.id,
-    title: acfProp.titre,
-    location: acfProp.ville,
-    ref: acfProp.reference,
-    price: acfProp.prix,
-    priceNumber: priceNumber,
-    area: acfProp.surface,
-    rooms: acfProp.pieces,
-    bedrooms: acfProp.chambres,
-    bathrooms: "",
-    image: acfProp.image,
-    allImages: acfProp.allImages || [acfProp.image],
-    date: acfProp.date,
-    description: acfProp.description,
-    fullContent: acfProp.description, // ACF n'a pas de contenu complet séparé
-    propertyType: acfProp.titre.split(" ")[0] || "PROPRIÉTÉ", // Utiliser le premier mot du titre comme type
-    constructionYear: acfProp.constructionYear || "",
-    hasBalcony: acfProp.hasBalcony || false,
-    hasElevator: acfProp.hasElevator || false,
-    hasTerrasse: acfProp.hasTerrasse || false,
-    hasPool: acfProp.hasPool || false,
-    garageCount: acfProp.garageCount || "0", 
-    dpe: "",
-    // Ces champs supplémentaires ne sont pas disponibles dans ACF mais requis par TransformedProperty
-    postalCode: "",
-    address: "",
-    country: "France",
-    dpeValue: "",
-    dpeGes: "",
-    dpeGesValue: "",
-    dpeDate: "",
-    isNewConstruction: false,
-    isPrestigious: priceNumber > 1_000_000,
-    isFurnished: acfProp.isFurnished || false,
-    isViager: false,
-    negotiatorName: "",
-    negotiatorPhone: "",
-    negotiatorEmail: "",
-    negotiatorPhoto: "",
-    negotiatorCity: "",
-    negotiatorPostalCode: "",
-    landArea: "",
-    floorNumber: "",
-    totalFloors: "",
-    toilets: "",
-    heatingType: ""
-  };
-}
