@@ -1,9 +1,9 @@
+
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { useState } from "react";
 import AutoplayPlugin from "embla-carousel-autoplay";
 import { useAcfProperties, NormalizedProperty } from "@/hooks/useAcfProperties";
-import { toast } from "@/components/ui/sonner";
 import { Link } from "react-router-dom";
+
 const PropertyCarouselACF = () => {
   // Fetch properties from ACF API
   const {
@@ -36,28 +36,40 @@ const PropertyCarouselACF = () => {
 
   // Trier les propriétés du plus cher au moins cher
   const sortedProperties = [...properties].sort((a, b) => getPropertyPrice(b) - getPropertyPrice(a));
-  return <section className="container mx-auto mb-20 px-4 py-[20px]">
+
+  return (
+    <section className="container mx-auto mb-20 px-4 py-[20px]">
+      <div className="text-center mb-10">
+        <h2 className="text-3xl font-serif text-[#C8A977] mb-4">Nos Biens d'Exception</h2>
+        <p className="text-[#37373A] max-w-2xl mx-auto">Découvrez notre sélection de propriétés exclusives</p>
+      </div>
       
       <Carousel className="mx-auto max-w-6xl" plugins={[AutoplayPlugin({
-      delay: 4000,
-      stopOnInteraction: true,
-      stopOnMouseEnter: true
-    })]} opts={{
-      align: "start",
-      loop: true
-    }}>
+        delay: 4000,
+        stopOnInteraction: true,
+        stopOnMouseEnter: true
+      })]} opts={{
+        align: "start",
+        loop: true
+      }}>
         <div className="relative">
           <CarouselContent>
-            {sortedProperties.map(property => <CarouselItem key={property.id} className="md:basis-1/3 pl-4 animate-fadeIn">
+            {sortedProperties.map(property => (
+              <CarouselItem key={property.id} className="md:basis-1/3 pl-4 animate-fadeIn">
                 <Link to={`/property/${property.id}`} className="block h-full">
                   <div className="overflow-hidden border-none shadow-md h-full bg-white hover:shadow-lg transition-all duration-300">
                     <div className="p-0 relative">
                       <div className="relative">
-                        <img src={property.image} alt={property.titre} className="w-full h-56 object-cover" onError={e => {
-                      const target = e.target as HTMLImageElement;
-                      target.onerror = null;
-                      target.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
-                    }} />
+                        <img 
+                          src={property.image} 
+                          alt={property.titre}
+                          className="w-full h-56 object-cover" 
+                          onError={e => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                          }} 
+                        />
                         <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
                           {property.reference}
                         </div>
@@ -99,7 +111,8 @@ const PropertyCarouselACF = () => {
                     </div>
                   </div>
                 </Link>
-              </CarouselItem>)}
+              </CarouselItem>
+            ))}
           </CarouselContent>
           <div className="absolute -left-6 top-1/2 transform -translate-y-1/2">
             <CarouselPrevious className="relative static transform-none h-8 w-8 border-[#CD9B59] bg-white text-[#CD9B59] hover:bg-[#CD9B59] hover:text-white" />
@@ -109,6 +122,8 @@ const PropertyCarouselACF = () => {
           </div>
         </div>
       </Carousel>
-    </section>;
+    </section>
+  );
 };
+
 export default PropertyCarouselACF;

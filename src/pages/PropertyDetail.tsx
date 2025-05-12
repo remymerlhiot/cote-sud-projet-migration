@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React from "react";
 import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -131,6 +132,7 @@ const PropertyDetail = () => {
         <Footer />
       </div>;
   }
+  
   if (error || !displayData) {
     return <div className="flex flex-col min-h-screen bg-cream font-raleway">
         <Header />
@@ -151,8 +153,12 @@ const PropertyDetail = () => {
       </div>;
   }
 
-  // Get all property images - ensure we handle the case where allImages might be empty or undefined
-  const propertyImages = displayData.allImages?.length ? displayData.allImages : displayData.image ? [displayData.image] : ["/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"];
+  // Get all property images and ensure we handle arrays properly
+  const propertyImages = Array.isArray(displayData.allImages) && displayData.allImages.length > 0
+    ? displayData.allImages
+    : displayData.image 
+      ? [displayData.image] 
+      : ["/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"];
 
   // Trouver le membre de l'équipe correspondant au négociateur
   const teamMember = displayData.negotiatorName ? findTeamMember(displayData.negotiatorName) : null;
@@ -166,42 +172,37 @@ const PropertyDetail = () => {
       <main className="flex-grow">
         {/* Property image gallery - Carousel container avec taille maximale */}
         <div className="relative w-full mb-8 bg-anthracite">
-          {propertyImages.length > 1 ? <div className="container mx-auto max-w-5xl">
-              <Carousel className="w-full" plugins={[AutoplayPlugin(autoplayOptions)]} opts={{
-            align: "center",
-            loop: true
-          }}>
-                <CarouselContent>
-                  {propertyImages.map((image, index) => <CarouselItem key={index} className="w-full">
-                      <div className="aspect-[4/3] w-full max-h-[600px] flex items-center justify-center p-4">
-                        <img src={image} alt={`${displayData.title} - Vue ${index + 1}`} className="max-w-full max-h-full object-contain" onError={e => {
-                    console.log("Image error, using fallback");
-                    e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
-                  }} />
-                      </div>
-                    </CarouselItem>)}
-                </CarouselContent>
-                <CarouselPrevious className="absolute left-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
-                <CarouselNext className="absolute right-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
-                
-                {/* Price badge */}
-                <div className="absolute top-4 right-4 z-10 bg-[#B17226] text-white px-4 py-2 rounded-md text-lg font-semibold">
-                  {displayData.price}
-                </div>
-              </Carousel>
-            </div> : <div className="relative container mx-auto max-w-5xl">
-              <div className="aspect-[4/3] w-full max-h-[600px] flex items-center justify-center p-4">
-                <img src={propertyImages[0]} alt={displayData.title || "Propriété"} className="max-w-full max-h-full object-contain" onError={e => {
-              console.log("Image error, using fallback");
-              e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
-            }} />
-              </div>
+          <div className="container mx-auto max-w-5xl">
+            <Carousel className="w-full" plugins={[AutoplayPlugin(autoplayOptions)]} opts={{
+              align: "center",
+              loop: true
+            }}>
+              <CarouselContent>
+                {propertyImages.map((image, index) => (
+                  <CarouselItem key={index} className="w-full">
+                    <div className="aspect-[4/3] w-full max-h-[600px] flex items-center justify-center p-4">
+                      <img 
+                        src={image} 
+                        alt={`${displayData.title} - Vue ${index + 1}`} 
+                        className="max-w-full max-h-full object-contain" 
+                        onError={e => {
+                          console.log("Image error, using fallback");
+                          e.currentTarget.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                        }} 
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="absolute left-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
+              <CarouselNext className="absolute right-4 z-10 bg-white/70 hover:bg-white text-[#C8A977] border-[#C8A977]" />
               
               {/* Price badge */}
               <div className="absolute top-4 right-4 z-10 bg-[#B17226] text-white px-4 py-2 rounded-md text-lg font-semibold">
                 {displayData.price}
               </div>
-            </div>}
+            </Carousel>
+          </div>
         </div>
         
         <div className="container mx-auto px-4">

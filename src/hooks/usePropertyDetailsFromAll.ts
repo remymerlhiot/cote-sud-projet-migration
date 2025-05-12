@@ -4,8 +4,8 @@ import { useAcfProperties, NormalizedProperty } from "@/hooks/useAcfProperties";
 import { useQuery } from "@tanstack/react-query";
 import { TransformedProperty } from "@/services/wordpress/types";
 
-// Type unifié qui peut accueillir les deux formats de données
-export type UnifiedPropertyDetails = TransformedProperty | NormalizedProperty;
+// Type unifié qui correspond uniquement au format TransformedProperty
+export type UnifiedPropertyDetails = TransformedProperty;
 
 /**
  * Hook qui tente de récupérer les détails d'une propriété depuis toutes les sources disponibles
@@ -73,17 +73,17 @@ function adaptACFToTransformed(acfProp: NormalizedProperty): TransformedProperty
     bedrooms: acfProp.chambres,
     bathrooms: "",
     image: acfProp.image,
-    allImages: acfProp.allImages,
+    allImages: acfProp.allImages || [acfProp.image],
     date: acfProp.date,
     description: acfProp.description,
     fullContent: acfProp.description, // ACF n'a pas de contenu complet séparé
     propertyType: acfProp.titre.split(" ")[0] || "PROPRIÉTÉ", // Utiliser le premier mot du titre comme type
-    constructionYear: "",
-    hasBalcony: false,
-    hasElevator: false,
-    hasTerrasse: false,
-    hasPool: false,
-    garageCount: "0", 
+    constructionYear: acfProp.constructionYear || "",
+    hasBalcony: acfProp.hasBalcony || false,
+    hasElevator: acfProp.hasElevator || false,
+    hasTerrasse: acfProp.hasTerrasse || false,
+    hasPool: acfProp.hasPool || false,
+    garageCount: acfProp.garageCount || "0", 
     dpe: "",
     // Ces champs supplémentaires ne sont pas disponibles dans ACF mais requis par TransformedProperty
     postalCode: "",
@@ -95,7 +95,7 @@ function adaptACFToTransformed(acfProp: NormalizedProperty): TransformedProperty
     dpeDate: "",
     isNewConstruction: false,
     isPrestigious: priceNumber > 1_000_000,
-    isFurnished: false,
+    isFurnished: acfProp.isFurnished || false,
     isViager: false,
     negotiatorName: "",
     negotiatorPhone: "",
