@@ -1,10 +1,9 @@
-
 import { Card, CardContent } from "@/components/ui/card";
-import { TransformedProperty } from "@/hooks/useProperties";
+import { NormalizedProperty } from "@/types";
 import { Link } from "react-router-dom";
 
 type PropertyProps = {
-  property: TransformedProperty;
+  property: NormalizedProperty;
 };
 
 // Affiche "NC" si la valeur est vide

@@ -1,8 +1,11 @@
 
 import { toast } from "@/components/ui/sonner";
-import { WordPressAnnonce, AcfData, NormalizedProperty } from "../types";
-import { normalizePropertyData } from "../services/wordpress/transformers";
+import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
+import { normalizePropertyData } from "./wordpress/transformers";
 import { API_BASE_URL, DEFAULT_IMAGE } from "./wordpress/config";
+
+// Exporter les types pour qu'ils soient utilisables par d'autres modules
+export type { NormalizedProperty };
 
 // 1. Liste WP REST
 export const fetchAnnoncesList = async (): Promise<WordPressAnnonce[]> => {

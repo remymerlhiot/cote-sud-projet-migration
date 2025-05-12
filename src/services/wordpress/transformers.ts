@@ -1,4 +1,5 @@
-import { WordPressAnnonce, AcfData, NormalizedProperty } from "./types";
+
+import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
 import { DEFAULT_IMAGE } from "./config";
 
 export const stripHtml = (html: string): string => {
@@ -89,6 +90,6 @@ export const normalizePropertyData = (
     isFurnished,
   };
 };
-// À la fin de transformers.ts
-export { normalizePropertyData as transformPropertyData };
 
+// Exporter la fonction renommée pour la compatibilité
+export { normalizePropertyData as transformPropertyData };
