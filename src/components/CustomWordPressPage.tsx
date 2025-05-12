@@ -7,6 +7,7 @@ import { toast } from "@/components/ui/sonner";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { TeamMemberProps } from "@/components/team/TeamMember";
 import { Phone, Mail, Linkedin } from "lucide-react";
+
 interface CustomWordPressPageProps {
   slug: string;
   className?: string;
@@ -17,7 +18,9 @@ interface CustomWordPressPageProps {
   styleTeamSection?: boolean;
   debugMode?: boolean;
   hideContent?: boolean; // New prop to control content visibility
+  fallbackContent?: React.ReactNode; // Add fallback content prop
 }
+
 const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
   slug,
   className = "",
@@ -27,13 +30,16 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
   hideTeamSection = false,
   styleTeamSection = false,
   debugMode = false,
-  hideContent = false // Default to showing content
+  hideContent = false, // Default to showing content
+  fallbackContent = null // Default fallback content
 }) => {
   const {
     data: page,
     isLoading,
-    isError
-  } = useCustomPage(slug);
+    isError,
+    error
+  } = useCustomPage(slug, { showErrors: false });
+  
   const [showOriginalHtml, setShowOriginalHtml] = useState<boolean>(false);
   const [originalContent, setOriginalContent] = useState<string>("");
   const [processedContent, setProcessedContent] = useState<string>("");
@@ -47,9 +53,17 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
     isFromWordPress: false
   };
 
+  // Log errors for debugging purposes
+  useEffect(() => {
+    if (isError) {
+      console.error(`Error loading page '${slug}':`, error);
+    }
+  }, [isError, error, slug]);
+
   // Process and clean the HTML content
   const processedHtmlContent = useMemo(() => {
     if (!page?.content) return "";
+    
     let content = page.content;
 
     // Clean the Elementor HTML
@@ -357,19 +371,90 @@ const CustomWordPressPage: React.FC<CustomWordPressPageProps> = ({
       console.log("WordPress page debug mode enabled");
     }
   }, [debugMode]);
+
   if (isLoading) {
-    return <div className="space-y-4">
+    return (
+      <div className="space-y-4">
         {showTitle && <Skeleton className="h-12 w-3/4" />}
         <Skeleton className="h-64 w-full" />
         <Skeleton className="h-32 w-full" />
-      </div>;
+      </div>
+    );
   }
-  if (isError) {
-    return <div className="text-center p-8 text-red-500">Erreur lors du chargement de la page</div>;
+
+  if (isError || !page) {
+    if (fallbackContent) {
+      return <>{fallbackContent}</>;
+    }
+    
+    return (
+      <div className="text-center py-12 px-4">
+        <h3 className="font-playfair text-2xl text-sable mb-4">
+          Contenu non disponible
+        </h3>
+        <p className="text-anthracite mb-6">
+          Nous ne pouvons pas afficher ce contenu pour le moment. Veuillez réessayer ultérieurement.
+        </p>
+        <div className="w-24 h-0.5 bg-sable/30 mx-auto"></div>
+      </div>
+    );
   }
-  if (!page) {
-    return <div className="text-center p-8 text-[#CD9B59]">Page introuvable</div>;
+
+  if (hideContent) {
+    return null;
   }
-  return;
+
+  return (
+    <div className={`wordpress-page ${className}`}>
+      {showTitle && page && (
+        <>
+          <h1 
+            className="text-3xl md:text-4xl lg:text-5xl font-playfair font-normal text-sable text-center mb-6"
+            dangerouslySetInnerHTML={{ __html: page.title }}
+          />
+          <div className="w-24 h-0.5 bg-sable/30 mx-auto mb-12"></div>
+        </>
+      )}
+      
+      {page?.featured_image && (
+        <div className="featured-image mb-8">
+          <img 
+            src={page.featured_image} 
+            alt={page.title || "Featured image"} 
+            className="w-full h-auto rounded-lg"
+          />
+        </div>
+      )}
+      
+      {page && (
+        <div 
+          className="page-content prose max-w-none prose-headings:text-sable prose-headings:font-light elementor-content"
+          dangerouslySetInnerHTML={{ __html: processedHtmlContent }}
+        />
+      )}
+
+      {debugMode && (
+        <div className="mt-8 p-4 bg-slate-100 rounded-lg">
+          <div className="flex justify-between items-center mb-4">
+            <h4 className="text-sm font-medium">Debug Mode</h4>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowOriginalHtml(!showOriginalHtml)}
+            >
+              {showOriginalHtml ? "Show Processed HTML" : "Show Original HTML"}
+            </Button>
+          </div>
+          
+          <div className="bg-white p-2 rounded border overflow-auto max-h-64">
+            <pre className="text-xs">
+              {showOriginalHtml ? originalContent : processedContent}
+            </pre>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
+
 export default CustomWordPressPage;
