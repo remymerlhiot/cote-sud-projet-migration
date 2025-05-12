@@ -76,6 +76,25 @@ export interface NormalizedProperty {
   negotiatorPostalCode?: string;
 }
 
+// Nouveaux champs attendus :
+  propertyType?: string;
+  isNewConstruction?: boolean;
+  isPrestigious?: boolean;
+  isViager?: boolean;
+  ref?: string;
+  price?: string;
+  area?: string;
+  rooms?: string;
+  bedrooms?: string;
+  bathrooms?: string;
+  isFurnished?: boolean;
+  garageCount?: string;
+  hasBalcony?: boolean;
+  hasTerrasse?: boolean;
+  hasElevator?: boolean;
+  hasPool?: boolean;
+}
+
 // Aliases to maintain compatibility
 export type WordPressProperty = WordPressAnnonce;
 export type TransformedProperty = NormalizedProperty;
