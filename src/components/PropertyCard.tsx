@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { NormalizedProperty } from "@/types";
 import { Link } from "react-router-dom";
@@ -47,7 +48,7 @@ const PropertyCard = ({ property }: PropertyProps) => {
   // Type affiché
   const displayType =
     property.propertyType ||
-    property.title?.split(" ")[0] ||
+    property.titre?.split(" ")[0] ||
     "PROPRIÉTÉ";
 
   const renderFeatureBadges = () => {
@@ -92,11 +93,11 @@ const PropertyCard = ({ property }: PropertyProps) => {
           <div className="relative">
             <img
               src={displayImage}
-              alt={property.title}
+              alt={property.titre}
               className="w-full h-56 object-cover"
             />
             <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
-              {property.ref}
+              {property.reference || property.ref}
             </div>
             {displayType && (
               <div className="absolute top-3 left-1/2 transform -translate-x-1/2 bg-[#C8A977]/90 text-white px-3 py-1 text-xs font-medium uppercase">
@@ -108,30 +109,30 @@ const PropertyCard = ({ property }: PropertyProps) => {
 
           <div className="p-4 text-center">
             <h3 className="text-lg font-serif mt-2 text-[#C8A977]">
-              {property.title}
+              {property.titre}
             </h3>
 
             <p className="font-semibold text-lg mb-4 text-[#B17226]">
-              {property.price}
+              {property.prix || property.price}
             </p>
 
             <div className="grid grid-cols-3 gap-2 border-t border-gray-200 pt-4 mb-4">
               <div className="flex flex-col items-center">
                 <p className="text-[10px] text-gray-600">Surface</p>
                 <p className="font-medium text-sm">
-                  {displayValue(property.area)}
+                  {displayValue(property.surface || property.area)}
                 </p>
               </div>
               <div className="flex flex-col items-center border-l border-r border-gray-200">
                 <p className="text-[10px] text-gray-600">Pièces</p>
                 <p className="font-medium text-sm">
-                  {displayValue(property.rooms)}
+                  {displayValue(property.pieces || property.rooms)}
                 </p>
               </div>
               <div className="flex flex-col items-center">
                 <p className="text-[10px] text-gray-600">Chambres</p>
                 <p className="font-medium text-sm">
-                  {displayValue(property.bedrooms)}
+                  {displayValue(property.chambres || property.bedrooms)}
                 </p>
               </div>
             </div>

@@ -15,7 +15,8 @@ export * from "./mediaApi";
 // Export propertyApi mais en évitant les conflits de nommage
 export { 
   fetchProperties as fetchWordPressProperties,
-  fetchPropertyById as fetchWordPressPropertyById
+  fetchPropertyById as fetchWordPressPropertyById,
+  transformPropertyData
 } from "./propertyApi";
 
 // Re-export FTP property API

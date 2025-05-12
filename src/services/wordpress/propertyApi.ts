@@ -1,9 +1,8 @@
 
 import { toast } from "@/components/ui/sonner";
 import { API_BASE_URL } from "./config";
-import { WordPressProperty } from "./types";
+import { WordPressProperty, TransformedProperty } from "./types";
 import { transformPropertyData } from "./transformers";
-import { TransformedProperty } from "./types";
 
 /**
  * Récupère toutes les propriétés (liste)
@@ -15,7 +14,7 @@ export const fetchProperties = async (): Promise<TransformedProperty[]> => {
       throw new Error(`Error fetching properties: ${response.statusText}`);
     }
     const data: WordPressProperty[] = await response.json();
-    return data.map(transformPropertyData);
+    return data.map((property) => transformPropertyData(property, null));
   } catch (error) {
     console.error("Failed to fetch properties:", error);
     toast.error("Impossible de récupérer les biens immobiliers");
@@ -63,7 +62,7 @@ export const fetchPropertyById = async (id: number): Promise<TransformedProperty
     }
 
     // 3) On transforme l'objet complet
-    const transformed = transformPropertyData(data);
+    const transformed = transformPropertyData(data, null);
     console.log(`Property ${id}: Transformation terminée, ${transformed.allImages.length} images disponibles`);
     
     // Log des URLs d'images pour débogage

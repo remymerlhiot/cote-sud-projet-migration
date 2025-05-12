@@ -1,3 +1,4 @@
+
 import { toast } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { TransformedProperty } from "./wordpress/types";
@@ -66,13 +67,18 @@ export const transformFTPPropertyData = (ftp: FTPProperty): TransformedProperty 
 
   return {
     id: parseInt(ftp.id) || 0,
-    title: ftp.type || ftp.title || "Propriété",
+    titre: ftp.type || ftp.title || "Propriété",
     location: ftp.city || "",
+    reference: ftp.reference || `REF ${ftp.id}`,
     ref: ftp.reference || `REF ${ftp.id}`,
+    prix: formattedPrice,
     price: formattedPrice,
     priceNumber: numPrice,
+    surface: ftp.surface ? `${ftp.surface}m²` : "",
     area: ftp.surface ? `${ftp.surface}m²` : "",
+    pieces: ftp.rooms || "",
     rooms: ftp.rooms || "",
+    chambres: ftp.bedrooms || "",
     bedrooms: ftp.bedrooms || "",
     image: ftp.photos[0] || FALLBACK_IMAGE,
     allImages: ftp.photos,
@@ -80,6 +86,7 @@ export const transformFTPPropertyData = (ftp: FTPProperty): TransformedProperty 
     description: ftp.description || "",
     fullContent: ftp.description || "",
     propertyType: ftp.type || "",
+    title: ftp.title || "",
     constructionYear: ftp.constructionYear || "",
     hasBalcony: ftp.features.hasBalcony,
     hasElevator: ftp.features.hasElevator,
@@ -110,5 +117,6 @@ export const transformFTPPropertyData = (ftp: FTPProperty): TransformedProperty 
     negotiatorPhoto: "",
     negotiatorCity: "",
     negotiatorPostalCode: "",
+    ville: ftp.city || "",
   };
 };

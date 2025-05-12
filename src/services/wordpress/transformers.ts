@@ -68,15 +68,29 @@ export const normalizePropertyData = (
     description = stripHtml(annonce.content.rendered).slice(0, 150) + "...";
   }
 
+  const prixValue = getField(["prix", "prix_affiche", "price"]) || "Prix sur demande";
+  const villeValue = getField(["ville", "localisation", "city"]) || "NC";
+  const surfaceValue = getField(["surf_hab", "surface", "area"]) || "NC";
+  const piecesValue = getField(["piece", "pieces", "rooms"]) || "NC";
+  const chambresValue = getField(["nb_chambre", "chambres", "bedrooms"]) || "NC";
+  const referenceValue = getField(["mandat", "reference", "ref"]) || `REF-${annonce.id}`;
+
   return {
     id: annonce.id,
     titre: annonce.title.rendered,
-    prix: getField(["prix", "prix_affiche", "price"]) || "Prix sur demande",
-    ville: getField(["ville", "localisation", "city"]) || "NC",
-    surface: getField(["surf_hab", "surface", "area"]) || "NC",
-    pieces: getField(["piece", "pieces", "rooms"]) || "NC",
-    chambres: getField(["nb_chambre", "chambres", "bedrooms"]) || "NC",
-    reference: getField(["mandat", "reference", "ref"]) || `REF-${annonce.id}`,
+    title: annonce.title.rendered,
+    prix: prixValue,
+    price: prixValue,
+    ville: villeValue,
+    location: villeValue,
+    surface: surfaceValue,
+    area: surfaceValue,
+    pieces: piecesValue,
+    rooms: piecesValue,
+    chambres: chambresValue,
+    bedrooms: chambresValue,
+    reference: referenceValue,
+    ref: referenceValue,
     image: allImages[0],
     allImages,
     description,
@@ -88,6 +102,12 @@ export const normalizePropertyData = (
     garageCount,
     constructionYear,
     isFurnished,
+    // Extended properties for compatibility
+    isNewConstruction: false,
+    isPrestigious: false,
+    isViager: false,
+    propertyType: annonce.title.rendered.split(" ")[0] || "Propriété",
+    bathrooms: "",
   };
 };
 
