@@ -1,5 +1,4 @@
-
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -7,13 +6,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import NosBiens from "./pages/NosBiens";
+import PropertyDetail from "./pages/PropertyDetail";
+import NosAvis from "./pages/NosAvis";
+import NotreHistoire from "./pages/NotreHistoire";
+import Partenaires from "./pages/Partenaires";
+import Estimation from "./pages/Estimation";
 import PageTest from "./pages/PageTest";
 import DynamicPage from "./pages/DynamicPage";
-import PropertyDetail from "./pages/PropertyDetail";
-import NotreHistoire from "./pages/NotreHistoire";
-import Estimation from "./pages/Estimation";
-import NosAvis from "./pages/NosAvis"; 
-import Partenaires from "./pages/Partenaires";
+import PropertyListACF from "./pages/PropertyListACF"; // Import de la nouvelle page ACF
 
 const queryClient = new QueryClient();
 
