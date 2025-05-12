@@ -1,33 +1,3 @@
-export interface NormalizedProperty {
-  id: number;
-  titre: string;
-  title?: string;
-  prix: string;
-  price?: string;
-  ville: string;
-  location?: string;
-  surface: string;
-  area?: string;
-  pieces: string;
-  rooms?: string;
-  chambres: string;
-  bedrooms?: string;
-  reference: string;
-  ref?: string;
-  image: string;
-  allImages: string[];
-  description: string;
-  date: string;
-  hasBalcony?: boolean;
-  hasTerrasse?: boolean;
-  hasElevator?: boolean;
-  hasPool?: boolean;
-  garageCount?: string;
-  constructionYear?: string;
-  isFurnished?: boolean;
-  isNewConstruction?: boolean;
-  isPrestigious?: boolean;
-  isViager?: boolean;
-  propertyType?: string;
-  bathrooms?: string;
-}
+
+// This file now just re-exports the central type definitions
+export { NormalizedProperty, TransformedProperty } from '@/types';

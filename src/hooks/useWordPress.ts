@@ -6,10 +6,9 @@ import {
   fetchMedia, 
   fetchPageBySlug,
   fetchWordPressPropertyById,
-  transformPropertyData,
-  TransformedProperty,
-  WordPressProperty
+  transformPropertyData
 } from "@/services/wordpress";
+import { WordPressAnnonce, NormalizedProperty } from "@/types";
 
 export const useProperties = () => {
   return useQuery({
@@ -55,4 +54,5 @@ export const useMedia = (mediaId: number) => {
 };
 
 // Re-export the transform function and types for convenience
-export { transformPropertyData, type WordPressProperty, type TransformedProperty };
+export { transformPropertyData };
+export type { WordPressAnnonce, NormalizedProperty };

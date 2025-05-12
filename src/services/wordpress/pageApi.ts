@@ -1,6 +1,6 @@
-
-import { API_BASE_URL, CUSTOM_API_BASE_URL } from "./config";
-import { WordPressPage, CustomWordPressPage } from "./types";
+import { API_BASE_URL } from "./config";
+import { toast } from "@/components/ui/sonner";
+import { WordPressPage, CustomWordPressPage } from "@/types";
 
 // Fetch pages from WordPress API
 export const fetchPages = async (): Promise<any[]> => {
@@ -16,7 +16,7 @@ export const fetchPages = async (): Promise<any[]> => {
     return data;
   } catch (error) {
     console.error("Failed to fetch pages:", error);
-    // Removed toast notification
+    toast.error("Failed to fetch pages");
     return [];
   }
 };
@@ -51,7 +51,7 @@ export const fetchPageBySlug = async (slug: string): Promise<WordPressPage | nul
     return null;
   } catch (error) {
     console.error(`Failed to fetch page with slug "${slug}" from standard API:`, error);
-    // Removed toast notification
+    toast.error("Failed to fetch page");
     return null;
   }
 };

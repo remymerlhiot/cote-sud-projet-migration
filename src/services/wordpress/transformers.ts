@@ -1,3 +1,4 @@
+
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
 import { DEFAULT_IMAGE } from "./config";
 

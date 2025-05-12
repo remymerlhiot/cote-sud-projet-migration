@@ -1,7 +1,6 @@
-// src/services/wordpress.ts
 
-// Ce fichier ré-exporte les modules clés des services WordPress
-// pour maintenir la compatibilité et centraliser les exports.
+// src/services/wordpress.ts
+// This file now just re-exports from the centralized modules
 
 // Types et configuration
 export * from "./wordpress/types";

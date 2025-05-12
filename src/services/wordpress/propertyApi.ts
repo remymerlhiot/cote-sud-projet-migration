@@ -1,19 +1,19 @@
 
 import { toast } from "@/components/ui/sonner";
 import { API_BASE_URL } from "./config";
-import { WordPressProperty, TransformedProperty } from "./types";
+import { WordPressAnnonce, NormalizedProperty } from "@/types";
 import { transformPropertyData } from "./transformers";
 
 /**
  * Récupère toutes les propriétés (liste)
  */
-export const fetchProperties = async (): Promise<TransformedProperty[]> => {
+export const fetchProperties = async (): Promise<NormalizedProperty[]> => {
   try {
     const response = await fetch(`${API_BASE_URL}/annonce?_embed&per_page=40`);
     if (!response.ok) {
       throw new Error(`Error fetching properties: ${response.statusText}`);
     }
-    const data: WordPressProperty[] = await response.json();
+    const data: WordPressAnnonce[] = await response.json();
     return data.map((property) => transformPropertyData(property, null));
   } catch (error) {
     console.error("Failed to fetch properties:", error);
@@ -27,12 +27,12 @@ export const fetchProperties = async (): Promise<TransformedProperty[]> => {
  * dans `_embedded["wp:attachment"]` la liste de tous
  * les médias attachés au post (pour Elementor carousel).
  */
-export const fetchPropertyById = async (id: number): Promise<TransformedProperty | null> => {
+export const fetchPropertyById = async (id: number): Promise<NormalizedProperty | null> => {
   try {
     // 1) On charge d'abord la donnée principale avec featuredmedia
     const res = await fetch(`${API_BASE_URL}/annonce/${id}?_embed`);
     if (!res.ok) throw new Error(res.statusText);
-    const data: any = await res.json();
+    const data: WordPressAnnonce = await res.json();
 
     console.log(`Property ${id}: Récupération des données principales réussie`);
 

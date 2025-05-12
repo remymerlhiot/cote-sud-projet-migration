@@ -1,6 +1,6 @@
 
 // Re-export all types
-export * from "./types";
+export * from "@/types";
 
 // Re-export config
 export * from "./config";

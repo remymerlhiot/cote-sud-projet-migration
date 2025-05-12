@@ -1,6 +1,6 @@
-
 import { API_BASE_URL } from "./config";
-import { WordPressMedia } from "./types";
+import { toast } from "@/components/ui/sonner";
+import { WordPressMedia } from "@/types";
 
 // Fetch media from WordPress API
 export const fetchMedia = async (mediaId: number): Promise<WordPressMedia | null> => {
@@ -15,6 +15,7 @@ export const fetchMedia = async (mediaId: number): Promise<WordPressMedia | null
     return data;
   } catch (error) {
     console.error(`Failed to fetch media #${mediaId}:`, error);
+    toast.error(`Failed to fetch media #${mediaId}: ${error.message}`);
     return null;
   }
 };

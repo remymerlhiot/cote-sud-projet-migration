@@ -22,15 +22,26 @@ export interface AcfData {
   };
 }
 
+/**
+ * Interface unifiée pour les propriétés immobilières
+ * Cette définition est la source unique de référence pour tous les composants
+ */
 export interface NormalizedProperty {
   id: number;
   titre: string;
+  title?: string;
   prix: string;
+  price?: string;
   ville: string;
+  location?: string;
   surface: string;
+  area?: string;
   pieces: string;
+  rooms?: string;
   chambres: string;
+  bedrooms?: string;
   reference: string;
+  ref?: string;
   image: string;
   allImages: string[];
   description: string;
@@ -42,20 +53,36 @@ export interface NormalizedProperty {
   garageCount?: string;
   constructionYear?: string;
   isFurnished?: boolean;
+  isNewConstruction?: boolean;
+  isPrestigious?: boolean;
+  isViager?: boolean;
+  propertyType?: string;
+  bathrooms?: string;
+  fullContent?: string;
+  dpe?: string;
+  postalCode?: string;
+  address?: string;
+  country?: string;
+  landArea?: string;
+  floorNumber?: string;
+  totalFloors?: string;
+  toilets?: string;
+  heatingType?: string;
+  dpeGes?: string;
+  dpeValue?: string;
+  dpeGesValue?: string;
+  dpeDate?: string;
+  negotiatorName?: string;
+  negotiatorPhone?: string;
+  negotiatorEmail?: string;
+  negotiatorPhoto?: string;
+  negotiatorCity?: string;
+  negotiatorPostalCode?: string;
+  priceNumber?: number;
 }
 
 // Pour les propriétés WordPress
-export interface WordPressProperty {
-  id: number;
-  title: { rendered: string };
-  content?: { rendered: string };
-  excerpt?: { rendered: string };
-  date: string;
-  _embedded?: {
-    "wp:featuredmedia"?: Array<{ source_url: string; alt_text?: string }>;
-    "wp:attachment"?: Array<{ source_url: string; alt_text?: string }>;
-  };
-}
+export interface WordPressProperty extends WordPressAnnonce {}
 
 export type TransformedProperty = NormalizedProperty;
 
