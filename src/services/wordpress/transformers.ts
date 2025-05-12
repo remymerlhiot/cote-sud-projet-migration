@@ -89,3 +89,6 @@ export const normalizePropertyData = (
     isFurnished,
   };
 };
+// À la fin de transformers.ts
+export { normalizePropertyData as transformPropertyData };
+
