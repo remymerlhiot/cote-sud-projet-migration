@@ -1,4 +1,5 @@
-import { API_BASE_URL } from "./config";
+
+import { API_BASE_URL, CUSTOM_API_BASE_URL } from "./config";
 import { toast } from "@/components/ui/sonner";
 import { WordPressPage, CustomWordPressPage } from "@/types";
 

@@ -1,7 +1,7 @@
 
 import { Spinner } from "@/components/ui/spinner";
 import { usePropertyDetailsFromAll } from "@/hooks/usePropertyDetailsFromAll";
-import PropertyCarousel from "@/components/home/PropertyCarousel";
+import PropertyCarousel from "@/components/PropertyCarousel";
 
 export default function PropertyDetail() {
   const { property, isLoading } = usePropertyDetailsFromAll();
