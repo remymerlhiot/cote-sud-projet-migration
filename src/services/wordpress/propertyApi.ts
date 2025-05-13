@@ -1,3 +1,11 @@
+import { toast } from "@/components/ui/sonner";
+import { API_BASE_URL } from "./config";
+import { WordPressAnnonce, NormalizedProperty } from "@/types";
+import { transformPropertyData } from "./transformers";
+
+/**
+ * Récupère toutes les propriétés (liste)
+ */
 export const fetchProperties = async (): Promise<NormalizedProperty[]> => {
   try {
     // Ajout du paramètre _embed=1 pour obtenir les médias embarqués
@@ -13,6 +21,10 @@ export const fetchProperties = async (): Promise<NormalizedProperty[]> => {
     const withGalerie = data.filter(p => p.galerie_elementor && p.galerie_elementor.length > 0).length;
     console.log(`Propriétés récupérées: ${data.length}, dont ${withGalerie} avec galerie_elementor`);
     
+    if (data.length > 0 && data[0].galerie_elementor) {
+      console.log("Exemple de galerie_elementor:", data[0].galerie_elementor.length, "images");
+    }
+    
     return data.map((property) => transformPropertyData(property, null));
   } catch (error) {
     console.error("Failed to fetch properties:", error);
@@ -21,6 +33,11 @@ export const fetchProperties = async (): Promise<NormalizedProperty[]> => {
   }
 };
 
+/**
+ * Récupère une propriété par son ID, et injecte
+ * dans `_embedded["wp:attachment"]` la liste de tous
+ * les médias attachés au post (pour Elementor carousel).
+ */
 export const fetchPropertyById = async (id: number): Promise<NormalizedProperty | null> => {
   try {
     // 1) On charge d'abord la donnée principale avec _embed=1
@@ -33,6 +50,11 @@ export const fetchPropertyById = async (id: number): Promise<NormalizedProperty 
     // Vérifier si nous avons une galerie_elementor
     if (data.galerie_elementor && Array.isArray(data.galerie_elementor) && data.galerie_elementor.length > 0) {
       console.log(`Property ${id}: galerie_elementor trouvée avec ${data.galerie_elementor.length} images`);
+      
+      // Vérifier les premières images
+      if (data.galerie_elementor.length > 0) {
+        console.log("Premier URL d'image:", data.galerie_elementor[0]);
+      }
     } else {
       console.log(`Property ${id}: Pas de galerie_elementor, utilisation des attachements classiques`);
       
@@ -46,7 +68,7 @@ export const fetchPropertyById = async (id: number): Promise<NormalizedProperty 
       if (mediaRes.ok) {
         const atts: any[] = await mediaRes.json();
         console.log(`Property ${id}: Médias attachés récupérés avec succès`, 
-          atts.map(a => ({ id: a.id, url: a.source_url })));
+          atts.slice(0, 3).map(a => ({ id: a.id, url: a.source_url })));
 
         // Initialiser ou remplacer le tableau wp:attachment
         if (!data._embedded) {
@@ -61,8 +83,10 @@ export const fetchPropertyById = async (id: number): Promise<NormalizedProperty 
     const transformed = transformPropertyData(data, null);
     console.log(`Property ${id}: Transformation terminée, ${transformed.allImages.length} images disponibles`);
     
-    // Log des URLs d'images pour débogage
-    console.log(`Property ${id}: URLs des images:`, transformed.allImages);
+    // Log des URLs d'images pour débogage (seulement les 3 premières)
+    if (transformed.allImages.length > 0) {
+      console.log(`Property ${id}: Premières images:`, transformed.allImages.slice(0, 3));
+    }
 
     return transformed;
   } catch (error) {
@@ -71,3 +95,6 @@ export const fetchPropertyById = async (id: number): Promise<NormalizedProperty 
     return null;
   }
 };
+
+// Exporter transformPropertyData pour résoudre l'erreur d'importation
+export { transformPropertyData } from "./transformers";
