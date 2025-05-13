@@ -17,4 +17,4 @@ export const ACF_API_BASE_URL = "https://agence-axo.immo/wp-json/acf/v3";
 /**
  * Image par défaut en cas d'absence
  */
-export const DEFAULT_IMAGE = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+export const DEFAULT_IMAGE = "https://cote-sud.immo/wp-content/uploads/2024/10/AXO_COTE-SUD_PRESTIGE-PATRIMOINE_SABLE-CUIVRE-SABLE-2-768x400.png";
