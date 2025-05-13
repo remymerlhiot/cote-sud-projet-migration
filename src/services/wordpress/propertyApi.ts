@@ -1,9 +1,7 @@
 export const fetchProperties = async (): Promise<NormalizedProperty[]> => {
   try {
-    // Requête avec paramètres explicites pour inclure toutes les données nécessaires
-    const response = await fetch(
-      `${API_BASE_URL}/annonce?_embed=1&per_page=40&_fields=id,title,content,excerpt,date,acf,galerie_elementor,_links,_embedded`
-    );
+    // Ajout du paramètre _embed=1 pour obtenir les médias embarqués
+    const response = await fetch(`${API_BASE_URL}/annonce?_embed=1&per_page=40`);
     
     if (!response.ok) {
       throw new Error(`Error fetching properties: ${response.statusText}`);
@@ -11,30 +9,10 @@ export const fetchProperties = async (): Promise<NormalizedProperty[]> => {
     
     const data: WordPressAnnonce[] = await response.json();
     
-    // Log détaillé pour débugger
-    console.log(`API: ${data.length} propriétés récupérées`);
+    // Log des statistiques de galeries
+    const withGalerie = data.filter(p => p.galerie_elementor && p.galerie_elementor.length > 0).length;
+    console.log(`Propriétés récupérées: ${data.length}, dont ${withGalerie} avec galerie_elementor`);
     
-    if (data.length > 0) {
-      // Vérifier la structure des données pour la première propriété
-      const firstProp = data[0];
-      console.log("Structure de données pour la première propriété:", {
-        id: firstProp.id,
-        title: firstProp.title?.rendered,
-        hasGalerie: Boolean(firstProp.galerie_elementor && firstProp.galerie_elementor.length > 0),
-        hasFeatured: Boolean(firstProp._embedded && firstProp._embedded["wp:featuredmedia"]),
-        hasAttachments: Boolean(firstProp._embedded && firstProp._embedded["wp:attachment"]),
-        attachmentCount: firstProp._embedded?.["wp:attachment"]?.length || 0
-      });
-      
-      // Si galerie_elementor existe, vérifier son format
-      if (firstProp.galerie_elementor && firstProp.galerie_elementor.length > 0) {
-        console.log("Format de galerie_elementor:", 
-          typeof firstProp.galerie_elementor[0], 
-          firstProp.galerie_elementor[0]);
-      }
-    }
-    
-    // Transformer les données en utilisant normalizePropertyData
     return data.map((property) => transformPropertyData(property, null));
   } catch (error) {
     console.error("Failed to fetch properties:", error);
@@ -45,46 +23,47 @@ export const fetchProperties = async (): Promise<NormalizedProperty[]> => {
 
 export const fetchPropertyById = async (id: number): Promise<NormalizedProperty | null> => {
   try {
-    // 1) Récupérer la propriété avec les médias incorporés
+    // 1) On charge d'abord la donnée principale avec _embed=1
     const res = await fetch(`${API_BASE_URL}/annonce/${id}?_embed=1`);
-    
     if (!res.ok) throw new Error(res.statusText);
-    
     const data: WordPressAnnonce = await res.json();
+
+    console.log(`Property ${id}: Récupération des données principales réussie`);
     
-    console.log(`Property ${id}: Données principales récupérées`, {
-      hasGalerie: Boolean(data.galerie_elementor && data.galerie_elementor.length > 0),
-      hasFeatured: Boolean(data._embedded && data._embedded["wp:featuredmedia"]),
-      hasAttachments: Boolean(data._embedded && data._embedded["wp:attachment"]),
-      attachmentCount: data._embedded?.["wp:attachment"]?.length || 0
-    });
-    
-    // 2) Si pas de médias attachés, essayer de les récupérer explicitement
-    if (!data._embedded?.["wp:attachment"] || data._embedded["wp:attachment"].length === 0) {
-      console.log(`Property ${id}: Pas de médias attachés, récupération explicite...`);
+    // Vérifier si nous avons une galerie_elementor
+    if (data.galerie_elementor && Array.isArray(data.galerie_elementor) && data.galerie_elementor.length > 0) {
+      console.log(`Property ${id}: galerie_elementor trouvée avec ${data.galerie_elementor.length} images`);
+    } else {
+      console.log(`Property ${id}: Pas de galerie_elementor, utilisation des attachements classiques`);
       
-      // Récupérer les médias attachés à ce post
+      // 2) Si pas de galerie_elementor, on récupère séparément toutes les images attachées
+      // Le paramètre media_type=image assure qu'on ne récupère que des images
       const mediaRes = await fetch(`${API_BASE_URL}/media?parent=${id}&per_page=50&media_type=image`);
-      
+      const attsCount = mediaRes.headers.get('x-wp-total') || 'unknown';
+
+      console.log(`Property ${id}: ${attsCount} médias attachés trouvés`);
+
       if (mediaRes.ok) {
-        const attachments = await mediaRes.json();
-        console.log(`Property ${id}: ${attachments.length} médias récupérés explicitement`);
-        
-        // Ajouter les médias à l'objet _embedded
+        const atts: any[] = await mediaRes.json();
+        console.log(`Property ${id}: Médias attachés récupérés avec succès`, 
+          atts.map(a => ({ id: a.id, url: a.source_url })));
+
+        // Initialiser ou remplacer le tableau wp:attachment
         if (!data._embedded) {
           data._embedded = {};
         }
         
-        data._embedded["wp:attachment"] = attachments;
+        data._embedded["wp:attachment"] = atts;
       }
     }
-    
-    // 3) Transformer les données
+
+    // 3) On transforme l'objet complet
     const transformed = transformPropertyData(data, null);
+    console.log(`Property ${id}: Transformation terminée, ${transformed.allImages.length} images disponibles`);
     
-    console.log(`Property ${id}: Transformation terminée avec ${transformed.allImages.length} images`);
+    // Log des URLs d'images pour débogage
     console.log(`Property ${id}: URLs des images:`, transformed.allImages);
-    
+
     return transformed;
   } catch (error) {
     console.error(`Failed to fetch property #${id}:`, error);
