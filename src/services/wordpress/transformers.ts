@@ -37,28 +37,37 @@ export const normalizePropertyData = (
   const isViager = acfData?.acf?.viager === "1" || acfData?.acf?.viager === "oui";
   const bathrooms = getField(["nb_sdb", "bathrooms"]);
 
-  // Images
+  // Images - nouvelle logique prioritaire avec galerie_elementor
   let allImages: string[] = [];
-  const tryField = (field: any) => {
-    if (Array.isArray(field)) {
-      const urls = field.map((p: any) => p?.url).filter(Boolean);
-      if (urls.length) return urls;
-    } else if (typeof field === "string" && field.trim()) {
-      return [field];
-    }
-    return [];
-  };
+  
+  // 1. Vérifier d'abord galerie_elementor (priorité maximale)
+  if (annonce.galerie_elementor && Array.isArray(annonce.galerie_elementor) && annonce.galerie_elementor.length > 0) {
+    console.log(`Property ${annonce.id}: Utilisation de galerie_elementor avec ${annonce.galerie_elementor.length} images`);
+    allImages = annonce.galerie_elementor;
+  } else {
+    // 2. Si pas de galerie_elementor, utiliser la logique existante
+    const tryField = (field: any) => {
+      if (Array.isArray(field)) {
+        const urls = field.map((p: any) => p?.url).filter(Boolean);
+        if (urls.length) return urls;
+      } else if (typeof field === "string" && field.trim()) {
+        return [field];
+      }
+      return [];
+    };
 
-  if (acfData?.acf.photo) {
-    allImages = tryField(acfData.acf.photo);
-  } else if (acfData?.acf.liste_photos) {
-    allImages = tryField(acfData.acf.liste_photos);
-  } else if (acfData?.acf.photos) {
-    allImages = tryField(acfData.acf.photos);
-  } else if (annonce._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
-    allImages = [annonce._embedded["wp:featuredmedia"][0].source_url];
+    if (acfData?.acf.photo) {
+      allImages = tryField(acfData.acf.photo);
+    } else if (acfData?.acf.liste_photos) {
+      allImages = tryField(acfData.acf.liste_photos);
+    } else if (acfData?.acf.photos) {
+      allImages = tryField(acfData.acf.photos);
+    } else if (annonce._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
+      allImages = [annonce._embedded["wp:featuredmedia"][0].source_url];
+    }
   }
 
+  // Si aucune image n'est trouvée, utiliser l'image par défaut
   if (!allImages.length) {
     allImages = [DEFAULT_IMAGE];
   }

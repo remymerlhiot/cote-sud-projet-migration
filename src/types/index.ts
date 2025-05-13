@@ -6,6 +6,7 @@ export interface WordPressAnnonce {
   content?: { rendered: string };
   excerpt?: { rendered: string };
   date: string;
+  galerie_elementor?: string[]; // Tableau d'URLs d'images Elementor
   _embedded?: {
     "wp:featuredmedia"?: Array<{ source_url: string; alt_text?: string }>;
     "wp:attachment"?: Array<{ source_url: string; alt_text?: string }>;

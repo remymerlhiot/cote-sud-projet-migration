@@ -12,7 +12,14 @@ export const fetchAnnoncesList = async (): Promise<WordPressAnnonce[]> => {
   try {
     const res = await fetch(`${API_BASE_URL}/wp/v2/annonce?_embed&per_page=40`);
     if (!res.ok) throw new Error(res.statusText);
-    return res.json();
+    const annonces = await res.json();
+    
+    // Log des statistiques de galeries
+    const withGalerie = annonces.filter((p: WordPressAnnonce) => 
+      p.galerie_elementor && p.galerie_elementor.length > 0).length;
+    console.log(`FluxApi: ${annonces.length} annonces récupérées, dont ${withGalerie} avec galerie_elementor`);
+    
+    return annonces;
   } catch (e) {
     toast.error("Impossible de récupérer la liste des annonces");
     return [];
@@ -49,7 +56,8 @@ export const fetchAllAnnonces = async (): Promise<NormalizedProperty[]> => {
     annonces.map(async annonce => {
       const acf = await fetchAcfData(annonce.id);
       let np = normalizePropertyData(annonce, acf);
-      // fallback attachments
+      
+      // fallback attachments uniquement si on n'a pas d'images
       if (np.allImages.length === 1 && np.allImages[0] === DEFAULT_IMAGE) {
         const attached = await fetchAttachments(annonce.id);
         if (attached.length) {
