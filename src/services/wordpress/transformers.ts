@@ -1,3 +1,4 @@
+
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
 import { extractImagesFromHtml } from "@/utils/extractImages";
 import { DEFAULT_IMAGE } from "./config"; // Import DEFAULT_IMAGE
@@ -9,7 +10,7 @@ export const stripHtml = (html: string): string => {
   return tmp.textContent || tmp.innerText || "";
 };
 
-export const normalizePropertyData = (
+export const transformPropertyData = (
   annonce: WordPressAnnonce,
   acfData: AcfData | null
 ): NormalizedProperty => {
@@ -183,4 +184,4 @@ export const normalizePropertyData = (
   };
 };
 
-export { normalizePropertyData as transformPropertyData };
+// Remove the alias export since we now directly export the function with the right name
