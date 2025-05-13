@@ -35,7 +35,8 @@ const extractNegotiatorName = (fullName?: string): string => {
 };
 
 const PropertyCard = ({ property }: PropertyProps) => {
-  const displayImage = property.images?.[0] || "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+  // Use property.image for the main display image
+  const displayImage = property.image || "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
 
   const displayType =
     property.propertyType || property.titre?.split(" ")[0] || "PROPRIÉTÉ";
@@ -94,8 +95,9 @@ const PropertyCard = ({ property }: PropertyProps) => {
           </p>
           <div className="flex justify-between text-xs text-gray-600 mt-2">
             <span>Surface {displayValue(property.surface)} m²</span>
-            <span>Pièces {displayValue(property.nbPieces)}</span>
-            <span>Chambres {displayValue(property.nbChambres)}</span>
+            {/* Assuming nbPieces and nbChambres were typos and should be pieces and chambres */}
+            <span>Pièces {displayValue(property.pieces)}</span>
+            <span>Chambres {displayValue(property.chambres)}</span>
           </div>
         </div>
       </Card>

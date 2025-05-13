@@ -1,3 +1,4 @@
+
 import { Spinner } from "@/components/ui/spinner";
 import { usePropertyDetailsFromAll } from "@/hooks/usePropertyDetailsFromAll";
 import PropertyCarousel from "@/components/PropertyCarousel";
@@ -14,8 +15,9 @@ export default function PropertyDetail() {
     if (property) {
       document.title = `${property.titre} | Côté Sud Immobilier`;
 
-      console.log(`Propriété ${property.id}: ${property.images.length} images disponibles`);
-      console.log("URLs des images:", property.images);
+      // Use property.allImages here
+      console.log(`Propriété ${property.id}: ${property.allImages.length} images disponibles`);
+      console.log("URLs des images:", property.allImages);
     }
   }, [property]);
 
@@ -48,7 +50,8 @@ export default function PropertyDetail() {
     <main className="max-w-4xl mx-auto py-8 px-4">
       <h1 className="text-3xl font-serif text-[#C8A977] mb-6">{property.titre}</h1>
 
-      <PropertyCarousel images={property.images} title={property.titre} />
+      {/* Pass property.allImages to PropertyCarousel */}
+      <PropertyCarousel images={property.allImages} title={property.titre} />
 
       <section className="mt-8 space-y-6">
         <div className="flex flex-wrap justify-between items-center">
