@@ -1,3 +1,4 @@
+
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
 import { extractImagesFromHtml } from "@/utils/extractImages";
 
@@ -34,8 +35,8 @@ export const normalizePropertyData = (
   const garageCount = feats.garage || "0";
   const constructionYear = feats.annee_construction || "";
   const isFurnished = feats.meuble === "oui";
-
-  const isNewConstruction = acfData?.acf?.neuf === "1" || acfData?.acf?.neuf === "oui";
+  // Correction de la ligne ci-dessous pour supprimer les caractères invalides et initialiser correctement la constante
+  const isNewConstruction = feats.construction_neuve === "oui"; 
   const isPrestigious = acfData?.acf?.prestige === "1" || acfData?.acf?.prestige === "oui";
   const isViager = acfData?.acf?.viager === "1" || acfData?.acf?.viager === "oui";
   const bathrooms = getField(["nb_sdb", "bathrooms"]);
