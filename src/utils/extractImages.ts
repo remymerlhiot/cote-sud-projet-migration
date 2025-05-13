@@ -1,3 +1,6 @@
+/**
+ * Extrait toutes les URLs d'images d'une chaîne HTML
+ */
 export const extractImagesFromHtml = (html: string): string[] => {
   const imgRegex = /<img[^>]+src="([^">]+)"/g;
   const dataImgRegex = /data-image="([^"]+)"/g;
