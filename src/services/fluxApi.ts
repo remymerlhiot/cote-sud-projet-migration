@@ -1,7 +1,7 @@
 
 import { toast } from "@/components/ui/sonner";
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
-import { normalizePropertyData } from "./wordpress/transformers";
+import { transformPropertyData } from "./wordpress/transformers"; // Changed from normalizePropertyData
 import { API_BASE_URL, ACF_API_BASE_URL, DEFAULT_IMAGE } from "./wordpress/config";
 
 // Exporter les types pour qu'ils soient utilisables par d'autres modules
@@ -68,7 +68,7 @@ export const fetchAllAnnonces = async (): Promise<NormalizedProperty[]> => {
     const props = await Promise.all(
       annonces.map(async annonce => {
         const acf = await fetchAcfData(annonce.id);
-        let np = normalizePropertyData(annonce, acf);
+        let np = transformPropertyData(annonce, acf); // Changed from normalizePropertyData
         
         // fallback attachments uniquement si on n'a pas d'images
         if (np.allImages.length === 1 && np.allImages[0] === DEFAULT_IMAGE) {
@@ -89,3 +89,4 @@ export const fetchAllAnnonces = async (): Promise<NormalizedProperty[]> => {
     return [];
   }
 };
+

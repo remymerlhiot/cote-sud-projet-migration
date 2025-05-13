@@ -1,4 +1,3 @@
-
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
 import { extractImagesFromHtml } from "@/utils/extractImages";
 import { DEFAULT_IMAGE } from "./config"; // Import DEFAULT_IMAGE
@@ -64,7 +63,8 @@ export const transformPropertyData = (
     if (Array.isArray(attachments) && attachments.length > 0) {
       allImages = attachments.map(att => {
         if (typeof att === 'object' && att !== null) {
-          return att.source_url || att.guid?.rendered || '';
+          // Corrected: use only att.source_url as att.guid is not in the type
+          return att.source_url || ''; 
         }
         return '';
       }).filter(Boolean);
