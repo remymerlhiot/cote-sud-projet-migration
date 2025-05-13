@@ -95,6 +95,13 @@ const PropertyCard = ({ property }: PropertyProps) => {
               src={displayImage}
               alt={property.titre}
               className="w-full h-56 object-cover"
+              loading="lazy"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                console.log(`Image error for property ${property.id}: ${target.src}`);
+              }}
             />
             <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">
               {property.reference || property.ref}

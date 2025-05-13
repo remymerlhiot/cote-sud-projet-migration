@@ -3,6 +3,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import AutoplayPlugin from "embla-carousel-autoplay";
 import { useAcfProperties, NormalizedProperty } from "@/hooks/useAcfProperties";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const PropertyCarouselACF = () => {
   // Fetch properties from ACF API
@@ -11,6 +12,28 @@ const PropertyCarouselACF = () => {
     isLoading,
     error
   } = useAcfProperties();
+  
+  // Log debug information about images
+  useEffect(() => {
+    if (properties && properties.length > 0) {
+      console.log(`PropertyCarouselACF: ${properties.length} propriétés chargées`);
+      
+      // Vérifier les images disponibles
+      const withImages = properties.filter(p => 
+        p.allImages && p.allImages.length > 0 && p.allImages[0] !== "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png"
+      ).length;
+      
+      console.log(`PropertyCarouselACF: ${withImages}/${properties.length} propriétés ont des images valides`);
+      
+      // Afficher le premier bien comme exemple
+      if (properties[0]) {
+        console.log(`Exemple - Première propriété (ID: ${properties[0].id}):`);
+        console.log(`- Image principale:`, properties[0].image);
+        console.log(`- Toutes les images (${properties[0].allImages.length}):`, properties[0].allImages);
+        console.log(`- Titre:`, properties[0].titre);
+      }
+    }
+  }, [properties]);
 
   // Si aucun bien n'est trouvé ou en cours de chargement, afficher un message
   if (isLoading) {
@@ -64,10 +87,12 @@ const PropertyCarouselACF = () => {
                           src={property.image} 
                           alt={property.titre}
                           className="w-full h-56 object-cover" 
+                          loading="lazy"
                           onError={e => {
                             const target = e.target as HTMLImageElement;
                             target.onerror = null;
                             target.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
+                            console.log(`Erreur de chargement d'image pour la propriété ${property.id}`);
                           }} 
                         />
                         <div className="absolute top-3 left-3 bg-white/80 px-2 py-1 text-[10px] font-medium">

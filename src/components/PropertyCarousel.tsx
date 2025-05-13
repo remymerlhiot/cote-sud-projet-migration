@@ -27,7 +27,7 @@ export default function PropertyCarousel({ images, title }: PropertyCarouselProp
   };
 
   const handleImageError = (index: number, e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.log(`Image loading error at index ${index}`);
+    console.log(`Image loading error at index ${index}:`, images[index]);
     const target = e.target as HTMLImageElement;
     target.onerror = null;
     target.src = "/lovable-uploads/fb5d6ada-8792-4e04-841d-2d9f6f6d9b39.png";
@@ -46,6 +46,9 @@ export default function PropertyCarousel({ images, title }: PropertyCarouselProp
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         loop={displayImages.length > 1}
         className="w-full h-[400px] md:h-[500px] rounded-md overflow-hidden"
+        touchEventsTarget="container"
+        simulateTouch={true}
+        threshold={5}
       >
         {displayImages.map((src, i) => (
           <SwiperSlide key={i} className="w-full h-full relative">
@@ -58,6 +61,7 @@ export default function PropertyCarousel({ images, title }: PropertyCarouselProp
               src={src}
               alt={`${title} – photo ${i + 1}`}
               className="w-full h-full object-cover"
+              loading="lazy"
               onLoad={() => handleImageLoad(i)}
               onError={(e) => handleImageError(i, e)}
               style={{ display: imagesLoaded[i] ? "block" : "none" }}
