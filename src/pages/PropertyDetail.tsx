@@ -1,23 +1,51 @@
-
 import { Spinner } from "@/components/ui/spinner";
 import { usePropertyDetailsFromAll } from "@/hooks/usePropertyDetailsFromAll";
 import PropertyCarousel from "@/components/PropertyCarousel";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function PropertyDetail() {
   const { property, isLoading } = usePropertyDetailsFromAll();
   const navigate = useNavigate();
+  const [imageStatus, setImageStatus] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     if (property) {
       document.title = `${property.titre} | Côté Sud Immobilier`;
 
-      // Use property.allImages here
+      // Debugging plus détaillé des images
       console.log(`Propriété ${property.id}: ${property.allImages.length} images disponibles`);
-      console.log("URLs des images:", property.allImages);
+      
+      // Vérifier l'accessibilité des images
+      const newImageStatus: {[key: string]: boolean} = {};
+      
+      if (property.allImages.length > 0) {
+        // Vérification des 3 premières images
+        property.allImages.slice(0, 3).forEach((url, index) => {
+          console.log(`Image ${index+1}: ${url}`);
+          
+          // Tester si l'image est accessible
+          const img = new Image();
+          img.onload = () => {
+            console.log(`✅ Image ${index+1} chargée avec succès`);
+            setImageStatus(prev => ({...prev, [url]: true}));
+          };
+          img.onerror = () => {
+            console.error(`❌ Erreur de chargement de l'image ${index+1}`);
+            setImageStatus(prev => ({...prev, [url]: false}));
+          };
+          img.src = url;
+          
+          // Par défaut, l'image est en cours de chargement
+          newImageStatus[url] = false;
+        });
+        
+        setImageStatus(newImageStatus);
+      } else {
+        console.warn("⚠️ Aucune image trouvée pour cette propriété!");
+      }
     }
   }, [property]);
 
@@ -50,8 +78,43 @@ export default function PropertyDetail() {
     <main className="max-w-4xl mx-auto py-8 px-4">
       <h1 className="text-3xl font-serif text-[#C8A977] mb-6">{property.titre}</h1>
 
+      {/* Debug info - à commenter en production */}
+      {process.env.NODE_ENV === 'development' && (
+        <details className="mb-4 p-2 bg-gray-100 rounded">
+          <summary className="cursor-pointer text-sm text-gray-600">
+            Infos de débogage ({property.allImages.length} images)
+          </summary>
+          <div className="p-2 text-xs">
+            <p>Nombre d'images: {property.allImages.length}</p>
+            {property.allImages.length > 0 && (
+              <div>
+                <p className="mt-1 font-semibold">Premières images:</p>
+                <ul className="list-disc pl-5">
+                  {property.allImages.slice(0, 3).map((url, idx) => (
+                    <li key={idx} className="mb-1">
+                      <a 
+                        href={url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className={`${imageStatus[url] === false ? "text-red-500" : "text-blue-500"} hover:underline`}
+                      >
+                        Image {idx+1}: {url.substring(url.lastIndexOf('/') + 1)}
+                      </a>
+                      {imageStatus[url] === false ? " ❌" : imageStatus[url] === true ? " ✅" : " ⏳"}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </details>
+      )}
+
       {/* Pass property.allImages to PropertyCarousel */}
-      <PropertyCarousel images={property.allImages} title={property.titre} />
+      <PropertyCarousel 
+        images={property.allImages} 
+        title={property.titre}
+      />
 
       <section className="mt-8 space-y-6">
         <div className="flex flex-wrap justify-between items-center">
@@ -76,6 +139,24 @@ export default function PropertyDetail() {
               <span className="font-medium w-28">Surface</span>
               <span>{property.surface} m²</span>
             </li>
+            {property.pieces && (
+              <li className="flex items-center text-[#37373A]">
+                <span className="font-medium w-28">Pièces</span>
+                <span>{property.pieces}</span>
+              </li>
+            )}
+            {property.chambres && (
+              <li className="flex items-center text-[#37373A]">
+                <span className="font-medium w-28">Chambres</span>
+                <span>{property.chambres}</span>
+              </li>
+            )}
+            {property.bathrooms && (
+              <li className="flex items-center text-[#37373A]">
+                <span className="font-medium w-28">Salles de bain</span>
+                <span>{property.bathrooms}</span>
+              </li>
+            )}
           </ul>
         </div>
       </section>
