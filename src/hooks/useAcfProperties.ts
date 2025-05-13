@@ -23,6 +23,7 @@ export const useAcfProperties = (options: UseAcfPropertiesOptions = {}) => {
     queryKey: ["acf-properties"],
     queryFn: async () => {
       try {
+        console.log("Démarrage de la récupération des propriétés ACF...");
         const properties = await fetchAllAnnonces();
         console.log(`Récupéré ${properties.length} propriétés depuis l'API ACF`);
         return properties;

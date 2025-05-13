@@ -2,7 +2,7 @@
 import { toast } from "@/components/ui/sonner";
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
 import { normalizePropertyData } from "./wordpress/transformers";
-import { API_BASE_URL, DEFAULT_IMAGE } from "./wordpress/config";
+import { API_BASE_URL, ACF_API_BASE_URL, DEFAULT_IMAGE } from "./wordpress/config";
 
 // Exporter les types pour qu'ils soient utilisables par d'autres modules
 export type { NormalizedProperty };
@@ -27,13 +27,17 @@ export const fetchAnnoncesList = async (): Promise<WordPressAnnonce[]> => {
   }
 };
 
-// 2. ACF
+// 2. ACF - Utiliser la nouvelle URL ACF
 export const fetchAcfData = async (id: number): Promise<AcfData | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/acf/v3/posts/${id}`);
-    if (!res.ok) throw new Error(res.statusText);
+    const res = await fetch(`${ACF_API_BASE_URL}/posts/${id}`);
+    if (!res.ok) {
+      console.warn(`Échec de récupération ACF pour le post ${id}: ${res.status}`);
+      return null;
+    }
     return res.json();
-  } catch {
+  } catch (error) {
+    console.error(`Erreur lors de la récupération ACF pour le post ${id}:`, error);
     return null;
   }
 };
