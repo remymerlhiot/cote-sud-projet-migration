@@ -1,4 +1,3 @@
-
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
 import { extractImagesFromHtml } from "@/utils/extractImages";
 import { DEFAULT_IMAGE } from "./config"; // Import DEFAULT_IMAGE
@@ -95,7 +94,7 @@ export const normalizePropertyData = (
   const surfaceValue = getField(["surf_hab", "surface", "area"]) || "NC";
   const piecesValue = getField(["piece", "pieces", "rooms"]) || "NC";
   const chambresValue = getField(["nb_chambre", "chambres", "bedrooms"]) || "NC";
-  const referenceValue = getFiel<ctrl62>("mandat", "reference", "ref"]) || `REF-${annonce.id}`;
+  const referenceValue = getField(["mandat", "reference", "ref"]) || `REF-${annonce.id}`;
 
   return {
     id: annonce.id,
@@ -133,4 +132,3 @@ export const normalizePropertyData = (
 };
 
 export { normalizePropertyData as transformPropertyData };
-
