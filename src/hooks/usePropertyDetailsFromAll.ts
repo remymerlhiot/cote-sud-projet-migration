@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useProperties } from "./useProperties";
 import { NormalizedProperty } from "../types";
@@ -15,9 +14,18 @@ export const usePropertyDetailsFromAll = (): {
   
   useEffect(() => {
     if (property) {
-      // Log pour le débogage des images
-      console.log(`Propriété ${id} trouvée, ${property.allImages.length} images disponibles`);
-      if (property.allImages.length === 0) {
+      // Log plus détaillé pour le débogage des images
+      console.log(`Propriété ${id} trouvée, ${property.allImages.length} images disponibles:`);
+      if (property.allImages.length > 0) {
+        console.log(`Première image: ${property.allImages[0]}`);
+        console.log(`Dernière image: ${property.allImages[property.allImages.length - 1]}`);
+        
+        // Vérification rapide d'accessibilité de la première image
+        const testImg = new Image();
+        testImg.onload = () => console.log("✅ Première image accessible");
+        testImg.onerror = () => console.error("❌ Première image inaccessible");
+        testImg.src = property.allImages[0];
+      } else {
         console.warn(`Aucune image pour la propriété ${id}`);
       }
     } else if (!isLoading && data && data.length > 0) {
