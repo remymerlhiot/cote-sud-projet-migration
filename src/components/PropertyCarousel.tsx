@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -10,33 +10,25 @@ interface PropertyCarouselProps {
   title: string;
 }
 
-// Logo AXO Côté Sud (fallback si aucune image dispo)
-const fallbackImage = "https://cote-sud.immo/wp-content/uploads/2024/10/AXO_COTE-SUD_PRESTIGE-PATRIMOINE_SABLE-CUIVRE-SABLE-2-768x400.png";
-
 export default function PropertyCarousel({ images, title }: PropertyCarouselProps) {
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([]); // Initialisé vide
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(Array(images.length).fill(false));
   const [swiper, setSwiper] = useState<any>(null);
 
-  const displayImages = images.length > 0 ? images : [fallbackImage];
+  const fallback = "https://cote-sud.immo/wp-content/uploads/2024/10/AXO_COTE-SUD_PRESTIGE-PATRIMOINE_SABLE-CUIVRE-SABLE-2-768x400.png";
 
-  // Recrée le tableau des images chargées quand les images changent
-  useEffect(() => {
-    setImagesLoaded(Array(displayImages.length).fill(false));
-  }, [displayImages]);
+  const displayImages = images.length > 0 ? images : [fallback];
 
   const handleImageLoad = (index: number) => {
-    setImagesLoaded((prev) => {
-      const updated = [...prev];
-      updated[index] = true;
-      return updated;
-    });
+    const newImagesLoaded = [...imagesLoaded];
+    newImagesLoaded[index] = true;
+    setImagesLoaded(newImagesLoaded);
   };
 
   const handleImageError = (index: number, e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.warn(`Erreur de chargement image [${index}]:`, displayImages[index]);
+    console.log(`❌ Erreur de chargement à l’index ${index}:`, images[index]);
     const target = e.target as HTMLImageElement;
     target.onerror = null;
-    target.src = fallbackImage;
+    target.src = fallback;
     handleImageLoad(index);
   };
 
@@ -59,7 +51,7 @@ export default function PropertyCarousel({ images, title }: PropertyCarouselProp
         {displayImages.map((src, i) => (
           <SwiperSlide key={i} className="w-full h-full relative">
             {!imagesLoaded[i] && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
                 <div className="animate-spin rounded-full h-10 w-10 border-4 border-solid border-t-transparent border-[#C8A977]" />
               </div>
             )}
@@ -70,19 +62,19 @@ export default function PropertyCarousel({ images, title }: PropertyCarouselProp
               loading="lazy"
               onLoad={() => handleImageLoad(i)}
               onError={(e) => handleImageError(i, e)}
-              style={{ display: imagesLoaded[i] ? "block" : "none" }}
+              style={{ display: "block" }} // toujours visible
             />
           </SwiperSlide>
         ))}
       </Swiper>
 
       {displayImages.length > 1 && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
           {displayImages.map((_, index) => (
             <button
               key={index}
               className={`w-2 h-2 rounded-full ${
-                swiper?.realIndex === index ? "bg-white" : "bg-white/50"
+                swiper?.activeIndex === index ? "bg-white" : "bg-white/50"
               }`}
               onClick={() => swiper?.slideTo(index)}
             />
