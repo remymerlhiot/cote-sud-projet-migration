@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 export default function PropertyDetail() {
   const { property, isLoading } = usePropertyDetailsFromAll();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (property) {
       document.title = `${property.titre} | Côté Sud Immobilier`;
@@ -46,7 +46,7 @@ export default function PropertyDetail() {
 
   return (
     <main className="max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-['FreightBig Pro', serif] text-[#C8A977] mb-6">{property.titre}</h1>
+      <h1 className="text-3xl font-serif text-[#C8A977] mb-6">{property.titre}</h1>
 
       <PropertyCarousel images={property.images} title={property.titre} />
 
@@ -63,7 +63,19 @@ export default function PropertyDetail() {
         </div>
 
         <div className="bg-[#EEE4D6]/30 p-6 rounded-md mt-8">
-          <h2 className="text-xl font-['FreightBig Pro', serif] text-[#C8A977] mb-4">Caractéristiques</h2>
+          <h2 className="text-xl font-serif text-[#C8A977] mb-4">Caractéristiques</h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
             <li className="flex items-center text-[#37373A]">
-              <span className="font-medium w-28">Ville</
+              <span className="font-medium w-28">Ville</span>
+              <span>{property.ville}</span>
+            </li>
+            <li className="flex items-center text-[#37373A]">
+              <span className="font-medium w-28">Surface</span>
+              <span>{property.surface} m²</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  );
+}
