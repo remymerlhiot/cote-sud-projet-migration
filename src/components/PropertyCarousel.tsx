@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -11,12 +11,17 @@ interface PropertyCarouselProps {
 }
 
 export default function PropertyCarousel({ images, title }: PropertyCarouselProps) {
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(Array(images.length).fill(false));
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([]);
   const [swiper, setSwiper] = useState<any>(null);
 
-  const fallback = "https://cote-sud.immo/wp-content/uploads/2024/10/AXO_COTE-SUD_PRESTIGE-PATRIMOINE_SABLE-CUIVRE-SABLE-2-768x400.png";
+  const fallback =
+    "https://cote-sud.immo/wp-content/uploads/2024/10/AXO_COTE-SUD_PRESTIGE-PATRIMOINE_SABLE-CUIVRE-SABLE-2-768x400.png";
 
   const displayImages = images.length > 0 ? images : [fallback];
+
+  useEffect(() => {
+    setImagesLoaded(Array(displayImages.length).fill(false));
+  }, [displayImages]);
 
   const handleImageLoad = (index: number) => {
     const newImagesLoaded = [...imagesLoaded];
@@ -24,13 +29,18 @@ export default function PropertyCarousel({ images, title }: PropertyCarouselProp
     setImagesLoaded(newImagesLoaded);
   };
 
-  const handleImageError = (index: number, e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.log(`❌ Erreur de chargement à l’index ${index}:`, images[index]);
+  const handleImageError = (
+    index: number,
+    e: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    console.log(`❌ Erreur de chargement à l’index ${index}:`, displayImages[index]);
     const target = e.target as HTMLImageElement;
     target.onerror = null;
     target.src = fallback;
     handleImageLoad(index);
   };
+
+  console.log("🖼️ Images reçues par le carousel :", images);
 
   return (
     <div className="relative">
@@ -62,7 +72,7 @@ export default function PropertyCarousel({ images, title }: PropertyCarouselProp
               loading="lazy"
               onLoad={() => handleImageLoad(i)}
               onError={(e) => handleImageError(i, e)}
-              style={{ display: "block" }} // toujours visible
+              style={{ display: "block" }}
             />
           </SwiperSlide>
         ))}
