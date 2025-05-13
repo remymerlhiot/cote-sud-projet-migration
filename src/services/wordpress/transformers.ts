@@ -1,17 +1,3 @@
-import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
-import { extractImagesFromHtml } from "@/utils/extractImages";
-import { DEFAULT_IMAGE } from "./config"; // Import DEFAULT_IMAGE
-
-// 👇 Logo agence comme image par défaut
-// export const DEFAULT_IMAGE =
-//   "https://cote-sud.immo/wp-content/uploads/2024/10/AXO_COTE-SUD_PRESTIGE-PATRIMOINE_SABLE-CUIVRE-SABLE-2-768x400.png"; // Remove this line
-
-export const stripHtml = (html: string): string => {
-  const tmp = document.createElement("DIV");
-  tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText || "";
-};
-
 export const normalizePropertyData = (
   annonce: WordPressAnnonce,
   acfData: AcfData | null
@@ -40,19 +26,72 @@ export const normalizePropertyData = (
   const isViager = acfData?.acf?.viager === "1" || acfData?.acf?.viager === "oui";
   const bathrooms = getField(["nb_sdb", "bathrooms"]);
 
-  // Images - priorité à galerie_elementor
+  // Images - Approche améliorée avec logs détaillés
   let allImages: string[] = [];
+  let imageSource = "aucune source";
 
+  // 1. Essayer galerie_elementor si disponible
   if (
     annonce.galerie_elementor &&
     Array.isArray(annonce.galerie_elementor) &&
     annonce.galerie_elementor.length > 0
   ) {
-    console.log(
-      `Property ${annonce.id}: Utilisation de galerie_elementor avec ${annonce.galerie_elementor.length} images`
-    );
-    allImages = annonce.galerie_elementor;
-  } else {
+    imageSource = "galerie_elementor";
+    
+    // Vérifier le format des données dans galerie_elementor
+    console.log(`Property ${annonce.id}: Données galerie_elementor:`, 
+      annonce.galerie_elementor[0]); // Log pour débug
+    
+    // Extraire les URLs selon le format
+    allImages = annonce.galerie_elementor.map(img => {
+      // Si c'est un objet (WordPress API format)
+      if (typeof img === 'object' && img !== null) {
+        return img.url || img.source_url || img.guid?.rendered || '';
+      }
+      // Si c'est déjà une URL
+      return typeof img === 'string' ? img : '';
+    }).filter(Boolean);
+    
+    console.log(`Property ${annonce.id}: Utilisation de ${imageSource} avec ${allImages.length} images`);
+  }
+  
+  // 2. Essayer les médias attachés si pas d'images dans galerie_elementor
+  if (allImages.length === 0 && annonce._embedded?.["wp:attachment"]) {
+    imageSource = "wp:attachment";
+    const attachments = annonce._embedded["wp:attachment"];
+    
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      console.log(`Property ${annonce.id}: Structure du premier attachement:`, 
+        attachments[0]); // Log pour débug
+      
+      allImages = attachments.map(att => {
+        if (typeof att === 'object' && att !== null) {
+          return att.source_url || att.guid?.rendered || '';
+        }
+        return '';
+      }).filter(Boolean);
+      
+      console.log(`Property ${annonce.id}: Utilisation de ${imageSource} avec ${allImages.length} images`);
+    }
+  }
+  
+  // 3. Essayer l'image mise en avant (featured) si toujours pas d'images
+  if (allImages.length === 0 && annonce._embedded?.["wp:featuredmedia"]) {
+    imageSource = "wp:featuredmedia";
+    const featuredMedia = annonce._embedded["wp:featuredmedia"];
+    
+    if (Array.isArray(featuredMedia) && featuredMedia.length > 0) {
+      const mediaItem = featuredMedia[0];
+      if (mediaItem.source_url) {
+        allImages.push(mediaItem.source_url);
+        console.log(`Property ${annonce.id}: Utilisation de ${imageSource} avec 1 image`);
+      }
+    }
+  }
+  
+  // 4. Essayer les champs ACF comme avant
+  if (allImages.length === 0) {
+    // Code existant pour essayer les champs ACF
     const tryField = (field: any) => {
       if (Array.isArray(field)) {
         const urls = field.map((p: any) => p?.url).filter(Boolean);
@@ -64,26 +103,42 @@ export const normalizePropertyData = (
     };
 
     if (acfData?.acf.photo) {
+      imageSource = "acf.photo";
       allImages = tryField(acfData.acf.photo);
     } else if (acfData?.acf.liste_photos) {
+      imageSource = "acf.liste_photos";
       allImages = tryField(acfData.acf.liste_photos);
     } else if (acfData?.acf.photos) {
+      imageSource = "acf.photos";
       allImages = tryField(acfData.acf.photos);
-    } else if (annonce._embedded?.["wp:featuredmedia"]?.[0]?.source_url) {
-      allImages = [annonce._embedded["wp:featuredmedia"][0].source_url];
+    }
+    
+    if (allImages.length > 0) {
+      console.log(`Property ${annonce.id}: Utilisation de ${imageSource} avec ${allImages.length} images`);
     }
   }
 
-  // Images Elementor depuis le HTML si rien n'est trouvé ailleurs
-  if (!allImages.length) {
+  // 5. Essayer d'extraire du HTML en dernier recours
+  if (allImages.length === 0) {
+    imageSource = "extraction HTML";
     const extractedFromHtml = extractImagesFromHtml(annonce.content?.rendered || "");
     if (extractedFromHtml.length) {
-      console.log(`Property ${annonce.id}: Images extraites du HTML Elementor`);
       allImages = extractedFromHtml;
+      console.log(`Property ${annonce.id}: Images extraites du HTML Elementor (${allImages.length})`);
     } else {
-      allImages = [DEFAULT_IMAGE]; // Now uses the imported DEFAULT_IMAGE
+      imageSource = "image par défaut";
+      allImages = [DEFAULT_IMAGE];
+      console.log(`Property ${annonce.id}: Aucune image trouvée, utilisation de l'image par défaut`);
     }
   }
+  
+  // Filtrer les images pour éliminer les doublons et les URLs non valides
+  allImages = [...new Set(allImages)].filter(url => 
+    url && typeof url === 'string' && url.startsWith('http')
+  );
+  
+  // Log final des images trouvées
+  console.log(`Property ${annonce.id}: Total de ${allImages.length} images trouvées depuis ${imageSource}`);
 
   const description = annonce.excerpt?.rendered
     ? stripHtml(annonce.excerpt.rendered)
@@ -109,11 +164,11 @@ export const normalizePropertyData = (
     pieces: piecesValue,
     rooms: piecesValue,
     chambres: chambresValue,
-    bedrooms: chambresValue, // Corrected: Use chambresValue instead of undefined bedroomsValue
+    bedrooms: chambresValue,
     reference: referenceValue,
     ref: referenceValue,
-    image: allImages.length > 0 ? allImages[0] : DEFAULT_IMAGE, // Ensure image is set
-    allImages,
+    image: allImages.length > 0 ? allImages[0] : DEFAULT_IMAGE,
+    allImages: allImages.length > 0 ? allImages : [DEFAULT_IMAGE],
     description,
     date: annonce.date,
     hasBalcony,
@@ -130,5 +185,3 @@ export const normalizePropertyData = (
     bathrooms,
   };
 };
-
-export { normalizePropertyData as transformPropertyData };
