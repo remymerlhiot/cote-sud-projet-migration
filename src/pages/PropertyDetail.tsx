@@ -1,4 +1,3 @@
-
 import { Spinner } from "@/components/ui/spinner";
 import { usePropertyDetailsFromAll } from "@/hooks/usePropertyDetailsFromAll";
 import PropertyCarousel from "@/components/PropertyCarousel";
@@ -14,29 +13,29 @@ export default function PropertyDetail() {
   useEffect(() => {
     if (property) {
       document.title = `${property.titre} | Côté Sud Immobilier`;
-      
-      // Log des images pour débogage
-      console.log(`Propriété ${property.id}: ${property.allImages.length} images disponibles`);
-      console.log("URLs des images:", property.allImages);
+
+      console.log(`Propriété ${property.id}: ${property.images.length} images disponibles`);
+      console.log("URLs des images:", property.images);
     }
   }, [property]);
 
-  if (isLoading) return (
-    <div className="flex justify-center items-center min-h-[60vh]">
-      <Spinner />
-    </div>
-  );
-  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Spinner />
+      </div>
+    );
+  }
+
   if (!property) {
     toast({
       title: "Erreur",
       description: "Propriété introuvable. Vous allez être redirigé vers la liste des biens.",
       variant: "destructive",
     });
-    
-    // Rediriger vers la liste après un court délai
+
     setTimeout(() => navigate("/biens"), 2000);
-    
+
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <p className="text-lg text-[#B17226]">Propriété introuvable.</p>
@@ -48,82 +47,23 @@ export default function PropertyDetail() {
   return (
     <main className="max-w-4xl mx-auto py-8 px-4">
       <h1 className="text-3xl font-['FreightBig Pro', serif] text-[#C8A977] mb-6">{property.titre}</h1>
-      
-      <PropertyCarousel images={property.allImages} title={property.titre} />
-      
+
+      <PropertyCarousel images={property.images} title={property.titre} />
+
       <section className="mt-8 space-y-6">
         <div className="flex flex-wrap justify-between items-center">
           <p className="text-2xl text-[#B17226] font-semibold">{property.prix} €</p>
           <p className="text-sm text-gray-500">Référence: {property.reference}</p>
         </div>
-        
+
         <Separator className="my-6 bg-[#EEE4D6]" />
-        
+
         <div className="prose max-w-none text-[#37373A]">
           <p>{property.description}</p>
         </div>
-        
+
         <div className="bg-[#EEE4D6]/30 p-6 rounded-md mt-8">
           <h2 className="text-xl font-['FreightBig Pro', serif] text-[#C8A977] mb-4">Caractéristiques</h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
             <li className="flex items-center text-[#37373A]">
-              <span className="font-medium w-28">Ville</span>
-              <span>{property.ville}</span>
-            </li>
-            <li className="flex items-center text-[#37373A]">
-              <span className="font-medium w-28">Surface</span>
-              <span>{property.surface} m²</span>
-            </li>
-            <li className="flex items-center text-[#37373A]">
-              <span className="font-medium w-28">Pièces</span>
-              <span>{property.pieces}</span>
-            </li>
-            <li className="flex items-center text-[#37373A]">
-              <span className="font-medium w-28">Chambres</span>
-              <span>{property.chambres}</span>
-            </li>
-            
-            {property.bathrooms && (
-              <li className="flex items-center text-[#37373A]">
-                <span className="font-medium w-28">SDB</span>
-                <span>{property.bathrooms}</span>
-              </li>
-            )}
-            
-            {property.garageCount && parseInt(property.garageCount) > 0 && (
-              <li className="flex items-center text-[#37373A]">
-                <span className="font-medium w-28">Garage</span>
-                <span>{property.garageCount}</span>
-              </li>
-            )}
-          </ul>
-          
-          {(property.hasBalcony || property.hasTerrasse || property.hasPool || property.isFurnished) && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {property.hasBalcony && (
-                <span className="px-3 py-1 bg-[#C8A977]/10 text-[#B17226] text-sm rounded-md">
-                  Balcon
-                </span>
-              )}
-              {property.hasTerrasse && (
-                <span className="px-3 py-1 bg-[#C8A977]/10 text-[#B17226] text-sm rounded-md">
-                  Terrasse
-                </span>
-              )}
-              {property.hasPool && (
-                <span className="px-3 py-1 bg-[#C8A977]/10 text-[#B17226] text-sm rounded-md">
-                  Piscine
-                </span>
-              )}
-              {property.isFurnished && (
-                <span className="px-3 py-1 bg-[#C8A977]/10 text-[#B17226] text-sm rounded-md">
-                  Meublé
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-      </section>
-    </main>
-  );
-}
+              <span className="font-medium w-28">Ville</
