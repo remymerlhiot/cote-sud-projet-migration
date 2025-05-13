@@ -1,6 +1,7 @@
-
 import { WordPressAnnonce, AcfData, NormalizedProperty } from "@/types";
-import { DEFAULT_IMAGE } from "./config";
+
+// 👇 Logo agence comme image par défaut
+export const DEFAULT_IMAGE = "https://cote-sud.immo/wp-content/uploads/2024/10/AXO_COTE-SUD_PRESTIGE-PATRIMOINE_SABLE-CUIVRE-SABLE-2-768x400.png";
 
 export const stripHtml = (html: string): string => {
   const tmp = document.createElement("DIV");
@@ -37,15 +38,13 @@ export const normalizePropertyData = (
   const isViager = acfData?.acf?.viager === "1" || acfData?.acf?.viager === "oui";
   const bathrooms = getField(["nb_sdb", "bathrooms"]);
 
-  // Images - nouvelle logique prioritaire avec galerie_elementor
+  // Images - priorité à galerie_elementor
   let allImages: string[] = [];
-  
-  // 1. Vérifier d'abord galerie_elementor (priorité maximale)
+
   if (annonce.galerie_elementor && Array.isArray(annonce.galerie_elementor) && annonce.galerie_elementor.length > 0) {
     console.log(`Property ${annonce.id}: Utilisation de galerie_elementor avec ${annonce.galerie_elementor.length} images`);
     allImages = annonce.galerie_elementor;
   } else {
-    // 2. Si pas de galerie_elementor, utiliser la logique existante
     const tryField = (field: any) => {
       if (Array.isArray(field)) {
         const urls = field.map((p: any) => p?.url).filter(Boolean);
@@ -67,12 +66,11 @@ export const normalizePropertyData = (
     }
   }
 
-  // Si aucune image n'est trouvée, utiliser l'image par défaut
+  // Image par défaut si aucune n'est disponible
   if (!allImages.length) {
     allImages = [DEFAULT_IMAGE];
   }
 
-  // Texte
   const description = annonce.excerpt?.rendered
     ? stripHtml(annonce.excerpt.rendered)
     : stripHtml(annonce.content?.rendered || "").slice(0, 150) + "...";
@@ -119,5 +117,4 @@ export const normalizePropertyData = (
   };
 };
 
-// Export compatible
 export { normalizePropertyData as transformPropertyData };
